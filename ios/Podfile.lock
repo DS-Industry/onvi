@@ -110,6 +110,7 @@ PODS:
     - AppMetricaCoreUtils (= 5.12.1)
     - AppMetricaLog (= 5.12.1)
   - boost (1.84.0)
+  - BranchSDK (3.13.3)
   - BVLinearGradient (2.8.3):
     - React-Core
   - DatadogCore (2.30.2):
@@ -2056,6 +2057,9 @@ PODS:
     - React-RCTFBReactNativeSpec
     - ReactCommon/turbomodule/core
     - SocketRocket
+  - react-native-branch (6.9.0):
+    - BranchSDK (= 3.13.3)
+    - React-Core
   - react-native-encrypted-storage (4.0.3):
     - React-Core
   - react-native-mmkv (3.3.3):
@@ -3098,6 +3102,7 @@ DEPENDENCIES:
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - React-Mapbuffer (from `../node_modules/react-native/ReactCommon`)
   - React-microtasksnativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
+  - react-native-branch (from `../node_modules/react-native-branch`)
   - react-native-encrypted-storage (from `../node_modules/react-native-encrypted-storage`)
   - react-native-mmkv (from `../node_modules/react-native-mmkv`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
@@ -3169,6 +3174,7 @@ SPEC REPOS:
     - AppMetricaStorageUtils
     - AppMetricaSynchronization
     - AppMetricaWebKit
+    - BranchSDK
     - DatadogCore
     - DatadogCrashReporting
     - DatadogInternal
@@ -3282,6 +3288,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   React-microtasksnativemodule:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/microtasks"
+  react-native-branch:
+    :path: "../node_modules/react-native-branch"
   react-native-encrypted-storage:
     :path: "../node_modules/react-native-encrypted-storage"
   react-native-mmkv:
@@ -3399,6 +3407,7 @@ SPEC CHECKSUMS:
   AppMetricaSynchronization: 3c019f1c791e11f80de51cacda4b2ed4b20935a8
   AppMetricaWebKit: 4a659e1f6990460e8e4893d44a22af01b5c57a4f
   boost: 7e761d76ca2ce687f7cc98e698152abd03a18f90
+  BranchSDK: 19a6e97115350db916a57823c7f6ed96d1e70e46
   BVLinearGradient: cb006ba232a1f3e4f341bb62c42d1098c284da70
   DatadogCore: 8e50ad6cb68343f701707f7eeca16e0acb52ed8c
   DatadogCrashReporting: 34763d4276d4fce286c7e8729cfcd2ac04dca43b
@@ -3462,6 +3471,7 @@ SPEC CHECKSUMS:
   React-logger: 500f2fa5697d224e63c33d913c8a4765319e19bf
   React-Mapbuffer: 06d59c448da7e34eb05b3fb2189e12f6a30fec57
   React-microtasksnativemodule: d1ee999dc9052e23f6488b730fa2d383a4ea40e5
+  react-native-branch: a4913fbefeb50b8081f3cf8869ab281308e67a94
   react-native-encrypted-storage: 569d114e329b1c2c2d9f8c84bcdbe4478dda2258
   react-native-mmkv: ac7507625cd74bac0eb5333604a7cd7b08fe9e3e
   react-native-netinfo: cec9c4e86083cb5b6aba0e0711f563e2fbbff187
