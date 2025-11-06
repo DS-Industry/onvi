@@ -242,6 +242,7 @@
 			files = (
 			);
 			inputFileListPaths = (
+				"",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
