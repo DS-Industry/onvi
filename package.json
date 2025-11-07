@@ -36,6 +36,7 @@
     "react-native": "0.82.1",
     "react-native-branch": "^6.9.0",
     "react-native-device-info": "^14.1.1",
+    "react-native-dotenv": "^3.4.11",
     "react-native-encrypted-storage": "^4.0.3",
     "react-native-feather": "^1.1.2",
     "react-native-flash-message": "^0.4.2",
