@@ -28,6 +28,7 @@
     "@tamagui/config": "^1.136.1",
     "@tamagui/core": "^1.136.1",
     "axios": "^1.13.2",
+    "babel-plugin-module-resolver": "^5.0.2",
     "i18next": "^25.6.0",
     "lottie-react-native": "^7.3.4",
     "nightly": "^0.0.0",
