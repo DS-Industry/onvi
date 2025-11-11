@@ -9,7 +9,6 @@ import calculateDistance from '@utils/calculateDistance.ts';
 import Modal from '@styled/Modal';
 import {Button} from '@styled/buttons';
 import {useTranslation} from 'react-i18next';
-import {XStack, YStack, Text as TamaguiText} from 'tamagui';
 import PressableCard from '@components/PressableCard/PressableCard';
 
 export default function NearPosButton() {
@@ -21,13 +20,10 @@ export default function NearPosButton() {
     cameraRef,
   } = useStore.getState();
   const {t} = useTranslation();
-
   const posList = useStore(state => state.posList);
   const nearByPos = useStore(state => state.nearByPos);
   const location = useStore(state => state.location);
-
   const [nearByModal, setNearByModal] = useState(false);
-
   const isNearestCarWashSet = useRef(false);
 
   const handleLaunchCarWash = () => {
@@ -37,7 +33,6 @@ export default function NearPosButton() {
       bottomSheetRef?.current?.snapToPosition(
         bottomSheetSnapPoints[bottomSheetSnapPoints.length - 2],
       );
-
       cameraRef?.current?.setCameraPosition({
         longitude: nearByPos.location.lon,
         latitude: nearByPos.location.lat,
@@ -53,10 +48,8 @@ export default function NearPosButton() {
     if (!location || !posList?.length) {
       return;
     }
-
     let nearest: CarWashLocation | null = null;
     let minDistance = Infinity;
-
     for (const carWash of posList) {
       const {lat, lon} = carWash.location;
       const distance = calculateDistance(
@@ -65,13 +58,11 @@ export default function NearPosButton() {
         lon,
         lat,
       );
-
       if (distance < minDistance && distance <= 5) {
         minDistance = distance;
         nearest = carWash;
       }
     }
-
     if (nearest) {
       setNearByPos(nearest);
       isNearestCarWashSet.current = true;
@@ -96,34 +87,35 @@ export default function NearPosButton() {
         borderRadius={dp(22)}
         height={dp(90)}
         width={'48%'}
-        flex={1}
+        // flex={1}
         padding={dp(16)}
         onPress={handleLaunchCarWash}>
-        <YStack>
-          <YStack paddingBottom={dp(8)}>
-            <TamaguiText color={WHITE} fontSize={dp(16)} fontWeight="700">
+        <View style={{flex: 1}}>
+          <View style={{paddingBottom: dp(8)}}>
+            <Text style={{color: WHITE, fontSize: dp(16), fontWeight: '700'}}>
               {t('app.business.letsWash')}
-            </TamaguiText>
-          </YStack>
-          <XStack justifyContent="space-between" alignItems="center">
-            <TamaguiText
-              fontSize={dp(10)}
-              fontWeight="700"
-              color={WHITE}
-              flex={1}
+            </Text>
+          </View>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+            <Text
+              style={{
+                fontSize: dp(10),
+                fontWeight: '700',
+                color: WHITE,
+                flex: 1,
+                marginRight: dp(8),
+              }}
               ellipsizeMode="tail"
-              marginRight={dp(8)}
               numberOfLines={3}>
               {nearByPos?.carwashes?.length ? nearByPos.carwashes[0].name : ''}
-            </TamaguiText>
+            </Text>
             <Image
               source={require('../../../../assets/icons/small-icon.png')}
               style={{width: 30, height: 30}}
             />
-          </XStack>
-        </YStack>
+          </View>
+        </View>
       </PressableCard>
-
       <Modal
         visible={nearByModal}
         onClose={() => setNearByModal(false)}

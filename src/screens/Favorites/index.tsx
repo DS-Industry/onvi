@@ -1,11 +1,10 @@
-import {FlatList, SafeAreaView} from 'react-native';
+import {FlatList, SafeAreaView, View, Text} from 'react-native';
 import {dp} from '@utils/dp';
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useNavigation} from '@react-navigation/core';
 import ScreenHeader from '@components/ScreenHeader';
 import {GeneralDrawerNavigationProp} from '../../types/navigation/DrawerNavigation.ts';
-import {Text, XStack, YStack} from 'tamagui';
 import calculateDistance from '@utils/calculateDistance.ts';
 import {CarWashLocation} from '@app-types/api/app/types.ts';
 import {CarWashCard} from '@components/CarWashCard/CarWashCard.tsx';
@@ -29,7 +28,6 @@ const Favorites = () => {
       const favoriteCarWashes = posList.filter(carwash =>
         favoritesCarwashes.includes(Number(carwash.carwashes[0].id)),
       );
-
       const favoriteCarWashesDistance = favoriteCarWashes.map(carwash => {
         const distance = calculateDistance(
           location.latitude,
@@ -37,15 +35,12 @@ const Favorites = () => {
           carwash.location.lat,
           carwash.location.lon,
         );
-
         const carWashWithDistance = {
           ...carwash,
           distance,
         };
-
         return carWashWithDistance;
       });
-
       setSortedData(favoriteCarWashesDistance);
     } else {
       setSortedData([]);
@@ -65,7 +60,7 @@ const Favorites = () => {
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: '#fff'}}>
-      <YStack flex={1} padding={dp(16)} flexDirection="column">
+      <View style={{flex: 1, padding: dp(16), flexDirection: 'column'}}>
         <ScreenHeader
           screenTitle={t('navigation.favorites')}
           btnType="back"
@@ -73,11 +68,11 @@ const Favorites = () => {
         />
         {favoritesCarwashesIsLoading ? (
           <>
-            <XStack marginTop={dp(25)} />
+            <View style={{marginTop: dp(25)}} />
             <CarwashesPlaceholder heightItems={63} />
           </>
         ) : (
-          <XStack marginTop={dp(25)} flex={1}>
+          <View style={{marginTop: dp(25), flex: 1}}>
             {sortedData.length > 0 ? (
               <FlatList
                 data={sortedData}
@@ -88,17 +83,17 @@ const Favorites = () => {
                 bounces={true}
                 contentContainerStyle={{paddingBottom: dp(40)}}
                 ItemSeparatorComponent={() => (
-                  <XStack style={{height: dp(8)}} />
+                  <View style={{height: dp(8)}} />
                 )}
               />
             ) : (
-              <Text width="100%" textAlign="center">
+              <Text style={{width: '100%', textAlign: 'center'}}>
                 Список избранных пуст.
               </Text>
             )}
-          </XStack>
+          </View>
         )}
-      </YStack>
+      </View>
     </SafeAreaView>
   );
 };

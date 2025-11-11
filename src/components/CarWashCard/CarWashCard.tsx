@@ -1,9 +1,16 @@
 import React, {useState} from 'react';
 import {dp} from '@utils/dp';
-import {Button, Image, Text, XStack, YStack} from 'tamagui';
-import {CarWashLocation} from '@app-types/api/app/types';
+import {
+  StyleSheet,
+  Modal,
+  TouchableWithoutFeedback,
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
 import useStore from '@state/store';
-import {StyleSheet, Modal, TouchableWithoutFeedback} from 'react-native';
 import {navigateBottomSheet} from '@navigators/BottomSheetStack';
 import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 
@@ -13,7 +20,7 @@ const HapticOptions = {
 };
 
 interface CarWashCardProps {
-  carWash: CarWashLocation;
+  carWash: any;
   showDistance?: boolean;
   showIsFavorite?: boolean;
   heartIsClickable?: boolean;
@@ -58,9 +65,7 @@ const CarWashCard = ({
 
   const id = carWash.carwashes[0].id;
   const numericId = Number(id);
-
-  const isFavorite =
-    !id || isNaN(numericId) ? false : isFavoriteCarwash(numericId);
+  const isFavorite = !id || isNaN(numericId) ? false : isFavoriteCarwash(numericId);
   const isPinned = !id || isNaN(numericId) ? false : isPinnedCarwash(numericId);
 
   const handleHeartPress = () => {
@@ -108,9 +113,7 @@ const CarWashCard = ({
         order: null,
         orderDate: null,
       });
-
       bottomSheetRef?.current?.snapToPosition('42%');
-
       cameraRef?.current?.setCameraPosition({
         longitude: carWash.location.lon,
         latitude: carWash.location.lat,
@@ -126,16 +129,18 @@ const CarWashCard = ({
 
   return (
     <>
-      <Button
-        height={showDistance ? dp(63) : dp(46)}
-        padding={10}
-        borderRadius={12}
-        borderWidth={showBorder ? 1 : 0}
-        borderColor="#E2E2E2"
-        justifyContent="flex-start"
+      <TouchableOpacity
+        style={[
+          localStyles.card,
+          {
+            height: showDistance ? dp(63) : dp(46),
+            borderWidth: showBorder ? 1 : 0,
+          },
+        ]}
         onPress={handleCardPress}
-        onLongPress={handleLongPress}>
-        <XStack flex={1} alignItems="center" gap={dp(8)}>
+        onLongPress={handleLongPress}
+        activeOpacity={0.8}>
+        <View style={localStyles.cardContent}>
           {enablePinIcon ? (
             <Image
               source={
@@ -143,43 +148,37 @@ const CarWashCard = ({
                   ? require('../../assets/icons/map-pin-active.png')
                   : require('../../assets/icons/map-pin.png')
               }
-              width={29}
-              height={29}
+              style={{width: 29, height: 29}}
             />
           ) : (
             <Image
               source={require('../../assets/icons/small-icon.png')}
-              width={18}
-              height={18}
+              style={{width: 18, height: 18}}
             />
           )}
-
-          <YStack paddingRight={dp(15)}>
-            <Text fontSize={13} ellipsizeMode="tail" numberOfLines={1}>
+          <View style={localStyles.textContainer}>
+            <Text style={localStyles.title} ellipsizeMode="tail" numberOfLines={1}>
               {carWash.carwashes[0].name}
             </Text>
             <Text
-              fontSize={12}
-              color={'#6F6F6F'}
+              style={localStyles.subtitle}
               ellipsizeMode="tail"
               numberOfLines={1}>
               {carWash.carwashes[0].address}
             </Text>
             {showDistance && (
               <Text
-                fontSize={12}
-                color={'#6F6F6F'}
+                style={localStyles.subtitle}
                 ellipsizeMode="tail"
                 numberOfLines={1}>
                 {`${carWash.distance?.toFixed(2)} km away`}
               </Text>
             )}
-          </YStack>
-        </XStack>
-
+          </View>
+        </View>
         {showIsFavorite && isFavorite && (
-          <Button
-            unstyled
+          <TouchableOpacity
+            style={localStyles.heartButton}
             onPress={() => {
               if (heartIsClickable) {
                 setMenuVisible(true);
@@ -187,12 +186,11 @@ const CarWashCard = ({
             }}>
             <Image
               source={require('../../assets/icons/heart-active.png')}
-              width={20}
-              height={20}
+              style={{width: 20, height: 20}}
             />
-          </Button>
+          </TouchableOpacity>
         )}
-      </Button>
+      </TouchableOpacity>
 
       <Modal
         visible={menuVisible}
@@ -200,55 +198,42 @@ const CarWashCard = ({
         animationType="slide"
         onRequestClose={closeModal}>
         <TouchableWithoutFeedback onPress={closeModal}>
-          <XStack style={styles.modalOverlay}>
-            <XStack style={styles.overlayBackground} />
-          </XStack>
+          <View style={localStyles.modalOverlay}>
+            <View style={localStyles.overlayBackground} />
+          </View>
         </TouchableWithoutFeedback>
-
-        <XStack style={styles.modalContent}>
+        <View style={localStyles.modalContent}>
           <TouchableWithoutFeedback>
-            <YStack style={styles.contextMenu}>
+            <View style={localStyles.contextMenu}>
               {longPressPinAction ? (
-                <Button unstyled onPress={handleClip} style={styles.menuButton}>
-                  <XStack
-                    padding={dp(15)}
-                    backgroundColor="white"
-                    borderRadius={dp(12)}
-                    alignItems="center"
-                    justifyContent="center"
-                    width="100%"
-                    gap={dp(6)}>
-                    <Text fontSize={dp(13)} color="#333" fontWeight="500">
+                <TouchableOpacity
+                  onPress={handleClip}
+                  style={localStyles.menuButton}>
+                  <View
+                    style={[
+                      localStyles.menuItem,
+                      {flexDirection: 'row', gap: dp(6)},
+                    ]}>
+                    <Text style={localStyles.menuText}>
                       {isPinned ? 'Открепить' : 'Закрепить'}
                     </Text>
                     <Image
-                      source={
-                        isPinned
-                          ? require('../../assets/icons/clip.png')
-                          : require('../../assets/icons/clip.png')
-                      }
-                      width={20}
-                      height={20}
+                      source={require('../../assets/icons/clip.png')}
+                      style={{width: 20, height: 20}}
                     />
-                  </XStack>
-                </Button>
+                  </View>
+                </TouchableOpacity>
               ) : (
-                <Button
-                  unstyled
+                <TouchableOpacity
                   onPress={handleHeartPress}
-                  style={styles.menuButton}>
-                  <XStack
-                    padding={dp(15)}
-                    backgroundColor="white"
-                    borderRadius={dp(12)}
-                    alignItems="center"
-                    justifyContent="center"
-                    width="100%"
-                    gap={dp(6)}>
-                    <Text fontSize={dp(13)} color="#333" fontWeight="500">
-                      {isFavorite
-                        ? 'Удалить из избранного'
-                        : 'Добавить в избранное'}
+                  style={localStyles.menuButton}>
+                  <View
+                    style={[
+                      localStyles.menuItem,
+                      {flexDirection: 'row', gap: dp(6)},
+                    ]}>
+                    <Text style={localStyles.menuText}>
+                      {isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}
                     </Text>
                     <Image
                       source={
@@ -256,34 +241,56 @@ const CarWashCard = ({
                           ? require('../../assets/icons/heart-active.png')
                           : require('../../assets/icons/heart.png')
                       }
-                      width={20}
-                      height={20}
+                      style={{width: 20, height: 20}}
                     />
-                  </XStack>
-                </Button>
+                  </View>
+                </TouchableOpacity>
               )}
-              <Button unstyled onPress={closeModal} style={styles.closeButton}>
-                <XStack
-                  padding={dp(15)}
-                  backgroundColor="white"
-                  borderRadius={dp(12)}
-                  alignItems="center"
-                  justifyContent="center"
-                  width="100%">
-                  <Text fontSize={dp(13)} color="#FF3B30" fontWeight="500">
+              <TouchableOpacity onPress={closeModal} style={localStyles.closeButton}>
+                <View style={localStyles.menuItem}>
+                  <Text style={[localStyles.menuText, {color: '#FF3B30'}]}>
                     Отмена
                   </Text>
-                </XStack>
-              </Button>
-            </YStack>
+                </View>
+              </TouchableOpacity>
+            </View>
           </TouchableWithoutFeedback>
-        </XStack>
+        </View>
       </Modal>
     </>
   );
 };
 
-const styles = StyleSheet.create({
+const localStyles = StyleSheet.create({
+  card: {
+    padding: 10,
+    borderRadius: 12,
+    borderColor: '#E2E2E2',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  cardContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: dp(8),
+    flex: 1,
+  },
+  textContainer: {
+    paddingRight: dp(15),
+    flex: 1,
+  },
+  title: {
+    fontSize: 13,
+    color: '#000',
+  },
+  subtitle: {
+    fontSize: 12,
+    color: '#6F6F6F',
+  },
+  heartButton: {
+    padding: 5,
+  },
   modalOverlay: {
     flex: 1,
     justifyContent: 'center',
@@ -307,6 +314,19 @@ const styles = StyleSheet.create({
   },
   menuButton: {
     width: '100%',
+  },
+  menuItem: {
+    padding: dp(15),
+    backgroundColor: 'white',
+    borderRadius: dp(12),
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+  },
+  menuText: {
+    fontSize: dp(13),
+    fontWeight: '500',
+    color: '#333',
   },
   closeButton: {
     width: '100%',

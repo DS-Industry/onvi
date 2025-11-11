@@ -1,6 +1,13 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {StyleSheet, Dimensions, Platform} from 'react-native';
-
+import {
+  StyleSheet,
+  Dimensions,
+  Platform,
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+} from 'react-native';
 import {useTranslation} from 'react-i18next';
 import useStore from '@state/store.ts';
 import {BLACK} from '@utils/colors.ts';
@@ -24,8 +31,7 @@ import {getStoryView} from '@services/api/story-view';
 import {StoryViewPlaceholder} from '@components/StoryView/StoryViewPlaceholder.tsx';
 import {transformContentDataToUserStories} from '@shared/mappers/StoryViewMapper.ts';
 import {StoryView} from '@components/StoryView';
-import {useCombinedTheme} from '@hooks/useCombinedTheme';
-import {YStack, Text, Card, Image, XStack, Button} from 'tamagui';
+// import {useCombinedTheme} from '@hooks/useCombinedTheme';
 import PressableCard from '@components/PressableCard/PressableCard.tsx';
 import {useSharedValue} from 'react-native-reanimated';
 import {CarWashCard} from '@components/CarWashCard/CarWashCard.tsx';
@@ -44,27 +50,19 @@ const Main = () => {
     loadLatestCarwashes,
     pinnedCarwashes,
   } = useStore.getState();
-
   const {latestCarwashesIsLoading} = useStore();
-
-  const ref = React.useRef<ICarouselInstance>(null);
+  const ref = useRef<ICarouselInstance>(null);
   const progress = useSharedValue<number>(0);
-
   const onPressPagination = (index: number) => {
     ref.current?.scrollTo({
       count: index - progress.value,
       animated: true,
     });
   };
-
   const {setIsMainScreen} = useNavStore.getState();
-
   const scrollViewRef = useRef<BottomSheetScrollViewMethods>(null);
-  const {backgroundColor, currentThemeName} = useCombinedTheme();
-
-  const [latestCarwashesData, setLatestCarwashesData] = useState<
-    CarWashLocation[]
-  >([]);
+  // const {backgroundColor, currentThemeName} = useCombinedTheme();
+  const [latestCarwashesData, setLatestCarwashesData] = useState<CarWashLocation[]>([]);
 
   const {isLoading: campaignLoading, data: campaignData} = useSWR(
     ['getCampaignList'],
@@ -85,11 +83,9 @@ const Main = () => {
       setSelectedPos(null);
       setBusiness(null);
       loadLatestCarwashes();
-
       if (scrollViewRef.current) {
         scrollViewRef.current.scrollTo({y: 0, animated: false});
       }
-
       return () => {
         setIsMainScreen(false);
       };
@@ -99,14 +95,11 @@ const Main = () => {
   useEffect(() => {
     if (latestCarwashes.length > 0) {
       const carwashMap = new Map();
-
       posList.forEach(carwash => {
         const id = Number(carwash?.carwashes[0]?.id) || undefined;
         carwashMap.set(id, carwash);
       });
-
       const result: CarWashLocation[] = [];
-
       if (pinnedCarwashes && pinnedCarwashes.length > 0) {
         pinnedCarwashes.forEach(id => {
           const carwash = carwashMap.get(id);
@@ -116,14 +109,12 @@ const Main = () => {
           }
         });
       }
-
       latestCarwashes.forEach(id => {
         const carwash = carwashMap.get(id);
         if (carwash) {
           result.push(carwash);
         }
       });
-
       setLatestCarwashesData(result.slice(0, 3));
     }
   }, [latestCarwashes, pinnedCarwashes, posList]);
@@ -139,13 +130,13 @@ const Main = () => {
       <PressableCard
         unstyled
         onPress={() => handleCampaignItemPress(item)}
-        style={styles.campaigns}>
+        style={localStyles.campaigns}>
         <Image
           source={{uri: item.attributes.image.data.attributes.url}}
           style={{
             width: dp(340),
             height: dp(190),
-            objectFit: 'contain',
+            resizeMode: 'contain',
           }}
         />
       </PressableCard>
@@ -162,20 +153,15 @@ const Main = () => {
       ref={scrollViewRef}
       nestedScrollEnabled={false}
       scrollEnabled={true}>
-      <YStack style={{minHeight: '100%'}}>
-        <Card
-          theme={currentThemeName}
-          backgroundColor={backgroundColor}
-          padding={dp(16)}
-          borderRadius={dp(22)}>
-          <XStack verticalAlign="center" gap={dp(16)}>
-            <XStack
-              flex={1}
-              backgroundColor="#D8D9DD"
-              borderRadius={dp(12)}
-              paddingHorizontal={dp(16)}
-              height={dp(45)}
-              alignItems="center"
+      <View style={{minHeight: '100%'}}>
+        <View
+          style={[
+            localStyles.card,
+            // {backgroundColor, borderRadius: dp(22)},
+          ]}>
+          <View style={localStyles.searchContainer}>
+            <TouchableOpacity
+              style={localStyles.searchInput}
               onPress={() => {
                 navigateBottomSheet('Search', {});
                 bottomSheetRef?.current?.snapToPosition(
@@ -184,20 +170,16 @@ const Main = () => {
               }}>
               <Image
                 source={require('../../../assets/icons/Search.png')}
-                width={dp(26)}
-                height={dp(26)}
+                style={{width: dp(26), height: dp(26)}}
               />
               <Text
-                color="#000"
-                fontSize={dp(16)}
-                fontWeight="600"
-                opacity={0.15}
-                marginLeft={dp(7)}
-                flex={1}>
+                style={[
+                  localStyles.searchText,
+                  {marginLeft: dp(7), flex: 1},
+                ]}>
                 {t('app.main.search')}
               </Text>
-              <Button
-                unstyled
+              <TouchableOpacity
                 onPress={() => {
                   navigateBottomSheet('Filters', {});
                   bottomSheetRef?.current?.snapToPosition(
@@ -206,47 +188,47 @@ const Main = () => {
                 }}>
                 <Image
                   source={require('../../../assets/icons/Settings-adjust.png')}
-                  width={dp(26)}
-                  height={dp(26)}
+                  style={{width: dp(26), height: dp(26)}}
                 />
-              </Button>
-            </XStack>
-          </XStack>
-          <YStack>
-            <Text
-              color={BLACK}
-              fontSize={dp(24)}
-              fontWeight="600"
-              marginTop={dp(16)}>
+              </TouchableOpacity>
+            </TouchableOpacity>
+          </View>
+          <View>
+            <Text style={[localStyles.sectionTitle, {marginTop: dp(16)}]}>
               {t('app.latestCarwashes.latest')}
             </Text>
             {latestCarwashesIsLoading ? (
               <>
-                <XStack marginTop={dp(12)} />
+                <View style={{marginTop: dp(12)}} />
                 <CarwashesPlaceholder />
               </>
             ) : (
               <>
-                <YStack marginTop={dp(12)} gap={dp(8)}>
-                  {latestCarwashesData.map(item => (
+                <View style={{marginTop: dp(12), gap: dp(8)}}>
+                  {latestCarwashesData.map((item, index) => (
                     <CarWashCard
+                      key={index}
                       carWash={item}
                       showDistance={false}
                       longPressPinAction={true}
                       enablePinIcon={true}
                     />
                   ))}
-                </YStack>
+                </View>
               </>
             )}
-          </YStack>
-        </Card>
-        <Card
-          backgroundColor={backgroundColor}
-          padding={dp(16)}
-          borderRadius={38}
-          flex={1}
-          marginTop={dp(8)}>
+          </View>
+        </View>
+        <View
+          style={[
+            localStyles.card,
+            // {
+            //   backgroundColor,
+            //   borderRadius: dp(38),
+            //   flex: 1,
+            //   marginTop: dp(8),
+            // },
+          ]}>
           {storyLoading || storyError ? (
             <StoryViewPlaceholder />
           ) : (
@@ -258,20 +240,14 @@ const Main = () => {
               )}
             </>
           )}
-          <XStack justifyContent={'space-between'}>
-            <Text
-              color={BLACK}
-              fontSize={dp(24)}
-              fontWeight="600"
-              marginTop={dp(12)}>
-              {t('app.main.PromotionsForYou')}
-            </Text>
-          </XStack>
-          <YStack flex={1} marginTop={dp(12)}>
+          <View style={localStyles.promotionsHeader}>
+            <Text style={localStyles.sectionTitle}>{t('app.main.PromotionsForYou')}</Text>
+          </View>
+          <View style={{flex: 1, marginTop: dp(12)}}>
             {campaignLoading ? (
               <CampaignPlaceholder />
             ) : (
-              <YStack flex={1}>
+              <View style={{flex: 1}}>
                 {campaignData && (
                   <>
                     <Carousel
@@ -303,28 +279,55 @@ const Main = () => {
                     />
                   </>
                 )}
-              </YStack>
+              </View>
             )}
-          </YStack>
-          <YStack>
-            <Text
-              color={BLACK}
-              fontSize={dp(24)}
-              fontWeight="600"
-              marginTop={dp(12)}>
+          </View>
+          <View>
+            <Text style={[localStyles.sectionTitle, {marginTop: dp(12)}]}>
               {t('app.main.freshNews')}
             </Text>
             <NewsList />
-          </YStack>
-        </Card>
-      </YStack>
+          </View>
+        </View>
+      </View>
     </BottomSheetScrollView>
   );
 };
 
 const {width} = Dimensions.get('window');
 
-const styles = StyleSheet.create({
+const localStyles = StyleSheet.create({
+  card: {
+    padding: dp(16),
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: dp(16),
+  },
+  searchInput: {
+    flex: 1,
+    backgroundColor: '#D8D9DD',
+    borderRadius: dp(12),
+    paddingHorizontal: dp(16),
+    height: dp(45),
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  searchText: {
+    color: '#000',
+    fontSize: dp(16),
+    fontWeight: '600',
+    opacity: 0.15,
+  },
+  sectionTitle: {
+    color: BLACK,
+    fontSize: dp(24),
+    fontWeight: '600',
+  },
+  promotionsHeader: {
+    justifyContent: 'space-between',
+  },
   campaigns: {
     width: width,
     justifyContent: 'center',

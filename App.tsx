@@ -17,7 +17,6 @@ import {
   ReanimatedLogLevel,
 } from 'react-native-reanimated';
 import useAppState from './src/hooks/useAppState';
-
 import {
   DdSdkReactNative,
   DatadogProviderConfiguration,
@@ -25,21 +24,13 @@ import {
 } from '@datadog/mobile-react-native';
 import {I18nextProvider, useTranslation} from 'react-i18next';
 import i18n from './src/locales';
-
-// if (__DEV__) {
-//   require('./ReactotronConfig');
-// }
-
 import {AppMetricaInit} from './src/components/AppMetricaInit';
-
 import MapboxGL from '@rnmapbox/maps';
+import Toast from 'react-native-toast-message';
 
 MapboxGL.setAccessToken(
   'sk.eyJ1Ijoib25pdm9uZSIsImEiOiJjbTBsN2Q2MzIwMnZ0MmtzN2U5d3lycTJ0In0.J57w_rOEzH4Mijty_YXoRA',
 );
-
-import TamaguiProvider from './src/components/TamaguiProvider';
-import Toast from 'react-native-toast-message';
 
 const getLocalMetaData = async (): Promise<DeviceMeta> => {
   const deviceId = await DeviceInfo.getUniqueId();
@@ -48,7 +39,6 @@ const getLocalMetaData = async (): Promise<DeviceMeta> => {
   const platform = DeviceInfo.getSystemName();
   const platformVersion = DeviceInfo.getSystemVersion();
   const manufacturer = DeviceInfo.getManufacturerSync();
-
   return {
     deviceId,
     model,
@@ -72,7 +62,6 @@ const DatadogWrapper = ({children}: DatadogWrapperProps) => {
     const initializeDatadog = async () => {
       try {
         const deviceId = await DeviceInfo.getUniqueId();
-
         const config = new DatadogProviderConfiguration(
           'puba21093aa63718370f3d12b6069ca901c',
           'production',
@@ -81,16 +70,13 @@ const DatadogWrapper = ({children}: DatadogWrapperProps) => {
           true,
           true,
         );
-
         config.site = 'EU1';
         config.longTaskThresholdMs = 100;
         config.nativeCrashReportEnabled = true;
         config.sessionSamplingRate = 100;
         config.serviceName = 'onvi-mobile';
-
         await DdSdkReactNative.initialize(config);
         await DdSdkReactNative.setUserInfo({id: deviceId});
-
         console.log('Datadog initialized successfully');
         setDatadogConfig(config);
       } catch (error) {
@@ -98,31 +84,28 @@ const DatadogWrapper = ({children}: DatadogWrapperProps) => {
         setInitializationError(true);
       }
     };
-
     initializeDatadog();
   }, []);
 
-  // Если инициализация еще не завершена
   if (!datadogConfig && !initializationError) {
     return null;
   }
 
-  // Если произошла ошибка - рендерим без провайдера
   if (initializationError || __DEV__) {
     return <>{children}</>;
   }
 
-  // Успешная инициализация
   return (
-    <DatadogProvider configuration={datadogConfig!}>{children}</DatadogProvider>
+    <DatadogProvider configuration={datadogConfig!}>
+      {children}
+    </DatadogProvider>
   );
 };
 
 function App(): React.JSX.Element {
   const [isConnected, setConnected] = useState(true);
   const {loadUser, user, fcmToken, loadFavoritesCarwashes} = useStore.getState();
-  const favoritesLoadedRef = useRef(false); 
-
+  const favoritesLoadedRef = useRef(false);
   const {t} = useTranslation();
 
   configureReanimatedLogger({
@@ -134,9 +117,8 @@ function App(): React.JSX.Element {
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
-      const networkState = state.isConnected ? state.isConnected : false;
+      const networkState = state.isConnected ?? false;
       setConnected(networkState);
-
       if (!networkState) {
         showMessage({
           message: t('errors.noInternet'),
@@ -147,11 +129,8 @@ function App(): React.JSX.Element {
         });
       }
     });
-
-    return () => {
-      unsubscribe();
-    };
-  }, []);
+    return () => unsubscribe();
+  }, [t]);
 
   useEffect(() => {
     loadUser();
@@ -159,7 +138,6 @@ function App(): React.JSX.Element {
       if (isConnected && user?.id) {
         try {
           const localMetaDataPartial: DeviceMeta = await getLocalMetaData();
-
           if (!user?.meta) {
             await createUserMeta({
               ...localMetaDataPartial,
@@ -184,15 +162,17 @@ function App(): React.JSX.Element {
               metaId: user.meta.metaId,
             });
           }
-        } catch (error: any) {}
+        } catch (error) {
+          console.error('Error syncing metadata:', error);
+        }
       }
     };
 
     const updateFavorites = async () => {
       try {
-        if (user && !favoritesLoadedRef.current) { 
+        if (user && !favoritesLoadedRef.current) {
           await loadFavoritesCarwashes();
-          favoritesLoadedRef.current = true; 
+          favoritesLoadedRef.current = true;
         }
       } catch (error) {
         Toast.show({
@@ -200,31 +180,29 @@ function App(): React.JSX.Element {
           text1: i18n.t('app.favoritesCarwashes.errorLoadingFavorites'),
         });
       }
-    }
+    };
 
     syncMetaData();
     updateFavorites();
   }, [fcmToken, isConnected, loadUser, user?.id]);
 
   return (
-    <TamaguiProvider>
-      <DatadogWrapper>
-        <ThemeProvider>
-          <RemoteNotifications />
-          <I18nextProvider i18n={i18n}>
-            <GestureHandlerRootView style={{flex: 1}}>
-              <SafeAreaView style={styles.container}>
-                <View style={{height: Dimensions.get('window').height}}>
-                  {!isConnected && <FlashMessage position="top" />}
-                  <Application />
-                </View>
-              </SafeAreaView>
-            </GestureHandlerRootView>
-          </I18nextProvider>
-        </ThemeProvider>
-        <AppMetricaInit />
-      </DatadogWrapper>
-    </TamaguiProvider>
+    <DatadogWrapper>
+      <ThemeProvider>
+        <RemoteNotifications />
+        <I18nextProvider i18n={i18n}>
+          <GestureHandlerRootView style={{flex: 1}}>
+            <SafeAreaView style={styles.container}>
+              <View style={{height: Dimensions.get('window').height}}>
+                {!isConnected && <FlashMessage position="top" />}
+                <Application />
+              </View>
+            </SafeAreaView>
+          </GestureHandlerRootView>
+        </I18nextProvider>
+      </ThemeProvider>
+      <AppMetricaInit />
+    </DatadogWrapper>
   );
 }
 
