@@ -2786,6 +2786,8 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
+  - RNCMaskedView (0.2.9):
+    - React-Core
   - RNDeviceInfo (14.1.1):
     - React-Core
   - RNFBApp (23.5.0):
@@ -2824,13 +2826,13 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - rnmapbox-maps (10.2.6):
+  - rnmapbox-maps (10.2.7):
     - MapboxMaps (~> 11.15.2)
     - React
     - React-Core
-    - rnmapbox-maps/DynamicLibrary (= 10.2.6)
+    - rnmapbox-maps/DynamicLibrary (= 10.2.7)
     - Turf
-  - rnmapbox-maps/DynamicLibrary (10.2.6):
+  - rnmapbox-maps/DynamicLibrary (10.2.7):
     - boost
     - DoubleConversion
     - fast_float
@@ -2884,7 +2886,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - RNReanimated (4.1.3):
+  - RNReanimated (4.1.5):
     - boost
     - DoubleConversion
     - fast_float
@@ -2911,11 +2913,11 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNReanimated/reanimated (= 4.1.3)
+    - RNReanimated/reanimated (= 4.1.5)
     - RNWorklets
     - SocketRocket
     - Yoga
-  - RNReanimated/reanimated (4.1.3):
+  - RNReanimated/reanimated (4.1.5):
     - boost
     - DoubleConversion
     - fast_float
@@ -2942,11 +2944,11 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNReanimated/reanimated/apple (= 4.1.3)
+    - RNReanimated/reanimated/apple (= 4.1.5)
     - RNWorklets
     - SocketRocket
     - Yoga
-  - RNReanimated/reanimated/apple (4.1.3):
+  - RNReanimated/reanimated/apple (4.1.5):
     - boost
     - DoubleConversion
     - fast_float
@@ -3274,6 +3276,7 @@ DEPENDENCIES:
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - "RNCCheckbox (from `../node_modules/@react-native-community/checkbox`)"
   - "RNCClipboard (from `../node_modules/@react-native-clipboard/clipboard`)"
+  - "RNCMaskedView (from `../node_modules/@react-native-masked-view/masked-view`)"
   - RNDeviceInfo (from `../node_modules/react-native-device-info`)
   - "RNFBApp (from `../node_modules/@react-native-firebase/app`)"
   - "RNFBMessaging (from `../node_modules/@react-native-firebase/messaging`)"
@@ -3509,6 +3512,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-community/checkbox"
   RNCClipboard:
     :path: "../node_modules/@react-native-clipboard/clipboard"
+  RNCMaskedView:
+    :path: "../node_modules/@react-native-masked-view/masked-view"
   RNDeviceInfo:
     :path: "../node_modules/react-native-device-info"
   RNFBApp:
@@ -3664,13 +3669,14 @@ SPEC CHECKSUMS:
   RNCAsyncStorage: 29f0230e1a25f36c20b05f65e2eb8958d6526e82
   RNCCheckbox: 33b44487ca8008394ce658cc32b26eab04f426ef
   RNCClipboard: 4b58c780f63676367640f23c8e114e9bd0cf86ac
+  RNCMaskedView: 4b5b12efdee55966f1d68f32d4b3401c2acf05c2
   RNDeviceInfo: bcce8752b5043a623fe3c26789679b473f705d3c
   RNFBApp: 255fa19a91d6c1309e021ee75d5d209754e5961b
   RNFBMessaging: c304c1d8949f996d3eed1cf4eeba33148d13b4ea
   RNGestureHandler: e1cf8ef3f11045536eed6bd4f132b003ef5f9a5f
-  rnmapbox-maps: dc82052eda86ede48e950e6780f5fd487274f28d
+  rnmapbox-maps: 45bae374417b6d5a2174da7eb047d78c3ae007b8
   RNReactNativeHapticFeedback: be4f1b4bf0398c30b59b76ed92ecb0a2ff3a69c6
-  RNReanimated: 732e7d1662f8cc0e533fa32791800de5b5934726
+  RNReanimated: ac06da53579693ab451941ef89f5a55afeab0dd9
   RNScreens: d821082c6dd1cb397cc0c98b026eeafaa68be479
   RNSVG: 8c0bbfa480a24b24468f1c76bd852a4aac3178e6
   RNWorklets: ab618bf7d1c7fd2cb793b9f0f39c3e29274b3ebf
