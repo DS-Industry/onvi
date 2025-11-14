@@ -11,6 +11,8 @@
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		8135ADE844D6E8EC68A3A6C8 /* libPods-OnviMobile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F2DEE8ACB3802ECB734D8163 /* libPods-OnviMobile.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		8B147E3F2EC73FFD00B3ADFE /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8B147E3E2EC73FFD00B3ADFE /* Images.xcassets */; };
+		8B147E432EC740DB00B3ADFE /* PaymentGatewayModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B147E422EC740DB00B3ADFE /* PaymentGatewayModule.swift */; };
 		93BE33EBD02445A0FCE6FF76 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
 
@@ -22,6 +24,8 @@
 		37CD2F0C6A65EC183D7A11BC /* Pods-OnviMobile.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OnviMobile.release.xcconfig"; path = "Target Support Files/Pods-OnviMobile/Pods-OnviMobile.release.xcconfig"; sourceTree = "<group>"; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = OnviMobile/AppDelegate.swift; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = OnviMobile/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		8B147E3E2EC73FFD00B3ADFE /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = ../../oldOnviMobile/OnviMobile/ios/OnviMobile/Images.xcassets; sourceTree = "<group>"; };
+		8B147E422EC740DB00B3ADFE /* PaymentGatewayModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentGatewayModule.swift; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F1C96DD930B84487ADA4E3DE /* Pods-OnviMobile.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OnviMobile.debug.xcconfig"; path = "Target Support Files/Pods-OnviMobile/Pods-OnviMobile.debug.xcconfig"; sourceTree = "<group>"; };
 		F2DEE8ACB3802ECB734D8163 /* libPods-OnviMobile.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-OnviMobile.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -47,6 +51,8 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */,
+				8B147E3E2EC73FFD00B3ADFE /* Images.xcassets */,
+				8B147E422EC740DB00B3ADFE /* PaymentGatewayModule.swift */,
 			);
 			name = OnviMobile;
 			sourceTree = "<group>";
@@ -160,6 +166,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
+				8B147E3F2EC73FFD00B3ADFE /* Images.xcassets in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				93BE33EBD02445A0FCE6FF76 /* PrivacyInfo.xcprivacy in Resources */,
 			);
@@ -261,6 +268,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				761780ED2CA45674006654EE /* AppDelegate.swift in Sources */,
+				8B147E432EC740DB00B3ADFE /* PaymentGatewayModule.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
