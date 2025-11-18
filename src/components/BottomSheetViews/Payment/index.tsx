@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
     marginRight: dp(10),
   },
   paymentActions: {
-    marginTop: dp(30),
+    // marginTop: dp(30),
     alignItems: 'center',
   },
   cancelButton: {

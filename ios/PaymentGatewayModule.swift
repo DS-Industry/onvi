@@ -10,17 +10,27 @@ import UIKit
 import React
 import YooKassaPayments
 
+// MARK: - Main Module Class
+@objc(PaymentGatewayModule)
 class PaymentGatewayModule: NSObject {
     
     var paymentCallback: RCTResponseSenderBlock?
     var confirmCallback: RCTResponseSenderBlock?
     var viewController: UIViewController?
     
+    // MARK: - React Native Required Method
+    @objc static func requiresMainQueueSetup() -> Bool {
+        return true
+    }
+}
+
+// MARK: - YooKassa Protocol Implementation
+extension PaymentGatewayModule: TokenizationModuleOutput {
     
-    func didFinish(on module: YooKassaPayments.TokenizationModuleInput, with error: YooKassaPayments.YooKassaPaymentsError?) {
-        let error: NSDictionary = [
-            "code" : "E_PAYMENT_CANCELLED",
-            "message" : "Payment cancelled."
+    func didFinish(on module: TokenizationModuleInput, with error: YooKassaPaymentsError?) {
+        let errorDict: NSDictionary = [
+            "code": "E_PAYMENT_CANCELLED",
+            "message": "Payment cancelled."
         ]
 
         DispatchQueue.main.async {
@@ -28,29 +38,29 @@ class PaymentGatewayModule: NSObject {
         }
 
         if let callback = self.paymentCallback {
-            callback([NSNull(), error])
+            callback([NSNull(), errorDict])
             self.paymentCallback = nil
         }
     }
     
-    func didFailConfirmation(error: YooKassaPayments.YooKassaPaymentsError?) {
-        let error: NSDictionary = [
-            "code" : "ERROR_PAYMENT_CONFIRMATION",
-            "message" : "Payment failed."
+    func didFailConfirmation(error: YooKassaPaymentsError?) {
+        let errorDict: NSDictionary = [
+            "code": "ERROR_PAYMENT_CONFIRMATION",
+            "message": "Payment failed."
         ]
         DispatchQueue.main.async {
             self.viewController?.dismiss(animated: true)
         }
 
         if let callback = self.paymentCallback {
-            callback([NSNull(), error])
+            callback([NSNull(), errorDict])
             self.paymentCallback = nil
         }
     }
     
-    func didFinishConfirmation(paymentMethodType: YooKassaPayments.PaymentMethodType) {
+    func didFinishConfirmation(paymentMethodType: PaymentMethodType) {
         let result: NSDictionary = [
-            "message" : "verified"
+            "message": "verified"
         ]
 
         DispatchQueue.main.async {
@@ -63,10 +73,10 @@ class PaymentGatewayModule: NSObject {
         }
     }
     
-    func tokenizationModule(_ module: YooKassaPayments.TokenizationModuleInput, didTokenize token: YooKassaPayments.Tokens, paymentMethodType: YooKassaPayments.PaymentMethodType) {
+    func tokenizationModule(_ module: TokenizationModuleInput, didTokenize token: Tokens, paymentMethodType: PaymentMethodType) {
         let result: NSDictionary = [
-            "token" : token.paymentToken,
-            "paymentMethodType" : paymentMethodType.rawValue.uppercased()
+            "token": token.paymentToken,
+            "paymentMethodType": paymentMethodType.rawValue.uppercased()
         ]
 
         if let callback = self.paymentCallback {
@@ -74,25 +84,27 @@ class PaymentGatewayModule: NSObject {
             paymentCallback = nil
         }
     }
-    
-    // MARK: - React Native Methods
+}
+
+// MARK: - React Native Exposed Methods
+extension PaymentGatewayModule {
     
     @objc
     func startTokenize(_ params: NSDictionary, callbacker callback: @escaping RCTResponseSenderBlock) -> Void {
         
-        debugPrint("PAYMENT GATEWAY -> Start tokenization...");
-        print("PAYMENT GATEWAY -> Start tokenization...");
-        self.paymentCallback = callback;
-        guard let clientApplicationKey = params["clientApplicationKey"] as? String,
-                  let _shopId = params["shopId"] as? String,
-                  let title = params["title"] as? String,
-                  let subtitle = params["subtitle"] as? String,
-                  let amountValue = params["price"] as? NSNumber
-              else {
-                  return
-              }
+        debugPrint("PAYMENT GATEWAY -> Start tokenization...")
+        print("PAYMENT GATEWAY -> Start tokenization...")
+        self.paymentCallback = callback
         
-        // Optional параметры
+        guard let clientApplicationKey = params["clientApplicationKey"] as? String,
+              let shopId = params["shopId"] as? String,
+              let title = params["title"] as? String,
+              let subtitle = params["subtitle"] as? String,
+              let amountValue = params["price"] as? NSNumber else {
+            return
+        }
+        
+        // Optional parameters
         let paymentTypes = params["paymentMethodTypes"] as? [String]
         let authCenterClientId = params["authCenterClientId"] as? String
         let userPhoneNumber = params["userPhoneNumber"] as? String
@@ -100,16 +112,12 @@ class PaymentGatewayModule: NSObject {
         let returnUrl = params["returnUrl"] as? String
         let customerId = params["customerId"] as? String
         
-        // Неиспользуемые переменные
-        _ = params["applePayMerchantId"] as? String
-        _ = params["isDebug"] as? Bool
-        
         var paymentMethodTypes: PaymentMethodTypes = []
         
-        if (paymentTypes != nil) {
-            paymentTypes!.forEach { type in
+        if let paymentTypes = paymentTypes {
+            paymentTypes.forEach { type in
                 if let payType = PaymentMethodType(rawValue: type.lowercased()) {
-                    if (payType == .yooMoney && authCenterClientId == nil) {
+                    if payType == .yooMoney && authCenterClientId == nil {
                         return
                     }
                     paymentMethodTypes.insert(PaymentMethodTypes(rawValue: [payType]))
@@ -119,68 +127,71 @@ class PaymentGatewayModule: NSObject {
             paymentMethodTypes.insert(.bankCard)
             paymentMethodTypes.insert(.sberbank)
 
-            if (authCenterClientId != nil) {
+            if authCenterClientId != nil {
                 paymentMethodTypes.insert(.yooMoney)
             }
         }
         
         let tokenizationSettings = TokenizationSettings(paymentMethodTypes: paymentMethodTypes)
-        let applicationScheme = "onvione://";
+        let applicationScheme = "onvione://"
         let amount = Amount(value: amountValue.decimalValue, currency: .rub)
-        let tokenizationModuleInputData =
-                    TokenizationModuleInputData(
-                    clientApplicationKey: clientApplicationKey,
-                    shopName: title,
-                    shopId: _shopId,
-                    purchaseDescription: subtitle,
-                    amount: amount,
-                    gatewayId: gatewayId,
-                    tokenizationSettings: tokenizationSettings,
-                    returnUrl: returnUrl,
-                    userPhoneNumber: userPhoneNumber,
-                    savePaymentMethod: .off,
-                    moneyAuthClientId: authCenterClientId,
-                    applicationScheme: applicationScheme,
-                    customerId: customerId
-                )
+        
+        let tokenizationModuleInputData = TokenizationModuleInputData(
+            clientApplicationKey: clientApplicationKey,
+            shopName: title,
+            shopId: shopId,
+            purchaseDescription: subtitle,
+            amount: amount,
+            gatewayId: gatewayId,
+            tokenizationSettings: tokenizationSettings,
+            returnUrl: returnUrl,
+            userPhoneNumber: userPhoneNumber,
+            savePaymentMethod: .off,
+            moneyAuthClientId: authCenterClientId,
+            applicationScheme: applicationScheme,
+            customerId: customerId
+        )
         
         DispatchQueue.main.async {
             let inputData: TokenizationFlow = .tokenization(tokenizationModuleInputData)
             self.viewController = TokenizationAssembly.makeModule(inputData: inputData, moduleOutput: self)
+            
             guard let rootViewController = RCTPresentedViewController() else {
                 return
             }
-            rootViewController.present(self.viewController!, animated: true, completion: nil)
+            
+            if let viewController = self.viewController {
+                rootViewController.present(viewController, animated: true, completion: nil)
+            }
         }
     }
     
     @objc
     func confirmPayment(_ params: NSDictionary, callbacker callback: @escaping RCTResponseSenderBlock) -> Void {
         guard let confirmationUrl = params["confirmationUrl"] as? String,
-                  let _paymentMethodType = params["paymentMethodType"] as? String
-              else {
-                  return
-              }
+              let paymentMethodTypeString = params["paymentMethodType"] as? String else {
+            return
+        }
         
-        print("PAYMENT GATEWAY -> BEGIN CONFIRMATIONS...");
+        print("PAYMENT GATEWAY -> BEGIN CONFIRMATIONS...")
         
-        guard let paymentMethodType = PaymentMethodType(rawValue: _paymentMethodType.lowercased()) else { return }
+        guard let paymentMethodType = PaymentMethodType(rawValue: paymentMethodTypeString.lowercased()) else { 
+            return 
+        }
         
         guard let viewController = viewController as? TokenizationModuleInput else { return }
+        
         confirmCallback = callback
-        viewController.startConfirmationProcess(confirmationUrl: confirmationUrl,
-                                                paymentMethodType: paymentMethodType)
+        viewController.startConfirmationProcess(
+            confirmationUrl: confirmationUrl,
+            paymentMethodType: paymentMethodType
+        )
     }
     
     @objc
     func dismiss() -> Void {
         DispatchQueue.main.async {
-            self.viewController?.dismiss(animated: true);
+            self.viewController?.dismiss(animated: true)
         }
     }
-}
-
-// Расширение для протокола YooKassa
-extension PaymentGatewayModule: TokenizationModuleOutput {
-    // Все методы уже реализованы выше
 }

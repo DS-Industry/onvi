@@ -12,8 +12,7 @@
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		8B147E3F2EC73FFD00B3ADFE /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8B147E3E2EC73FFD00B3ADFE /* Images.xcassets */; };
 		8B147E432EC740DB00B3ADFE /* PaymentGatewayModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B147E422EC740DB00B3ADFE /* PaymentGatewayModule.swift */; };
-		8B3C08F52EC7600D005277F7 /* PaymentGatewayModuleBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B3C08F42EC76009005277F7 /* PaymentGatewayModuleBridge.m */; };
-		8BFB61372ECB6024006C6918 /* OnviMobile-Bridging-Header.h in Sources */ = {isa = PBXBuildFile; fileRef = 8BFB61362ECB6022006C6918 /* OnviMobile-Bridging-Header.h */; };
+		8B1813622ECC577A000AF3EA /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8B1813612ECC577A000AF3EA /* GoogleService-Info.plist */; };
 		93BE33EBD02445A0FCE6FF76 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
 		D125F162FE9C0FEA6EB4C766 /* libPods-OnviMobile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7DC4D57D4D262853A5C4276A /* libPods-OnviMobile.a */; };
 /* End PBXBuildFile section */
@@ -29,8 +28,7 @@
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = OnviMobile/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		8B147E3E2EC73FFD00B3ADFE /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = ../../oldOnviMobile/OnviMobile/ios/OnviMobile/Images.xcassets; sourceTree = "<group>"; };
 		8B147E422EC740DB00B3ADFE /* PaymentGatewayModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentGatewayModule.swift; sourceTree = "<group>"; };
-		8B3C08F42EC76009005277F7 /* PaymentGatewayModuleBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PaymentGatewayModuleBridge.m; sourceTree = "<group>"; };
-		8BFB61362ECB6022006C6918 /* OnviMobile-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "OnviMobile-Bridging-Header.h"; sourceTree = "<group>"; };
+		8B1813612ECC577A000AF3EA /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		AC6E70C30C1309E5C09C1012 /* Pods-OnviMobile.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OnviMobile.debug.xcconfig"; path = "Target Support Files/Pods-OnviMobile/Pods-OnviMobile.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -50,8 +48,6 @@
 		13B07FAE1A68108700A75B9A /* OnviMobile */ = {
 			isa = PBXGroup;
 			children = (
-				8BFB61362ECB6022006C6918 /* OnviMobile-Bridging-Header.h */,
-				8B3C08F42EC76009005277F7 /* PaymentGatewayModuleBridge.m */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				761780EC2CA45674006654EE /* AppDelegate.swift */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
@@ -87,6 +83,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
+				8B1813612ECC577A000AF3EA /* GoogleService-Info.plist */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -176,6 +173,7 @@
 				8B147E3F2EC73FFD00B3ADFE /* Images.xcassets in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				93BE33EBD02445A0FCE6FF76 /* PrivacyInfo.xcprivacy in Resources */,
+				8B1813622ECC577A000AF3EA /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -253,6 +251,7 @@
 			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
+				"",
 			);
 			outputPaths = (
 			);
@@ -283,10 +282,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8B3C08F52EC7600D005277F7 /* PaymentGatewayModuleBridge.m in Sources */,
 				761780ED2CA45674006654EE /* AppDelegate.swift in Sources */,
 				8B147E432EC740DB00B3ADFE /* PaymentGatewayModule.swift in Sources */,
-				8BFB61372ECB6024006C6918 /* OnviMobile-Bridging-Header.h in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -302,6 +299,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_BITCODE = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = i386;
 				INFOPLIST_FILE = OnviMobile/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
@@ -317,7 +315,6 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = OnviMobile;
-				SWIFT_OBJC_BRIDGING_HEADER = "OnviMobile-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -332,6 +329,7 @@
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = i386;
 				INFOPLIST_FILE = OnviMobile/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
@@ -347,7 +345,6 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = OnviMobile;
-				SWIFT_OBJC_BRIDGING_HEADER = "OnviMobile-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
