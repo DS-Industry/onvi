@@ -114,7 +114,6 @@ PODS:
   - BranchSDK (3.13.3)
   - BVLinearGradient (2.8.3):
     - React-Core
-  - ClickstreamSDK (1.5.0)
   - DatadogCore (2.30.2):
     - DatadogInternal (= 2.30.2)
   - DatadogCrashReporting (2.30.2):
@@ -167,32 +166,11 @@ PODS:
   - DoubleConversion (1.1.6)
   - fast_float (8.0.0)
   - FBLazyVector (0.82.1)
-  - Firebase/Core (12.4.0):
-    - Firebase/CoreOnly
-    - FirebaseAnalytics (~> 12.4.0)
   - Firebase/CoreOnly (12.4.0):
     - FirebaseCore (~> 12.4.0)
   - Firebase/Messaging (12.4.0):
     - Firebase/CoreOnly
     - FirebaseMessaging (~> 12.4.0)
-  - FirebaseAnalytics (12.4.0):
-    - FirebaseAnalytics/Default (= 12.4.0)
-    - FirebaseCore (~> 12.4.0)
-    - FirebaseInstallations (~> 12.4.0)
-    - GoogleUtilities/AppDelegateSwizzler (~> 8.1)
-    - GoogleUtilities/MethodSwizzler (~> 8.1)
-    - GoogleUtilities/Network (~> 8.1)
-    - "GoogleUtilities/NSData+zlib (~> 8.1)"
-    - nanopb (~> 3.30910.0)
-  - FirebaseAnalytics/Default (12.4.0):
-    - FirebaseCore (~> 12.4.0)
-    - FirebaseInstallations (~> 12.4.0)
-    - GoogleAppMeasurement/Default (= 12.4.0)
-    - GoogleUtilities/AppDelegateSwizzler (~> 8.1)
-    - GoogleUtilities/MethodSwizzler (~> 8.1)
-    - GoogleUtilities/Network (~> 8.1)
-    - "GoogleUtilities/NSData+zlib (~> 8.1)"
-    - nanopb (~> 3.30910.0)
   - FirebaseCore (12.4.0):
     - FirebaseCoreInternal (~> 12.4.0)
     - GoogleUtilities/Environment (~> 8.1)
@@ -219,33 +197,6 @@ PODS:
   - fmt (11.0.2)
   - FunctionalSwift (2.3.3)
   - glog (0.3.5)
-  - GoogleAdsOnDeviceConversion (3.1.0):
-    - GoogleUtilities/Environment (~> 8.1)
-    - GoogleUtilities/Logger (~> 8.1)
-    - GoogleUtilities/Network (~> 8.1)
-    - nanopb (~> 3.30910.0)
-  - GoogleAppMeasurement/Core (12.4.0):
-    - GoogleUtilities/AppDelegateSwizzler (~> 8.1)
-    - GoogleUtilities/MethodSwizzler (~> 8.1)
-    - GoogleUtilities/Network (~> 8.1)
-    - "GoogleUtilities/NSData+zlib (~> 8.1)"
-    - nanopb (~> 3.30910.0)
-  - GoogleAppMeasurement/Default (12.4.0):
-    - GoogleAdsOnDeviceConversion (~> 3.1.0)
-    - GoogleAppMeasurement/Core (= 12.4.0)
-    - GoogleAppMeasurement/IdentitySupport (= 12.4.0)
-    - GoogleUtilities/AppDelegateSwizzler (~> 8.1)
-    - GoogleUtilities/MethodSwizzler (~> 8.1)
-    - GoogleUtilities/Network (~> 8.1)
-    - "GoogleUtilities/NSData+zlib (~> 8.1)"
-    - nanopb (~> 3.30910.0)
-  - GoogleAppMeasurement/IdentitySupport (12.4.0):
-    - GoogleAppMeasurement/Core (= 12.4.0)
-    - GoogleUtilities/AppDelegateSwizzler (~> 8.1)
-    - GoogleUtilities/MethodSwizzler (~> 8.1)
-    - GoogleUtilities/Network (~> 8.1)
-    - "GoogleUtilities/NSData+zlib (~> 8.1)"
-    - nanopb (~> 3.30910.0)
   - GoogleDataTransport (10.1.0):
     - nanopb (~> 3.30910.0)
     - PromisesObjC (~> 2.4)
@@ -3240,23 +3191,22 @@ PODS:
     - SocketRocket
     - Yoga
   - SocketRocket (0.7.1)
-  - SPaySDK (2.6.3):
-    - ClickstreamSDK (~> 1.5.0)
+  - SPaySDK (3.0.2)
   - Turf (4.0.0)
   - TwoFA (1.4.3):
     - YooMoneyAuthenticatorApi (~> 2.0)
     - YooMoneyCoreApi (~> 3.0)
     - YooMoneyUI (~> 7.7)
   - Yoga (0.0.0)
-  - YooKassaPayments (7.4.0):
-    - AppMetricaAnalytics (~> 5.8)
+  - YooKassaPayments (8.1.0):
+    - AppMetricaAnalytics (~> 5.12)
     - FMobileSdk (~> 2.0.0-1231)
-    - MoneyAuth (~> 12.1)
-    - SPaySDK (~> 2.5)
-    - YooKassaPaymentsApi (~> 2.25)
+    - MoneyAuth (~> 12.2)
+    - SPaySDK (~> 3.0)
+    - YooKassaPaymentsApi (~> 2.26)
     - YooKassaWalletApi (~> 2.7)
     - YooMoneyPinning
-  - YooKassaPaymentsApi (2.25.0):
+  - YooKassaPaymentsApi (2.26.0):
     - FunctionalSwift
     - YooMoneyCoreApi (~> 3.1.1)
   - YooKassaWalletApi (2.7.2):
@@ -3287,8 +3237,6 @@ DEPENDENCIES:
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
   - fast_float (from `../node_modules/react-native/third-party-podspecs/fast_float.podspec`)
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
-  - Firebase/Core
-  - Firebase/Messaging
   - FirebaseCore
   - fmt (from `../node_modules/react-native/third-party-podspecs/fmt.podspec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
@@ -3383,8 +3331,7 @@ DEPENDENCIES:
   - RNWorklets (from `../node_modules/react-native-worklets`)
   - SocketRocket (~> 0.7.1)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
-  - YooKassaPayments (from `https://git.yoomoney.ru/scm/sdk/yookassa-payments-swift.git`, tag `7.4.0`)
-  - YooKassaPaymentsApi (= 2.25.0)
+  - YooKassaPayments (from `https://git.yoomoney.ru/scm/sdk/yookassa-payments-swift.git`, tag `8.1.0`)
 
 SPEC REPOS:
   https://git.yoomoney.ru/scm/sdk/cocoa-pod-specs.git:
@@ -3424,7 +3371,6 @@ SPEC REPOS:
     - AppMetricaWebKit
     - BEMCheckBox
     - BranchSDK
-    - ClickstreamSDK
     - DatadogCore
     - DatadogCrashReporting
     - DatadogInternal
@@ -3433,14 +3379,11 @@ SPEC REPOS:
     - DatadogTrace
     - DatadogWebViewTracking
     - Firebase
-    - FirebaseAnalytics
     - FirebaseCore
     - FirebaseCoreExtension
     - FirebaseCoreInternal
     - FirebaseInstallations
     - FirebaseMessaging
-    - GoogleAdsOnDeviceConversion
-    - GoogleAppMeasurement
     - GoogleDataTransport
     - GoogleUtilities
     - KSCrash
@@ -3653,12 +3596,12 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga"
   YooKassaPayments:
     :git: https://git.yoomoney.ru/scm/sdk/yookassa-payments-swift.git
-    :tag: 7.4.0
+    :tag: 8.1.0
 
 CHECKOUT OPTIONS:
   YooKassaPayments:
     :git: https://git.yoomoney.ru/scm/sdk/yookassa-payments-swift.git
-    :tag: 7.4.0
+    :tag: 8.1.0
 
 SPEC CHECKSUMS:
   appmetrica-react-native-analytics: 20de23ba14518b5a336e4bfad97879e78cb8f990
@@ -3687,7 +3630,6 @@ SPEC CHECKSUMS:
   boost: 7e761d76ca2ce687f7cc98e698152abd03a18f90
   BranchSDK: 19a6e97115350db916a57823c7f6ed96d1e70e46
   BVLinearGradient: cb006ba232a1f3e4f341bb62c42d1098c284da70
-  ClickstreamSDK: 591cbf0c2f96bcaba6a36365a94a19f4463a1ae5
   DatadogCore: 8e50ad6cb68343f701707f7eeca16e0acb52ed8c
   DatadogCrashReporting: 34763d4276d4fce286c7e8729cfcd2ac04dca43b
   DatadogInternal: bd8672d506a7e67936ed5f7ca612169e49029b44
@@ -3700,7 +3642,6 @@ SPEC CHECKSUMS:
   fast_float: b32c788ed9c6a8c584d114d0047beda9664e7cc6
   FBLazyVector: 0aa6183b9afe3c31fc65b5d1eeef1f3c19b63bfa
   Firebase: f07b15ae5a6ec0f93713e30b923d9970d144af3e
-  FirebaseAnalytics: 0fc2b20091f0ddd21bf73397cf8f0eb5346dc24f
   FirebaseCore: bb595f3114953664e3c1dc032f008a244147cfd3
   FirebaseCoreExtension: 7e1f7118ee970e001a8013719fb90950ee5e0018
   FirebaseCoreInternal: d7f5a043c2cd01a08103ab586587c1468047bca6
@@ -3710,8 +3651,6 @@ SPEC CHECKSUMS:
   fmt: a40bb5bd0294ea969aaaba240a927bd33d878cdd
   FunctionalSwift: bc40a208dd4f29100767aba35602cc231e8d355a
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
-  GoogleAdsOnDeviceConversion: e03a386840803ea7eef3fd22a061930142c039c1
-  GoogleAppMeasurement: 1e718274b7e015cefd846ac1fcf7820c70dc017d
   GoogleDataTransport: aae35b7ea0c09004c3797d53c8c41f66f219d6a7
   GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
   hermes-engine: 273e30e7fb618279934b0b95ffab60ecedb7acf5
@@ -3802,8 +3741,8 @@ SPEC CHECKSUMS:
   RNCClipboard: 4b58c780f63676367640f23c8e114e9bd0cf86ac
   RNCMaskedView: 4b5b12efdee55966f1d68f32d4b3401c2acf05c2
   RNDeviceInfo: bcce8752b5043a623fe3c26789679b473f705d3c
-  RNFBApp: 78d866e12b98c79b7cb141fcdcdf9813eae09b15
-  RNFBMessaging: e16ebeae1f64f57603a193f1be6f3be7ab55c5e4
+  RNFBApp: 255fa19a91d6c1309e021ee75d5d209754e5961b
+  RNFBMessaging: c304c1d8949f996d3eed1cf4eeba33148d13b4ea
   RNGestureHandler: e1cf8ef3f11045536eed6bd4f132b003ef5f9a5f
   rnmapbox-maps: 45bae374417b6d5a2174da7eb047d78c3ae007b8
   RNReactNativeHapticFeedback: be4f1b4bf0398c30b59b76ed92ecb0a2ff3a69c6
@@ -3812,12 +3751,12 @@ SPEC CHECKSUMS:
   RNSVG: 8c0bbfa480a24b24468f1c76bd852a4aac3178e6
   RNWorklets: ab618bf7d1c7fd2cb793b9f0f39c3e29274b3ebf
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
-  SPaySDK: 96c77660e19ec669e0ea7434c677dce884e64219
+  SPaySDK: 488c8b3dff08541f9f9097d15279c6c2cfc14ada
   Turf: c9eb11a65d96af58cac523460fd40fec5061b081
   TwoFA: 43214c0d2f7be83bccad6e8a31b656565632ce95
   Yoga: 689c8e04277f3ad631e60fe2a08e41d411daf8eb
-  YooKassaPayments: 1edcef7102475b3890113bc4cb657677f78f32fc
-  YooKassaPaymentsApi: 63a1fb836f6543e306891ae9a58a55928b2df842
+  YooKassaPayments: 9e9c5623d5e412190595516c928aed7672e39336
+  YooKassaPaymentsApi: f4441641c0456c7e6f252eee2a587b19df41fbbe
   YooKassaWalletApi: f7162cf7dd44a261ab1be83e66c6c67d50f90122
   YooMoneyAuthenticatorApi: 473077a60a5db1c8e1f0310f8437cab34b8e021e
   YooMoneyCoreApi: f53a22898878aab2f07449351a8a08f4918a6100
@@ -3826,6 +3765,6 @@ SPEC CHECKSUMS:
   YooMoneyUI: af34ddd1b07cfaff4b194cc944a823aae68f5798
   YooMoneyUserAuthCenterApi: e19361858e23ef4072ffacc5b3aa1d0925714f22
 
-PODFILE CHECKSUM: 6842836fe693af640caeb57690e0d1d4f46d7d44
+PODFILE CHECKSUM: f269b1e0a7c3bd876395b76f00e24406a68275d5
 
 COCOAPODS: 1.16.2
