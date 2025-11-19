@@ -1,32 +1,25 @@
-//
-//  PaymentGatewayModule.swift
-//  OnviMobile
-//
-//  Created by Evgeniy Shomin on 2024-04-29.
-//
-
 import Foundation
 import UIKit
 import React
 import YooKassaPayments
 
-// MARK: - Main Module Class
 @objc(PaymentGatewayModule)
-class PaymentGatewayModule: NSObject {
+class PaymentGatewayModule: RCTViewManager, TokenizationModuleOutput {
     
     var paymentCallback: RCTResponseSenderBlock?
     var confirmCallback: RCTResponseSenderBlock?
     var viewController: UIViewController?
     
-    // MARK: - React Native Required Method
-    @objc static func requiresMainQueueSetup() -> Bool {
+    // MARK: - React Native Required Methods
+    override class func requiresMainQueueSetup() -> Bool {
         return true
     }
-}
-
-// MARK: - YooKassa Protocol Implementation
-extension PaymentGatewayModule: TokenizationModuleOutput {
     
+    override func view() -> UIView! {
+        return UIView() // Пустая view, так как это не UI компонент
+    }
+    
+    // MARK: - YooKassa Protocol Implementation
     func didFinish(on module: TokenizationModuleInput, with error: YooKassaPaymentsError?) {
         let errorDict: NSDictionary = [
             "code": "E_PAYMENT_CANCELLED",
@@ -84,11 +77,8 @@ extension PaymentGatewayModule: TokenizationModuleOutput {
             paymentCallback = nil
         }
     }
-}
-
-// MARK: - React Native Exposed Methods
-extension PaymentGatewayModule {
     
+    // MARK: - React Native Exposed Methods
     @objc
     func startTokenize(_ params: NSDictionary, callbacker callback: @escaping RCTResponseSenderBlock) -> Void {
         
@@ -175,8 +165,8 @@ extension PaymentGatewayModule {
         
         print("PAYMENT GATEWAY -> BEGIN CONFIRMATIONS...")
         
-        guard let paymentMethodType = PaymentMethodType(rawValue: paymentMethodTypeString.lowercased()) else { 
-            return 
+        guard let paymentMethodType = PaymentMethodType(rawValue: paymentMethodTypeString.lowercased()) else {
+            return
         }
         
         guard let viewController = viewController as? TokenizationModuleInput else { return }

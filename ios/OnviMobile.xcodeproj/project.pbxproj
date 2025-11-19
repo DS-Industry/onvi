@@ -13,6 +13,7 @@
 		8B147E3F2EC73FFD00B3ADFE /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8B147E3E2EC73FFD00B3ADFE /* Images.xcassets */; };
 		8B147E432EC740DB00B3ADFE /* PaymentGatewayModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B147E422EC740DB00B3ADFE /* PaymentGatewayModule.swift */; };
 		8B1813622ECC577A000AF3EA /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8B1813612ECC577A000AF3EA /* GoogleService-Info.plist */; };
+		8BDD639A2ECDBBFA00B417E4 /* PaymentGatewayModuleBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BDD63992ECDBBFA00B417E4 /* PaymentGatewayModuleBridge.m */; };
 		93BE33EBD02445A0FCE6FF76 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
 		D125F162FE9C0FEA6EB4C766 /* libPods-OnviMobile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7DC4D57D4D262853A5C4276A /* libPods-OnviMobile.a */; };
 /* End PBXBuildFile section */
@@ -29,6 +30,8 @@
 		8B147E3E2EC73FFD00B3ADFE /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = ../../oldOnviMobile/OnviMobile/ios/OnviMobile/Images.xcassets; sourceTree = "<group>"; };
 		8B147E422EC740DB00B3ADFE /* PaymentGatewayModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentGatewayModule.swift; sourceTree = "<group>"; };
 		8B1813612ECC577A000AF3EA /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		8BDD63962ECDBB6E00B417E4 /* OnviMobile-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "OnviMobile-Bridging-Header.h"; sourceTree = "<group>"; };
+		8BDD63992ECDBBFA00B417E4 /* PaymentGatewayModuleBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PaymentGatewayModuleBridge.m; sourceTree = "<group>"; };
 		AC6E70C30C1309E5C09C1012 /* Pods-OnviMobile.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OnviMobile.debug.xcconfig"; path = "Target Support Files/Pods-OnviMobile/Pods-OnviMobile.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -55,6 +58,8 @@
 				13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */,
 				8B147E3E2EC73FFD00B3ADFE /* Images.xcassets */,
 				8B147E422EC740DB00B3ADFE /* PaymentGatewayModule.swift */,
+				8BDD63962ECDBB6E00B417E4 /* OnviMobile-Bridging-Header.h */,
+				8BDD63992ECDBBFA00B417E4 /* PaymentGatewayModuleBridge.m */,
 			);
 			name = OnviMobile;
 			sourceTree = "<group>";
@@ -142,7 +147,7 @@
 				LastUpgradeCheck = 2610;
 				TargetAttributes = {
 					13B07F861A680F5B00A75B9A = {
-						LastSwiftMigration = 1120;
+						LastSwiftMigration = 2610;
 					};
 				};
 			};
@@ -283,6 +288,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				761780ED2CA45674006654EE /* AppDelegate.swift in Sources */,
+				8BDD639A2ECDBBFA00B417E4 /* PaymentGatewayModuleBridge.m in Sources */,
 				8B147E432EC740DB00B3ADFE /* PaymentGatewayModule.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -295,9 +301,11 @@
 			baseConfigurationReference = AC6E70C30C1309E5C09C1012 /* Pods-OnviMobile.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = NO;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
 				ENABLE_BITCODE = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = i386;
@@ -315,6 +323,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = OnviMobile;
+				SWIFT_OBJC_BRIDGING_HEADER = "OnviMobile-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -326,9 +335,11 @@
 			baseConfigurationReference = 3A41960CF715520D21D6CF38 /* Pods-OnviMobile.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = NO;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = i386;
 				INFOPLIST_FILE = OnviMobile/Info.plist;
@@ -345,6 +356,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = OnviMobile;
+				SWIFT_OBJC_BRIDGING_HEADER = "OnviMobile-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
