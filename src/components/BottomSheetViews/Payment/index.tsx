@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet, Text, Pressable, View, ScrollView} from 'react-native';
-import {BottomSheetView} from '@gorhom/bottom-sheet';
+import BottomSheet, {BottomSheetScrollView, BottomSheetView} from '@gorhom/bottom-sheet';
 import {BusinessHeader} from '@components/Business/Header';
 import {dp} from '@utils/dp';
 import {navigateBottomSheet} from '@navigators/BottomSheetStack';
@@ -118,8 +118,8 @@ const Payment = () => {
   }, [order.sum, discount, usedPoints, toggled, user]);
 
   return (
-    <BottomSheetView style={styles.mainContainer}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+    <BottomSheet style={styles.mainContainer}>
+      <BottomSheetScrollView contentContainerStyle={styles.scrollContent}>
         <BusinessHeader type="box" box={order?.bayNumber ?? 0} />
         <Text style={styles.title}>
           {freeOn ? t('app.payment.vacuumActivation') : t('app.payment.title')}
@@ -232,7 +232,7 @@ const Payment = () => {
             </Pressable>
           </View>
         </View>
-      </ScrollView>
+      </BottomSheetScrollView>
 
       <PromocodeModal
         visible={showPromocodeModal}
@@ -243,7 +243,7 @@ const Payment = () => {
         promocodeError={promoError}
         fetching={isMutating}
       />
-    </BottomSheetView>
+    </BottomSheet>
   );
 };
 
@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
     marginRight: dp(10),
   },
   paymentActions: {
-    // marginTop: dp(30),
+    marginTop: dp(30),
     alignItems: 'center',
   },
   cancelButton: {
