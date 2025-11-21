@@ -12,8 +12,7 @@ import useStore from '../../state/store.ts';
 import useSWR from 'swr';
 import {getPOSList} from '@services/api/pos';
 import {throttle} from 'lodash';
-
-import {CameraRef} from '@rnmapbox/maps/lib/typescript/src/components/Camera';
+import { CameraRef } from 'node_modules/@rnmapbox/maps/lib/typescript/src/components/Camera';
 
 export type CameraReference = {
   setCameraPosition: (val?: {
