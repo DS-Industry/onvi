@@ -49,7 +49,7 @@ const NewsList = () => {
       {isLoadingInitialData ? (
         <ActivityIndicator size="large" color="#0000FF" />
       ) : (
-        <>f</>
+        <></>
         // <FlatList
         //   data={data}
         //   renderItem={renderItem}
