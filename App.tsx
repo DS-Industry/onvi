@@ -192,7 +192,7 @@ function App(): React.JSX.Element {
         <RemoteNotifications />
         <I18nextProvider i18n={i18n}>
           <GestureHandlerRootView style={{flex: 1}}>
-            <SafeAreaView style={styles.container}>
+            <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
               <View style={{height: Dimensions.get('window').height}}>
                 {!isConnected && <FlashMessage position="top" />}
                 <Application />
