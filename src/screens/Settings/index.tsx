@@ -8,8 +8,12 @@ import {
   Text,
   TouchableOpacity,
   View,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 
+import Modal from 'react-native-modal';
 import {dp} from '../../utils/dp';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
@@ -17,7 +21,6 @@ import useStore from '../../state/store';
 import {formatPhoneNumber} from '../../utils/phoneFormat';
 import {Button} from '@styled/buttons';
 import {LogOut} from 'react-native-feather';
-import BottomSheet, {BottomSheetTextInput} from '@gorhom/bottom-sheet';
 import {useNavigation} from '@react-navigation/native';
 import Switch from '@styled/buttons/CustomSwitch';
 import {AvatarEnum} from '../../types/AvatarEnum.ts';
@@ -70,9 +73,6 @@ const Settings = () => {
     'both.jpg' | 'female.jpg' | 'male.jpg'
   >(initialAvatar);
 
-  const bottomSheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => ['80%'], []);
-
   const {trigger, isMutating} = useSWRMutation(
     'updateUserData',
     (key, {arg}: {arg: IUpdateAccountRequest}) => update(arg),
@@ -107,7 +107,6 @@ const Settings = () => {
     setUserName(initialUserName);
     setEmail(initialEmail);
     setEmailValid(null);
-    bottomSheetRef?.current?.close();
   };
 
   const saveUserDate = async () => {
@@ -148,15 +147,6 @@ const Settings = () => {
     navigation.navigate('О приложении');
   };
 
-  const renderOverlay = () => {
-    if (editing) {
-      return <View style={styles.overlay} />;
-    }
-    return null;
-  };
-
-  const avatarValue = avatarSwitch(selectedAvatar);
-
   const handleEmailChange = (val: string) => {
     setEmail(val);
     if (val === '') {
@@ -177,133 +167,153 @@ const Settings = () => {
 
   const editingMode = () => {
     return (
-      <BottomSheet
-        ref={bottomSheetRef}
-        snapPoints={snapPoints}
-        keyboardBlurBehavior="restore"
-        // add bottom inset to elevate the sheet
-        bottomInset={dp(Dimensions.get('window').height / 5)}
-        // set `detached` to true
-        detached={true}
-        style={styles.sheetContainer}
-        backgroundStyle={{borderRadius: dp(38)}}
-        handleHeight={dp(30)}
-        handleIndicatorStyle={{display: 'none'}}>
-        <View style={styles.contentContainer}>
-          <Text style={{...styles.titleText, marginBottom: dp(20)}}>
-            {t('app.settings.personalData')}
-          </Text>
-          <View style={styles.avatars}>
-            <TouchableOpacity
-              onPress={() => setSelectedAvatar('both.jpg')}
-              style={
-                styles[
-                  selectedAvatar === 'both.jpg'
-                    ? 'selectedAvatar'
-                    : 'avatarButton'
-                ]
-              }>
-              <Image
-                style={{height: dp(80), width: dp(80), borderRadius: 50}}
-                source={require('../../assets/avatars/both.jpg')}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => setSelectedAvatar('female.jpg')}
-              style={
-                styles[
-                  selectedAvatar === 'female.jpg'
-                    ? 'selectedAvatar'
-                    : 'avatarButton'
-                ]
-              }>
-              <Image
-                style={{height: dp(80), width: dp(80), borderRadius: 50}}
-                source={require('../../assets/avatars/female.jpg')}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => setSelectedAvatar('male.jpg')}
-              style={
-                styles[
-                  selectedAvatar === 'male.jpg'
-                    ? 'selectedAvatar'
-                    : 'avatarButton'
-                ]
-              }>
-              <Image
-                style={{height: dp(80), width: dp(80), borderRadius: 50}}
-                source={require('../../assets/avatars/male.jpg')}
-              />
-            </TouchableOpacity>
+      <Modal
+        isVisible={editing}
+        onBackdropPress={handleClosePress}
+        onSwipeComplete={handleClosePress}
+        swipeDirection="down"
+        style={styles.modal}
+        avoidKeyboard
+        propagateSwipe
+        backdropOpacity={0.6}
+        animationIn="slideInUp"
+        animationOut="slideOutDown"
+        useNativeDriverForBackdrop
+        hideModalContentWhileAnimating
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.modalContent}
+        >
+          <View style={styles.modalHeader}>
+            <View style={styles.modalHandle} />
           </View>
-          <View style={styles.textInputGroup}>
-            <Text style={{padding: dp(10)}}>👤</Text>
-            <BottomSheetTextInput
-              value={userName}
-              placeholder={t('app.settings.name')}
-              onChangeText={(val: string) => {
-                setUserName(val);
-              }}
-              style={styles.bottomSheetTextInput}
-            />
-          </View>
-          <View style={getEmailInputStyle()}>
-            <Text style={{padding: dp(10)}}>✉️</Text>
-            <BottomSheetTextInput
-              value={email}
-              placeholder={t('app.settings.email')}
-              onChangeText={handleEmailChange}
-              style={styles.bottomSheetTextInput}
-            />
-          </View>
-          <View
-            style={{
-              ...styles.textInputGroup,
-              backgroundColor: 'rgba(0, 0, 0, 0.3)',
-            }}>
-            <Text style={{padding: dp(10)}}>📞</Text>
-            <BottomSheetTextInput
-              editable={false}
-              value={formatPhoneNumber(initialPhone)}
-              placeholder={t('app.settings.email')}
+          
+          <ScrollView 
+            style={styles.modalScrollView}
+            contentContainerStyle={styles.modalScrollContent}
+            showsVerticalScrollIndicator={false}
+          >
+            <Text style={{...styles.titleText, marginBottom: dp(20)}}>
+              {t('app.settings.personalData')}
+            </Text>
+            
+            <View style={styles.avatars}>
+              <TouchableOpacity
+                onPress={() => setSelectedAvatar('both.jpg')}
+                style={
+                  styles[
+                    selectedAvatar === 'both.jpg'
+                      ? 'selectedAvatar'
+                      : 'avatarButton'
+                  ]
+                }>
+                <Image
+                  style={{height: dp(80), width: dp(80), borderRadius: 50}}
+                  source={require('../../assets/avatars/both.jpg')}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setSelectedAvatar('female.jpg')}
+                style={
+                  styles[
+                    selectedAvatar === 'female.jpg'
+                      ? 'selectedAvatar'
+                      : 'avatarButton'
+                  ]
+                }>
+                <Image
+                  style={{height: dp(80), width: dp(80), borderRadius: 50}}
+                  source={require('../../assets/avatars/female.jpg')}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setSelectedAvatar('male.jpg')}
+                style={
+                  styles[
+                    selectedAvatar === 'male.jpg'
+                      ? 'selectedAvatar'
+                      : 'avatarButton'
+                  ]
+                }>
+                <Image
+                  style={{height: dp(80), width: dp(80), borderRadius: 50}}
+                  source={require('../../assets/avatars/male.jpg')}
+                />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.textInputGroup}>
+              <Text style={{padding: dp(10)}}>👤</Text>
+              <TextInput
+                value={userName}
+                placeholder={t('app.settings.name')}
+                onChangeText={(val: string) => {
+                  setUserName(val);
+                }}
+                style={styles.textInput}
+                placeholderTextColor="#999"
+              />
+            </View>
+            
+            <View style={getEmailInputStyle()}>
+              <Text style={{padding: dp(10)}}>✉️</Text>
+              <TextInput
+                value={email}
+                placeholder={t('app.settings.email')}
+                onChangeText={handleEmailChange}
+                style={styles.textInput}
+                placeholderTextColor="#999"
+                autoCapitalize="none"
+                keyboardType="email-address"
+              />
+            </View>
+            <View
               style={{
-                ...styles.bottomSheetTextInput,
-                backgroundColor: 'rgba(0, 0, 0, 0.008)',
-              }}
+                ...styles.textInputGroup,
+                backgroundColor: 'rgba(0, 0, 0, 0.3)',
+              }}>
+              <Text style={{padding: dp(10)}}>📞</Text>
+              <TextInput
+                editable={false}
+                value={formatPhoneNumber(initialPhone)}
+                placeholder={t('app.settings.phone')}
+                style={{
+                  ...styles.textInput,
+                  backgroundColor: 'rgba(0, 0, 0, 0.008)',
+                  color: '#666',
+                }}
+                placeholderTextColor="#999"
+              />
+            </View>
+          </ScrollView>
+          <View style={styles.modalButtons}>
+            <Button
+              label={t('common.buttons.cancel')}
+              color={'blue'}
+              width={dp(140)}
+              height={dp(40)}
+              fontSize={dp(16)}
+              fontWeight={'600'}
+              onClick={handleClosePress}
+            />
+            <Button
+              label={t('common.buttons.save')}
+              color={'blue'}
+              width={dp(140)}
+              height={dp(40)}
+              fontSize={dp(16)}
+              fontWeight={'600'}
+              disabled={isMutating || emailValid === false}
+              onClick={saveUserDate}
+              showLoading={isMutating}
             />
           </View>
-        </View>
-        <View
-          style={{
-            flexDirection: 'row',
-            marginBottom: dp(16),
-            justifyContent: 'space-evenly',
-          }}>
-          <Button
-            label={t('common.buttons.cancel')}
-            color={'blue'}
-            width={dp(140)}
-            height={dp(40)}
-            fontSize={dp(16)}
-            fontWeight={'600'}
-            onClick={handleClosePress}
-          />
-          <Button
-            label={t('common.buttons.save')}
-            color={'blue'}
-            width={dp(140)}
-            height={dp(40)}
-            fontSize={dp(16)}
-            fontWeight={'600'}
-            disabled={isMutating || emailValid === false}
-            onClick={saveUserDate}
-            showLoading={isMutating}
-          />
-        </View>
-      </BottomSheet>
+        </KeyboardAvoidingView>
+      </Modal>
     );
   };
+
+  const avatarValue = avatarSwitch(selectedAvatar);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -376,11 +386,11 @@ const Settings = () => {
                       inActiveText={''}
                       backgroundActive="#000"
                       backgroundInActive="#A3A3A6"
-                      circleImageActive={require('../../assets/icons/small-icon.png')} // Replace with your image source
-                      circleImageInactive={require('../../assets/icons/small-icon.png')} // Replace with your image source
-                      circleSize={dp(18)} // Adjust the circle size as needed
+                      circleImageActive={require('../../assets/icons/small-icon.png')}
+                      circleImageInactive={require('../../assets/icons/small-icon.png')}
+                      circleSize={dp(18)}
                       switchBorderRadius={20}
-                      width={dp(45)} // Adjust the switch width as needed
+                      width={dp(45)}
                       textStyle={{fontSize: dp(13), color: 'white'}}
                     />
                   </View>
@@ -462,8 +472,7 @@ const Settings = () => {
           </View>
         </View>
       </ScrollView>
-      {renderOverlay()}
-      {editing && editingMode()}
+      {editingMode()}
     </SafeAreaView>
   );
 };
@@ -572,17 +581,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  sheetContainer: {
-    // add horizontal space
-    marginHorizontal: dp(16),
-  },
-  contentContainer: {
-    flex: 1,
+  textInputGroup: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: dp(15),
     alignItems: 'center',
-    flexDirection: 'column',
-    padding: dp(10),
+    backgroundColor: '#F5F5F5',
+    borderRadius: dp(30),
+    width: '100%',
   },
-  bottomSheetTextInput: {
+  textInput: {
     flex: 1,
     paddingTop: dp(10),
     paddingRight: dp(10),
@@ -592,29 +600,7 @@ const styles = StyleSheet.create({
     fontSize: dp(16),
     fontWeight: '400',
     textAlign: 'left',
-    padding: 6,
     color: '#000000',
-    backgroundColor: '#F5F5F5',
-    borderRadius: dp(30),
-  },
-  overlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)', // Semi-transparent black color
-  },
-  loadingContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  textInputGroup: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: dp(15),
-    alignItems: 'center',
     backgroundColor: '#F5F5F5',
     borderRadius: dp(30),
   },
@@ -623,6 +609,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     alignItems: 'center',
+    width: '100%',
+    marginBottom: dp(10),
   },
   avatarButton: {
     borderRadius: 50,
@@ -692,6 +680,40 @@ const styles = StyleSheet.create({
   invalidInput: {
     borderColor: 'red',
     borderWidth: 1,
+  },
+  modal: {
+    justifyContent: 'flex-end',
+    margin: 0,
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderTopLeftRadius: dp(38),
+    borderTopRightRadius: dp(38),
+    maxHeight: '80%',
+  },
+  modalHeader: {
+    alignItems: 'center',
+    paddingVertical: dp(10),
+  },
+  modalHandle: {
+    width: dp(40),
+    height: dp(4),
+    backgroundColor: '#ccc',
+    borderRadius: dp(2),
+  },
+  modalScrollView: {
+    flexGrow: 0,
+  },
+  modalScrollContent: {
+    padding: dp(16),
+    alignItems: 'center',
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    paddingVertical: dp(16),
+    borderTopWidth: 1,
+    borderTopColor: '#f0f0f0',
   },
 });
 
