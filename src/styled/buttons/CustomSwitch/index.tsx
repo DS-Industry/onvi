@@ -1,4 +1,4 @@
-import React, {ReactElement, useEffect, useState} from 'react';
+import React, {JSX, ReactElement, useEffect, useState} from 'react';
 import {
   StyleSheet,
   TouchableWithoutFeedback,
@@ -34,7 +34,7 @@ interface SwitchProps {
   circleImageInactive?: ReactElement;
 }
 
-const spring = (_value: any, config: any = {damping: 20, stiffness: 120}) =>
+const spring = (_value: any, config: any = {damping: 12, stiffness: 80, mass: 0.7}) =>
   withSpring(_value, config);
 
 const PADDINGHORIZONTAL = 2;
@@ -149,34 +149,32 @@ const Switch = (IProps: SwitchProps): JSX.Element => {
       (defaultWidth -
         (defaultCircleSize +
           (defaultPadding.paddingLeft + defaultPadding.paddingRight)));
+
+    const springConfig = { damping: 12, stiffness: 80, mass: 0.7 };
+
     if (value) {
-      circleTranslateX.value = spring(size, {damping: 15, stiffness: 120});
-      textTranslateXActive.value = spring(0);
-      textTranslateXInActive.value = spring(factory * defaultWidth);
+      circleTranslateX.value = spring(size, springConfig);
+      textTranslateXActive.value = spring(0, springConfig);
+      textTranslateXInActive.value = spring(factory * defaultWidth, springConfig);
       if (circleActiveColor) {
-        circleColor.value = spring(circleActiveColor, {
-          damping: 20,
-          stiffness: 100,
-        });
+        circleColor.value = spring(circleActiveColor, springConfig);
       }
     } else {
-      circleTranslateX.value = spring(0, {damping: 15, stiffness: 120});
-      textTranslateXActive.value = spring(-(defaultWidth * factory));
-      textTranslateXInActive.value = spring(0);
+      circleTranslateX.value = spring(0, springConfig);
+      textTranslateXActive.value = spring(-(defaultWidth * factory), springConfig);
+      textTranslateXInActive.value = spring(0, springConfig);
       if (circleInActiveColor) {
-        circleColor.value = spring(circleInActiveColor, {
-          damping: 20,
-          stiffness: 100,
-        });
+        circleColor.value = spring(circleInActiveColor, springConfig);
       }
     }
   }, [value, defaultWidth, defaultCircleSize, defaultPadding, isRTL]);
 
   useEffect(() => {
+    const springConfig = { damping: 12, stiffness: 80, mass: 0.7 };
     if (disabled) {
-      opacity.value = spring(0.8);
+      opacity.value = spring(0.8, springConfig);
     } else {
-      opacity.value = spring(1);
+      opacity.value = spring(1, springConfig);
     }
   }, [disabled]);
 
