@@ -1,6 +1,6 @@
 import React, {useRef, useState, useMemo, useEffect, useCallback} from 'react';
 import {View, StyleSheet, Dimensions, Platform} from 'react-native';
-import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import {Gesture, GestureDetector, GestureHandlerRootView} from 'react-native-gesture-handler';
 import {BurgerButton} from '@navigators/BurgerButton';
 import {Balance} from '@components/Balance';
 import {Map} from '@components/Map';
@@ -84,6 +84,8 @@ const Home = React.memo(({navigation}: any) => {
     easing: Easing.linear,
   });
 
+  const blockDragGesture = Gesture.Pan().enabled(!isDraggable);
+
   return (
     <GestureHandlerRootView style={styles.master}>
       <View style={styles.container}>
@@ -99,7 +101,7 @@ const Home = React.memo(({navigation}: any) => {
 
         <BottomSheet
           animationConfigs={animationConfigs}
-          enableContentPanningGesture={isDraggable}
+          // enableContentPanningGesture={isDraggable}
           enableHandlePanningGesture={isDraggable}
           ref={bsRef}
           handleIndicatorStyle={styles.handleIndicator}
@@ -116,9 +118,11 @@ const Home = React.memo(({navigation}: any) => {
           )}
           style={styles.shadow}
           topInset={0}>
-          <View style={styles.contentContainer}>
-            {memoizedBottomSheetStack}
-          </View>
+          <GestureDetector gesture={blockDragGesture}>
+            <View style={styles.contentContainer}>
+              {memoizedBottomSheetStack}
+            </View>
+          </GestureDetector>
         </BottomSheet>
 
         <View style={[styles.burger]}>
