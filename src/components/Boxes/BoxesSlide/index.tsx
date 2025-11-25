@@ -1,5 +1,6 @@
 import React, {useCallback} from 'react';
-import {StyleSheet, Dimensions, FlatList} from 'react-native';
+import {StyleSheet, Dimensions} from 'react-native';
+import {FlatList} from 'react-native-gesture-handler'; 
 import {horizontalScale} from '../../../utils/metrics';
 import {dp} from '../../../utils/dp';
 import {Box} from '@components/Boxes/Box';
