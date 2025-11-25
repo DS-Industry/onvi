@@ -14,24 +14,24 @@ const NewsList = () => {
       pageSize: PAGE_SIZE,
     });
 
-  // const renderItem = ({item}) => (
-  //   <PressableCard
-  //     width="48%"
-  //     aspectRatio={1}
-  //     borderRadius={dp(23)}
-  //     overflow="hidden"
-  //     onPress={() => navigateBottomSheet('Post', {data: item})}>
-  //     <Image
-  //       source={{
-  //         uri:
-  //           item.attributes.vertical_image?.data?.attributes?.url ||
-  //           item.attributes.horizontal_image?.data?.attributes?.url,
-  //       }}
-  //       style={{width: '100%', height: '100%'}}
-  //       resizeMode="cover"
-  //     />
-  //   </PressableCard>
-  // );
+  const renderItem = ({item}) => (
+    <PressableCard
+      width="48%"
+      aspectRatio={1}
+      borderRadius={dp(23)}
+      // overflow="hidden"
+      onPress={() => navigateBottomSheet('Post', {data: item})}>
+      <Image
+        source={{
+          uri:
+            item.attributes.vertical_image?.data?.attributes?.url ||
+            item.attributes.horizontal_image?.data?.attributes?.url,
+        }}
+        style={{width: '100%', height: '100%'}}
+        resizeMode="cover"
+      />
+    </PressableCard>
+  );
 
   const renderFooter = () => {
     if (!isLoadingMore) {
@@ -49,20 +49,19 @@ const NewsList = () => {
       {isLoadingInitialData ? (
         <ActivityIndicator size="large" color="#0000FF" />
       ) : (
-        <></>
-        // <FlatList
-        //   data={data}
-        //   renderItem={renderItem}
-        //   keyExtractor={(item, index) => String(item.id || index)}
-        //   numColumns={2}
-        //   columnWrapperStyle={{gap: dp(11)}}
-        //   scrollEnabled={false}
-        //   onEndReached={loadMore}
-        //   onEndReachedThreshold={0.5}
-        //   ListFooterComponent={renderFooter}
-        //   contentContainerStyle={{paddingTop: dp(12), paddingBottom: dp(40)}}
-        //   ItemSeparatorComponent={() => <View style={{height: dp(11)}} />}
-        // />
+        <FlatList
+          data={data}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => String(item.id || index)}
+          numColumns={2}
+          columnWrapperStyle={{gap: dp(11)}}
+          scrollEnabled={false}
+          onEndReached={loadMore}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={renderFooter}
+          contentContainerStyle={{paddingTop: dp(12), paddingBottom: dp(40)}}
+          ItemSeparatorComponent={() => <View style={{height: dp(11)}} />}
+        />
       )}
     </>
   );

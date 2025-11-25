@@ -148,7 +148,7 @@ const Main = () => {
     <BottomSheetScrollView
       contentContainerStyle={{
         flexGrow: 1,
-        paddingBottom: Platform.OS === 'ios' ? dp(0) : dp(40),
+        // paddingBottom: Platform.OS === 'ios' ? dp(0) : dp(40),
       }}
       ref={scrollViewRef}
       nestedScrollEnabled={false}
@@ -157,7 +157,6 @@ const Main = () => {
         <View
           style={[
             localStyles.card,
-            // {backgroundColor, borderRadius: dp(22)},
           ]}>
           <View style={localStyles.searchContainer}>
             <TouchableOpacity
@@ -222,12 +221,9 @@ const Main = () => {
         <View
           style={[
             localStyles.card,
-            // {
-            //   backgroundColor,
-            //   borderRadius: dp(38),
-            //   flex: 1,
-            //   marginTop: dp(8),
-            // },
+            {
+              marginTop: dp(8),
+            },
           ]}>
           {storyLoading || storyError ? (
             <StoryViewPlaceholder />
@@ -299,6 +295,8 @@ const {width} = Dimensions.get('window');
 const localStyles = StyleSheet.create({
   card: {
     padding: dp(16),
+    borderRadius: dp(22),
+    backgroundColor: 'white',
   },
   searchContainer: {
     flexDirection: 'row',

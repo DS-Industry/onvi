@@ -25,6 +25,7 @@ interface PressableCardProps {
   backgroundColor?: string;
   padding?: number;
   style?: object;
+  aspectRatio?: number;
   unstyled?: boolean;
 }
 
@@ -41,6 +42,7 @@ const PressableCard = ({
   padding = 0,
   style = {},
   unstyled = false,
+  aspectRatio,
   ...props
 }: PressableCardProps) => {
   const scaleValue = useRef(new Animated.Value(1)).current;
@@ -87,6 +89,7 @@ const PressableCard = ({
             width,
             height,
             transform: [{scale: scaleValue}],
+            aspectRatio: aspectRatio
           },
           !unstyled && {
             backgroundColor,
