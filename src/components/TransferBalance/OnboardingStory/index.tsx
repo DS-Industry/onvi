@@ -1,9 +1,8 @@
 import React, {useState, useEffect} from 'react';
-import {View, StyleSheet, Dimensions, TouchableOpacity} from 'react-native';
-// import {MultiStoryContainer} from 'react-native-story-view';
+import {View, StyleSheet, Dimensions} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {dp} from '@utils/dp';
-import {X} from 'react-native-feather';
+import {StoryView} from '@components/StoryView'; // Импортируем наш компонент
 import {UserStoriesList} from '../../../types/Stories';
 
 // Get device dimensions for fullscreen story
@@ -25,7 +24,7 @@ const onboardingStories: UserStoriesList = [
         id: 13981,
         url: 'https://storage.yandexcloud.net/onvi-mobile/%D0%98%D1%81%D1%82%D0%BE%D1%80%D0%B8%D0%B8/mobile_app_how_to_transfer_balance_ru_step1.png',
         type: 'image',
-        duration: 10, // 5 seconds duration
+        duration: 10,
         storyId: 1,
         isReadMore: false,
       },
@@ -51,19 +50,19 @@ const onboardingStories: UserStoriesList = [
 
 interface OnboardingStoryProps {
   onComplete: () => void;
-  isManualTrigger?: boolean; // Add prop to indicate manual trigger
+  isManualTrigger?: boolean;
 }
 
 const TransferBalanceOnboardingStory: React.FC<OnboardingStoryProps> = ({
   onComplete,
-  isManualTrigger = false, // Default to false for automatic behavior
+  isManualTrigger = false,
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (isManualTrigger) {
-      // If manually triggered, bypass the AsyncStorage check and show immediately
+      // If manually triggered, show immediately
       setIsVisible(true);
       setLoading(false);
     } else {
@@ -106,95 +105,23 @@ const TransferBalanceOnboardingStory: React.FC<OnboardingStoryProps> = ({
     }
   };
 
-  const handleSkip = async () => {
-    try {
-      // Only save to AsyncStorage if this is not a manual trigger
-      if (!isManualTrigger) {
-        await AsyncStorage.setItem(TRANSFER_BALANCE_ONBOARDING_KEY, 'true');
-      }
-      setIsVisible(false);
-      onComplete();
-    } catch (error) {
-      setIsVisible(false);
-      onComplete();
-    }
-  };
-
   if (loading || !isVisible) {
     return null;
   }
 
   return (
-    <View style={styles.container}>
-      {/* <MultiStoryContainer
-        enableProgress={true}
-        visible={isVisible}
-        viewedStories={[]}
-        stories={onboardingStories}
-        userStoryIndex={0}
-        duration={5000}
-        onComplete={handleOnboardingComplete}
-        renderHeaderComponent={() => (
-          <View style={styles.headerContainer}>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={handleSkip}
-              activeOpacity={0.7}>
-              <X stroke={'white'} width={dp(24)} height={dp(24)} />
-            </TouchableOpacity>
-          </View>
-        )}
-        renderFooterComponent={() => <View></View>}
-        storyContainerViewProps={{
-          style: styles.storyContainer,
-        }}
-        imageStyle={styles.storyImage}
-      /> */}
-    </View>
+    <StoryView
+      stories={onboardingStories}
+      initialUserIndex={0}
+      onClose={handleOnboardingComplete}
+      isFullScreen={true}
+    />
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  headerContainer: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end', // Align contents to the right
-    alignItems: 'center',
-    position: 'absolute',
-    top: dp(50),
-    left: dp(15),
-    right: dp(15),
-    zIndex: 999,
-  },
-  closeButton: {
-    width: dp(36),
-    height: dp(36),
-    borderRadius: dp(18),
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
-    elevation: 5,
-  },
-  storyContainer: {
-    width: screenWidth,
-    height: screenHeight,
-    padding: 0,
-    margin: 0,
-    backgroundColor: '#000',
-  },
-  storyImage: {
-    width: screenWidth,
-    height: screenHeight,
-    resizeMode: 'cover',
   },
 });
 

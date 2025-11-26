@@ -37,6 +37,7 @@ import {useSharedValue} from 'react-native-reanimated';
 import {CarWashCard} from '@components/CarWashCard/CarWashCard.tsx';
 import CarwashesPlaceholder from '../CarwashesPlaceholder/index.tsx';
 import {NewsList} from './NewsList/NewsList.tsx';
+import { useStoryView } from '@context/StoryViewContext/index.tsx';
 
 const Main = () => {
   const {t} = useTranslation();
@@ -53,15 +54,18 @@ const Main = () => {
   const {latestCarwashesIsLoading} = useStore();
   const ref = useRef<ICarouselInstance>(null);
   const progress = useSharedValue<number>(0);
+  
+  const {openStoryView} = useStoryView();
+
   const onPressPagination = (index: number) => {
     ref.current?.scrollTo({
       count: index - progress.value,
       animated: true,
     });
   };
+  
   const {setIsMainScreen} = useNavStore.getState();
   const scrollViewRef = useRef<BottomSheetScrollViewMethods>(null);
-  // const {backgroundColor, currentThemeName} = useCombinedTheme();
   const [latestCarwashesData, setLatestCarwashesData] = useState<CarWashLocation[]>([]);
 
   const {isLoading: campaignLoading, data: campaignData} = useSWR(
@@ -232,6 +236,9 @@ const Main = () => {
               {storyData && (
                 <StoryView
                   stories={transformContentDataToUserStories(storyData)}
+                  onStoryOpen={(index) => {
+                    openStoryView(transformContentDataToUserStories(storyData), index);
+                  }}
                 />
               )}
             </>

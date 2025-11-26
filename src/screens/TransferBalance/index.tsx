@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -16,12 +16,12 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from 'react-native';
-import {useTranslation} from 'react-i18next';
-import {dp} from '../../utils/dp';
-import {useNavigation} from '@react-navigation/core';
-import {GeneralDrawerNavigationProp} from '../../types/navigation/DrawerNavigation.ts';
-import {getBalance} from '@services/api/balance';
-import {transferBalance} from '@services/api/balance';
+import { useTranslation } from 'react-i18next';
+import { dp } from '../../utils/dp';
+import { useNavigation } from '@react-navigation/core';
+import { GeneralDrawerNavigationProp } from '../../types/navigation/DrawerNavigation.ts';
+import { getBalance } from '@services/api/balance';
+import { transferBalance } from '@services/api/balance';
 import TransferFailModal from '@components/TransferBalance/TransferFailModal';
 import TransferSuccessModal from '@components/TransferBalance/TransferSuccessModal';
 import TransferBalanceOnboardingStory from '@components/TransferBalance/OnboardingStory';
@@ -37,7 +37,7 @@ type FindBalanceResponse = {
 const TransferBalance = () => {
   const [cardNumber, setCardNumber] = useState<string>('');
   const [balance, setBalance] = useState<FindBalanceResponse>();
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const [error, setError] = useState<string>('');
   const [showContent, setShowContent] = useState<boolean>(false);
   const [showInstructions, setShowInstructions] = useState<boolean>(false);
@@ -45,13 +45,13 @@ const TransferBalance = () => {
   const [transferSuccessModal, setTransferSuccessModal] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
 
-  const {loadUser} = useStore.getState();
+  const { loadUser } = useStore.getState();
 
   const url =
     'https://docs.google.com/document/d/1z4eILEuMX58WQRyf17mhU50NbH1A_QyosilFs18vqA4/edit?usp=sharing';
 
   const handlePress = () => {
-    Linking.openURL(url).catch(() => {});
+    Linking.openURL(url).catch(() => { });
   };
 
   const navigation =
@@ -126,7 +126,7 @@ const TransferBalance = () => {
           keyboardShouldPersistTaps="handled">
           <SafeAreaView style={styles.safeArea}>
             {(!showContent || showInstructions) && (
-              <TransferBalanceOnboardingStory
+              < TransferBalanceOnboardingStory
                 onComplete={() => {
                   setShowContent(true);
                   setShowInstructions(false);
@@ -186,7 +186,7 @@ const TransferBalance = () => {
                           <TextInput
                             style={[
                               styles.input,
-                              error ? {color: 'red'} : undefined,
+                              error ? { color: 'red' } : undefined,
                             ]}
                             value={cardNumber}
                             onChangeText={formatCardNumber}
@@ -197,7 +197,7 @@ const TransferBalance = () => {
                             editable={balance ? false : true}
                           />
                           {balance ? (
-                            <Text style={{...styles.balanceText, marginTop: 0}}>
+                            <Text style={{ ...styles.balanceText, marginTop: 0 }}>
                               {balance?.balance} {t('common.labels.points')}
                             </Text>
                           ) : (
@@ -235,7 +235,7 @@ const TransferBalance = () => {
 
                       {balance?.bonusAsPromo > 0 &&
                         (balance?.bonusAsPromo < 50 ? (
-                          <Text style={{marginTop: dp(10)}}>
+                          <Text style={{ marginTop: dp(10) }}>
                             💡 {balance?.bonusAsPromo}{' '}
                             {t('app.transferBalance.bonusPointsNotTransferred')}
                             .{' '}
@@ -246,11 +246,11 @@ const TransferBalance = () => {
                             .
                           </Text>
                         ) : (
-                          <Text style={{marginTop: dp(10)}}>
+                          <Text style={{ marginTop: dp(10) }}>
                             💡 {balance?.bonusAsPromo}{' '}
                             {t('app.transferBalance.bonusesReturn')}
                             <Pressable
-                              style={{display: 'flex', alignItems: 'flex-end'}}>
+                              style={{ display: 'flex', alignItems: 'flex-end' }}>
                               <Text
                                 style={{
                                   color: 'blue',
@@ -537,4 +537,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export {TransferBalance};
+export { TransferBalance };

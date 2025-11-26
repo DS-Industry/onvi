@@ -27,6 +27,8 @@ import i18n from './src/locales';
 import {AppMetricaInit} from './src/components/AppMetricaInit';
 import MapboxGL from '@rnmapbox/maps';
 import Toast from 'react-native-toast-message';
+import {StoryViewContext} from './src/context/StoryViewContext'
+import {StoryView} from './src/components/StoryView'
 
 MapboxGL.setAccessToken(
   'sk.eyJ1Ijoib25pdm9uZSIsImEiOiJjbTBsN2Q2MzIwMnZ0MmtzN2U5d3lycTJ0In0.J57w_rOEzH4Mijty_YXoRA',
@@ -107,6 +109,35 @@ function App(): React.JSX.Element {
   const {loadUser, user, fcmToken, loadFavoritesCarwashes} = useStore.getState();
   const favoritesLoadedRef = useRef(false);
   const {t} = useTranslation();
+
+  const [fullScreenStory, setFullScreenStory] = useState<{
+    visible: boolean;
+    stories: any;
+    initialIndex: number;
+  }>({
+    visible: false,
+    stories: null,
+    initialIndex: 0,
+  });
+  
+  const openStoryView = (stories: any, initialIndex: number) => {
+    setFullScreenStory({
+      visible: true,
+      stories,
+      initialIndex,
+    });
+  };
+  
+  const closeStoryView = () => {
+    setFullScreenStory(prev => ({
+      ...prev,
+      visible: false,
+    }));
+  };
+  const storyViewContextValue = {
+    openStoryView,
+    closeStoryView,
+  };
 
   configureReanimatedLogger({
     level: ReanimatedLogLevel.error,
@@ -191,14 +222,24 @@ function App(): React.JSX.Element {
       <ThemeProvider>
         <RemoteNotifications />
         <I18nextProvider i18n={i18n}>
-          <GestureHandlerRootView style={{flex: 1}}>
-            <SafeAreaView style={styles.container} edges={[]}>
-              <View style={{height: Dimensions.get('window').height}}>
-                {!isConnected && <FlashMessage position="top" />}
-                <Application />
-              </View>
-            </SafeAreaView>
-          </GestureHandlerRootView>
+          <StoryViewContext.Provider value={storyViewContextValue}>
+            <GestureHandlerRootView style={{flex: 1}}>
+              <SafeAreaView style={styles.container} edges={[]}>
+                <View style={{flex: 1}}>
+                  {!isConnected && <FlashMessage position="top" />}
+                  <Application />
+                  {fullScreenStory.visible && fullScreenStory.stories && (
+                    <StoryView
+                      stories={fullScreenStory.stories}
+                      initialUserIndex={fullScreenStory.initialIndex}
+                      onClose={closeStoryView}
+                      isFullScreen={true}
+                    />
+                  )}
+                </View>
+              </SafeAreaView>
+            </GestureHandlerRootView>
+          </StoryViewContext.Provider>
         </I18nextProvider>
       </ThemeProvider>
       <AppMetricaInit />
@@ -209,6 +250,15 @@ function App(): React.JSX.Element {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  storyOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'black',
+    zIndex: 9999,
   },
 });
 
