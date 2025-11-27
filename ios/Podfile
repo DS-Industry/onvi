@@ -18,6 +18,10 @@ if linkage != nil
   use_frameworks! :linkage => linkage.to_sym
 end
 
+project 'OnviMobile',
+  'Staging Debug' => :debug,
+  'Staging Release' => :release
+
 target 'OnviMobile' do
   config = use_native_modules!
 
