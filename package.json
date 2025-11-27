@@ -17,6 +17,8 @@
     "aos:staging-release": "yarn setStaging && react-native run-android --mode=stagingRelease", 
     "aos:prod": "yarn setProduction && react-native run-android --mode=productionDebug",
     "aos:prod-release": "yarn setProduction && react-native run-android --mode=productionRelease",
+    "aos:SD-apk": "yarn setStaging && cd android && ./gradlew assembleStagingDebug",
+    "aos:PD-apk": "yarn setProduction && cd android && ./gradlew assembleProductionDebug",
     "aos:SR-apk": "yarn setStaging && cd android && ./gradlew assembleStagingRelease",
     "aos:PR-apk": "yarn setProduction && cd android && ./gradlew assembleProductionRelease",
     "aos:PR-Bundle": "yarn setProduction && cd android && ./gradlew bundleProductionRelease"
