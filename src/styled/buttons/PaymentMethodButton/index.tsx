@@ -7,6 +7,7 @@ import {
   StyleSheet,
   ImageSourcePropType,
   ViewStyle,
+  Platform,
 } from 'react-native';
 import {dp} from '@utils/dp.ts';
 import {scale, verticalScale} from 'react-native-size-matters';
@@ -54,19 +55,36 @@ const styles = StyleSheet.create({
     height: verticalScale(75),
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 3,
-    position: 'relative',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000000',
+        shadowOffset: {
+          width: 0,
+          height: 1,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+      },
+      android: {
+        elevation: 2,
+        borderWidth: 0.5,
+        borderColor: 'rgba(0, 0, 0, 0.08)',
+      },
+    }),
   },
   selectedButton: {
     borderWidth: 2,
-    borderColor: '#0B68E1', // Blue color from your other buttons
+    borderColor: '#0B68E1',
+    ...Platform.select({
+      ios: {
+        shadowOpacity: 0,
+        shadowRadius: 0,
+      },
+      android: {
+        elevation: 0,
+        borderWidth: 2, 
+      },
+    }),
   },
   buttonContent: {
     alignItems: 'center',

@@ -1,3 +1,4 @@
+// StoryView.tsx - обновленный код
 import React, {useEffect, useRef, useState} from 'react';
 import {
   View,
@@ -16,7 +17,8 @@ import {UserStoriesList} from '../../types/Stories.ts';
 import {X} from 'react-native-feather';
 import {GestureHandlerRootView, TapGestureHandler, PanGestureHandler} from 'react-native-gesture-handler';
 
-const {width: screenWidth, height: screenHeight} = Dimensions.get('window');
+// Получаем реальные размеры экрана
+const {width: screenWidth, height: screenHeight} = Dimensions.get('screen'); 
 
 interface StoryViewProps {
   stories: UserStoriesList;
@@ -38,7 +40,12 @@ const StoryView: React.FC<StoryViewProps> = ({
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
   const [progressAnimations, setProgressAnimations] = useState<Animated.Value[]>([]);
   const [loading, setLoading] = useState(true);
-  const [dimensions, setDimensions] = useState({width: screenWidth, height: screenHeight});
+  
+  // Используем screen dimensions для полного покрытия экрана
+  const [dimensions, setDimensions] = useState({
+    width: screenWidth, 
+    height: screenHeight
+  });
   
   const currentAnimationRef = useRef<Animated.CompositeAnimation | null>(null);
   const isHandlingTapRef = useRef(false);
@@ -50,8 +57,11 @@ const StoryView: React.FC<StoryViewProps> = ({
   }, [isFullScreen, stories, initialUserIndex]);
 
   useEffect(() => {
-    const subscription = Dimensions.addEventListener('change', ({window}) => {
-      setDimensions({width: window.width, height: window.height});
+    const subscription = Dimensions.addEventListener('change', ({screen}) => {
+      setDimensions({
+        width: screen.width, 
+        height: screen.height
+      });
     });
     return () => subscription?.remove();
   }, []);
@@ -293,7 +303,6 @@ const StoryView: React.FC<StoryViewProps> = ({
     );
   };
 
-  // Рендерим только превью, если это не полноэкранный режим и не открыт полноэкранный просмотр
   if (!isFullScreen && !isStoryViewVisible) {
     return (
       <GestureHandlerRootView style={styles.container}>
@@ -325,11 +334,12 @@ const StoryView: React.FC<StoryViewProps> = ({
     <>
       <StatusBar 
         hidden={true} 
-        backgroundColor="black" 
+        backgroundColor="transparent"
+        translucent={true}
         barStyle="light-content" 
       />
       <View style={[
-        styles.storyOverlay, 
+        styles.fullScreenContainer,
         {
           width: dimensions.width,
           height: dimensions.height,
@@ -356,22 +366,22 @@ const StoryView: React.FC<StoryViewProps> = ({
             ]}>
               {renderProgressBars()}
               {renderCurrentStory()}
+              
+              {/* Крестик внутри контейнера истории */}
+              <View style={[
+                styles.headerContainer,
+                {top: Platform.OS === 'ios' ? dp(80) : dp(60)}
+              ]}>
+                <TouchableOpacity
+                  style={styles.closeButton}
+                  onPress={handleClosePress}
+                  activeOpacity={0.7}>
+                  <X stroke={'white'} width={dp(24)} height={dp(24)} />
+                </TouchableOpacity>
+              </View>
             </View>
           </TapGestureHandler>
         </PanGestureHandler>
-        
-        {/* Крестик вынесен отдельно и не находится внутри TapGestureHandler */}
-        <View style={[
-          styles.headerContainer,
-          {top: Platform.OS === 'ios' ? 90 : 70} // Опустили крестик еще ниже
-        ]}>
-          <TouchableOpacity
-            style={styles.closeButton}
-            onPress={handleClosePress}
-            activeOpacity={0.7}>
-            <X stroke={'white'} width={dp(24)} height={dp(24)} />
-          </TouchableOpacity>
-        </View>
       </View>
     </>
   );
@@ -399,12 +409,12 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
     borderRadius: dp(5),
   },
-  storyOverlay: {
+  fullScreenContainer: {
     position: 'absolute',
     top: 0,
     left: 0,
     backgroundColor: 'black',
-    zIndex: 1000,
+    zIndex: 9999,
   },
   storyContainer: {
     flex: 1,
@@ -459,7 +469,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'black',
   },
   storyImage: {
-    // Размеры задаются динамически через dimensions
   },
 });
 

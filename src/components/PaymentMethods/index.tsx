@@ -1,11 +1,12 @@
 import React from 'react';
 import {
   ImageSourcePropType,
-  ScrollView,
   StyleSheet,
   Text,
   View,
+  Dimensions,
 } from 'react-native';
+import {FlatList} from 'react-native-gesture-handler';
 import {dp} from '@utils/dp.ts';
 import {scale} from 'react-native-size-matters';
 import PaymentMethodButton, {
@@ -24,6 +25,9 @@ interface PaymentMethodsProps {
   onSelectMethod: (method: PaymentMethodType) => void;
 }
 
+const {width: screenWidth} = Dimensions.get('window');
+const ITEM_WIDTH = scale(85) + dp(12); 
+
 const PaymentMethods: React.FC<PaymentMethodsProps> = ({
   selectedMethod,
   onSelectMethod,
@@ -33,36 +37,53 @@ const PaymentMethods: React.FC<PaymentMethodsProps> = ({
     {
       id: 'BANK_CARD',
       label: t('app.payment.bankCard'),
-      icon: require('../../assets/icons/bank_card.png'), // Update path as needed
+      icon: require('../../assets/icons/bank_card.png'),
     },
     {
       id: 'SBP',
       label: t('app.payment.sbp'),
-      icon: require('../../assets/icons/sbp_icon.png'), // Update path as needed
+      icon: require('../../assets/icons/sbp_icon.png'),
     },
     {
       id: 'SBERBANK',
       label: t('app.payment.sberPay'),
-      icon: require('../../assets/icons/sber_pay_icon.png'), // Update path as needed
+      icon: require('../../assets/icons/sber_pay_icon.png'),
     },
   ];
+
+  const visibleItemsCount = Math.ceil(screenWidth / ITEM_WIDTH);
+
+  const renderItem = ({item}: {item: PaymentMethod}) => (
+    <PaymentMethodButton
+      key={item.id}
+      icon={item.icon}
+      label={item.label}
+      selected={selectedMethod === item.id}
+      onPress={() => onSelectMethod(item.id)}
+      style={styles.methodButton}
+    />
+  );
 
   return (
     <View style={styles.container}>
       <Text style={styles.sectionTitle}>{t('app.payment.paymentMethod')}</Text>
       <View style={styles.buttonsContainer}>
-        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-          {paymentMethods.map(method => (
-            <PaymentMethodButton
-              key={method.id}
-              icon={method.icon}
-              label={method.label}
-              selected={selectedMethod === method.id}
-              onPress={() => onSelectMethod(method.id)}
-              style={styles.methodButton}
-            />
-          ))}
-        </ScrollView>
+        <FlatList
+          data={paymentMethods}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+          horizontal={true}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+          initialNumToRender={visibleItemsCount}
+          maxToRenderPerBatch={10}
+          windowSize={5}
+          getItemLayout={(data, index) => ({
+            length: ITEM_WIDTH,
+            offset: ITEM_WIDTH * index,
+            index,
+          })}
+        />
       </View>
     </View>
   );
@@ -80,7 +101,9 @@ const styles = StyleSheet.create({
   },
   buttonsContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+  },
+  scrollContent: {
+    paddingHorizontal: dp(2),
   },
   methodButton: {
     width: scale(85),
