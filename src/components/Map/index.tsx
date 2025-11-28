@@ -6,13 +6,13 @@ import React, {
   forwardRef,
 } from 'react';
 import {View, Dimensions, Platform, PermissionsAndroid} from 'react-native';
-import MapboxGL, {UserLocation} from '@rnmapbox/maps';
+import MapboxGL from '@rnmapbox/maps';
 import Marker from './Marker';
 import useStore from '../../state/store.ts';
 import useSWR from 'swr';
 import {getPOSList} from '@services/api/pos';
-import {throttle} from 'lodash';
 import { CameraRef } from 'node_modules/@rnmapbox/maps/lib/typescript/src/components/Camera';
+import Geolocation from '@react-native-community/geolocation';
 
 export type CameraReference = {
   setCameraPosition: (val?: {
@@ -29,8 +29,7 @@ const DEFAULT_LOCATION = {
 };
 
 const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
-  const {posList, setPosList, location, setLocation, business} =
-    useStore.getState();
+  const {posList, setPosList, location, setLocation, business, setCameraRef} = useStore.getState();
   const {data} = useSWR(['getPOSList'], () => getPOSList({}), {
     revalidateOnFocus: false,
   });
@@ -39,14 +38,23 @@ const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
 
   const cameraRef = React.useRef<CameraRef>(null);
   const [cameraSet, setCameraSet] = useState(false);
+  const [hasLocationPermission, setHasLocationPermission] = useState(false);
+
+  useEffect(() => {
+    if (setCameraRef) {
+      setCameraRef({
+        current: {
+          setCameraPosition: setCameraPosition
+        }
+      });
+    }
+  }, []);
 
   useEffect(() => {
     if (data && data.businessesLocations) {
       setPosList(data.businessesLocations);
     }
   }, [data]);
-
-  const [hasLocationPermission, setHasLocationPermission] = useState(false);
 
   const memoizedBusinesses = useMemo(
     () =>
@@ -89,6 +97,35 @@ const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
   }, []);
 
   useEffect(() => {
+    if (!hasLocationPermission) return;
+  
+    const watchId = Geolocation.watchPosition(
+      position => {
+        const {latitude, longitude} = position.coords;
+        const newLocation = {latitude, longitude};
+        
+        setLocation(newLocation);
+        
+        if (!locationFound) {
+          setLocationFound(true);
+        }
+  
+        if (userLocationRef) {
+          userLocationRef.current = newLocation;
+        }
+      },
+      error => {},
+      {
+        enableHighAccuracy: true,
+        distanceFilter: 10,
+        interval: 5000,
+      }
+    );
+  
+    return () => Geolocation.clearWatch(watchId);
+  }, [hasLocationPermission, locationFound]);
+
+  useEffect(() => {
     if (!cameraSet && hasLocationPermission && locationFound && location) {
       cameraRef.current?.setCamera({
         centerCoordinate: [
@@ -110,18 +147,6 @@ const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
     }
   }, [hasLocationPermission, locationFound, location, cameraSet]);
 
-  const onUserLocationUpdateThrottled = useMemo(
-    () =>
-      throttle(userLocation => {
-        if (!locationFound) {
-          setLocationFound(true);
-        }
-        const {latitude: lat, longitude: lon} = userLocation.coords;
-        setLocation({latitude: lat, longitude: lon});
-      }, 1000),
-    [setLocation],
-  );
-
   const setCameraPosition = (val?: {
     longitude?: number;
     latitude?: number;
@@ -139,7 +164,7 @@ const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
       zoomLevel: val?.zoomLevel ?? 14,
       pitch: 1,
       animationMode: 'flyTo',
-      animationDuration: val?.animationDuration ?? 1,
+      animationDuration: val?.animationDuration ?? 1000,
       padding: {
         paddingLeft: 0,
         paddingRight: 0,
@@ -185,13 +210,13 @@ const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
             DEFAULT_LOCATION.latitude,
           ]}
         />
-        <UserLocation
-          visible={hasLocationPermission}
-          showsUserHeadingIndicator={true}
-          requestsAlwaysUse={true}
-          onUpdate={onUserLocationUpdateThrottled}
-          animated={true}
-        />
+        
+        {hasLocationPermission && (
+          <MapboxGL.LocationPuck
+            puckBearingEnabled={true}
+            puckBearing="heading"
+          />
+        )}
       </MapboxGL.MapView>
       {business && (
         <View

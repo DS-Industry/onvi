@@ -3,14 +3,13 @@ import {View, StyleSheet, Dimensions, Platform} from 'react-native';
 import {Gesture, GestureDetector, GestureHandlerRootView} from 'react-native-gesture-handler';
 import {BurgerButton} from '@navigators/BurgerButton';
 import {Balance} from '@components/Balance';
-import {Map} from '@components/Map';
 import BottomSheet, {useBottomSheetTimingConfigs} from '@gorhom/bottom-sheet';
 import {dp} from '../../utils/dp';
 import {BottomSheetStack} from '@navigators/BottomSheetStack';
 import useStore from '../../state/store';
 import {useSharedValue, Easing} from 'react-native-reanimated';
 
-import {CameraReference} from '@components/Map';
+import {CameraReference, Map} from '@components/Map';
 import FindMeButton from '@screens/Home/FindMeButton.tsx';
 import {useSnapPoints} from '../../utils/snapPoints';
 
