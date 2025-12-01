@@ -5,6 +5,7 @@ import React, {
   useImperativeHandle,
   forwardRef,
   useCallback,
+  useRef,
 } from 'react';
 import {View, Dimensions, Platform, PermissionsAndroid} from 'react-native';
 import MapboxGL, {UserLocation} from '@rnmapbox/maps';
@@ -39,8 +40,9 @@ const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
   const [locationFound, setLocationFound] = useState(false);
 
   const cameraRef = React.useRef<CameraRef>(null);
-  const [cameraSet, setCameraSet] = useState(false);
   const [hasLocationPermission, setHasLocationPermission] = useState(false);
+  
+  const shouldAutoSetCameraRef = useRef(true);
 
   useEffect(() => {
     if (data && data.businessesLocations) {
@@ -82,37 +84,37 @@ const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
         } else {
           setHasLocationPermission(true);
         }
-      } catch (err) {}
+      } catch (err) {
+      }
     };
 
     requestLocationPermission();
   }, []);
 
   useEffect(() => {
-    if (!cameraSet && hasLocationPermission && locationFound && location) {
-      const timer = setTimeout(() => {
-        cameraRef.current?.setCamera({
-          centerCoordinate: [
-            location?.longitude ?? DEFAULT_LOCATION.longitude,
-            location?.latitude ?? DEFAULT_LOCATION.latitude,
-          ],
-          zoomLevel: 14,
-          pitch: 1,
-          animationMode: 'flyTo',
-          animationDuration: 2000,
-          padding: {
-            paddingLeft: 0,
-            paddingRight: 0,
-            paddingTop: 0,
-            paddingBottom: 300,
-          },
-        });
-        setCameraSet(true);
-      }, 100);
+    if (shouldAutoSetCameraRef.current && hasLocationPermission && locationFound && location) {
       
-      return () => clearTimeout(timer);
+      shouldAutoSetCameraRef.current = false;
+      
+      cameraRef.current?.setCamera({
+        centerCoordinate: [
+          location?.longitude ?? DEFAULT_LOCATION.longitude,
+          location?.latitude ?? DEFAULT_LOCATION.latitude,
+        ],
+        zoomLevel: 14,
+        pitch: 1,
+        animationMode: 'flyTo',
+        animationDuration: 2000,
+        padding: {
+          paddingLeft: 0,
+          paddingRight: 0,
+          paddingTop: 0,
+          paddingBottom: 300,
+        },
+      });
+      
     }
-  }, [hasLocationPermission, locationFound, location, cameraSet]);
+  }, [hasLocationPermission, locationFound, location]);
 
   const onUserLocationUpdateThrottled = useMemo(
     () =>
@@ -132,21 +134,30 @@ const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
     zoomLevel?: number;
     animationDuration?: number;
   }) => {
-    setCameraSet(false);
+    shouldAutoSetCameraRef.current = false;
     
     requestAnimationFrame(() => {
-      cameraRef.current?.setCamera({
-        centerCoordinate:
-          val?.longitude && val?.latitude
-            ? [val.longitude, val.latitude]
-            : [
-                location?.longitude ?? DEFAULT_LOCATION.longitude,
-                location?.latitude ?? DEFAULT_LOCATION.latitude,
-              ],
-        zoomLevel: val?.zoomLevel ?? 14,
+      const currentLocation = useStore.getState().location;
+      
+      const targetLongitude = val?.longitude !== undefined 
+        ? val.longitude 
+        : (currentLocation?.longitude ?? DEFAULT_LOCATION.longitude);
+      
+      const targetLatitude = val?.latitude !== undefined
+        ? val.latitude
+        : (currentLocation?.latitude ?? DEFAULT_LOCATION.latitude);
+
+      
+      if (!cameraRef.current) {
+        return;
+      }
+      
+      cameraRef.current.setCamera({
+        centerCoordinate: [targetLongitude, targetLatitude],
+        zoomLevel: val?.zoomLevel ?? 16,
         pitch: 1,
         animationMode: 'flyTo',
-        animationDuration: val?.animationDuration ?? 1,
+        animationDuration: val?.animationDuration ?? 1000,
         padding: {
           paddingLeft: 0,
           paddingRight: 0,
@@ -154,7 +165,6 @@ const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
           paddingBottom: 300,
         },
       });
-      setCameraSet(true);
     });
   }, []);
 
