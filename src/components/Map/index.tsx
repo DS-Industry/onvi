@@ -146,7 +146,7 @@ const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
         zoomLevel: val?.zoomLevel ?? 14,
         pitch: 1,
         animationMode: 'flyTo',
-        animationDuration: val?.animationDuration ?? 1000,
+        animationDuration: val?.animationDuration ?? 1,
         padding: {
           paddingLeft: 0,
           paddingRight: 0,
@@ -156,7 +156,7 @@ const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
       });
       setCameraSet(true);
     });
-  }, [location]);
+  }, []);
 
   useImperativeHandle(ref, () => ({
     setCameraPosition: setCameraPosition,
