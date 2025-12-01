@@ -215,6 +215,9 @@ const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
           <MapboxGL.LocationPuck
             puckBearingEnabled={true}
             puckBearing="heading"
+            pulsing={{
+              isEnabled: false,
+            }}
           />
         )}
       </MapboxGL.MapView>
