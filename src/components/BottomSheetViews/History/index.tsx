@@ -16,11 +16,11 @@ import EmptyPlaceholder from '@components/EmptyPlaceholder';
 
 import {navigateBottomSheet} from '@navigators/BottomSheetStack';
 
-import HistoryPlaceholder from './HistoryPlaceholder.tsx';
 import useSWR from 'swr';
 import {getOrderHistory} from '@services/api/user';
 
 import {useNavStore} from '@state/useNavStore/index.ts';
+import HistoryPlaceholder from './HistoryPlaceholder';
 
 const History = () => {
   const {t} = useTranslation();

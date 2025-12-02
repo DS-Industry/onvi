@@ -1,12 +1,12 @@
-import React, {memo} from 'react';
-import {IUser} from '../../../../types/models/User.ts';
-import {OrderDetailsType} from '../../../../state/order/OrderSlice.ts';
-import {CarWash} from '../../../../types/api/app/types.ts';
-import {StyleSheet, Text, View} from 'react-native';
-import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
-import {Info} from 'react-native-feather';
-import {dp} from '@utils/dp.ts';
-import {useTranslation} from 'react-i18next';
+import React, { memo } from 'react';
+import { IUser } from '../../../../types/models/User.ts';
+import { OrderDetailsType } from '../../../../state/order/OrderSlice.ts';
+import { CarWash } from '../../../../types/api/app/types.ts';
+import { StyleSheet, Text, View } from 'react-native';
+import Skeleton from 'react-native-reanimated-skeleton'; // Измененный импорт
+import { Info } from 'react-native-feather';
+import { dp } from '@utils/dp.ts';
+import { useTranslation } from 'react-i18next';
 
 interface PaymentSummaryProps {
   order: OrderDetailsType;
@@ -16,8 +16,8 @@ interface PaymentSummaryProps {
 }
 
 const PaymentSummary: React.FC<PaymentSummaryProps> = memo(
-  ({order, user, selectedPos, finalOrderCost}) => {
-    const {t} = useTranslation();
+  ({ order, user, selectedPos, finalOrderCost }) => {
+    const { t } = useTranslation();
 
     return (
       <View style={styles.container}>
@@ -37,14 +37,24 @@ const PaymentSummary: React.FC<PaymentSummaryProps> = memo(
                 {t('app.payment.yourCashback')}
               </Text>
               {!user || !user.tariff || user.tariff === 0 ? (
-                <View>
-                  <SkeletonPlaceholder borderRadius={10}>
-                    <SkeletonPlaceholder.Item
-                      width={40}
-                      height={15}
-                      alignSelf={'flex-end'}
-                    />
-                  </SkeletonPlaceholder>
+                <View style={{ alignSelf: 'flex-end' }}>
+                  <Skeleton
+                    isLoading={true}
+                    layout={[
+                      {
+                        key: 'cashback-placeholder',
+                        width: 40,
+                        height: 15,
+                        borderRadius: 10,
+                      },
+                    ]}
+                    boneColor="#f0f0f0"
+                    highlightColor="#e0e0e0"
+                    animationType="shiver"
+                    animationDuration={1200}
+                  >
+                    <View />
+                  </Skeleton>
                 </View>
               ) : (
                 <Text style={styles.itemPrice}>

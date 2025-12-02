@@ -1,8 +1,7 @@
-import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
-
-import {dp} from '../../utils/dp';
-
-import {View} from 'react-native';
+import React from 'react';
+import { View } from 'react-native';
+import Skeleton from 'react-native-reanimated-skeleton';
+import { dp } from '../../utils/dp';
 
 interface BalancePlaceholderProps {
   bottomSheetIndex: number;
@@ -11,17 +10,28 @@ interface BalancePlaceholderProps {
 export default function BalancePlaceholder({
   bottomSheetIndex,
 }: BalancePlaceholderProps) {
+  if (bottomSheetIndex > 2) {
+    return null;
+  }
+
+  const layout = [
+    {
+      key: 'balance-placeholder',
+      width: dp(80),
+      height: dp(40),
+      borderRadius: dp(60), 
+    },
+  ];
+
   return (
-    <SkeletonPlaceholder borderRadius={60} highlightColor={'#BFFA00'}>
-      <View
-        style={{
-          width: dp(80),
-          height: dp(40),
-          marginTop: dp(15),
-          marginRight: dp(10),
-          display: bottomSheetIndex > 2 ? 'none' : 'flex',
-        }}
-      />
-    </SkeletonPlaceholder>
+    <Skeleton
+      isLoading={true} 
+      layout={layout}
+      boneColor="#f0f0f0" 
+      highlightColor="#BFFA00" 
+      animationType="shiver"
+    >
+      <View />
+    </Skeleton>
   );
 }

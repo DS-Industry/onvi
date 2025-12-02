@@ -1,32 +1,52 @@
-import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
-import {View, StyleSheet} from 'react-native';
+import React from 'react';
+import {View, StyleSheet, useWindowDimensions} from 'react-native';
+import Skeleton from 'react-native-reanimated-skeleton';
 import {dp} from '../../../utils/dp';
 
 export default function CampaignPlaceholder() {
+  const {width: windowWidth} = useWindowDimensions();
+  const containerWidth = windowWidth - dp(32);
+
+  const layout = [
+    {
+      key: 'campaign-banner',
+      width: containerWidth,
+      height: dp(150),
+      borderRadius: dp(25),
+      marginTop: dp(30),
+      marginBottom: dp(10),
+      alignSelf: 'center',
+    },
+    {
+      key: 'campaign-description',
+      width: containerWidth,
+      height: dp(80),
+      borderRadius: dp(10),
+      marginBottom: dp(10),
+      alignSelf: 'center',
+    },
+  ];
+
   return (
-    <SkeletonPlaceholder borderRadius={4}>
-      <View>
-        <SkeletonPlaceholder.Item style={styles.firstItem} />
-        <SkeletonPlaceholder.Item style={styles.secondItem} />
-      </View>
-    </SkeletonPlaceholder>
+    <View style={styles.container}>
+      <Skeleton
+        isLoading={true}
+        layout={layout}
+        boneColor="#f0f0f0"
+        highlightColor="#e0e0e0"
+        animationType="shiver"
+        animationDuration={1200}
+      >
+        <View />
+        <View />
+      </Skeleton>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  firstItem: {
-    marginTop: dp(30),
-    width: '100%',
-    height: dp(150),
-    borderRadius: dp(25),
-    alignSelf: 'center',
-    marginBottom: dp(10),
-  },
-  secondItem: {
-    width: '100%',
-    height: dp(80),
-    borderRadius: dp(10),
-    alignSelf: 'center',
-    marginBottom: dp(10),
+  container: {
+    overflow: 'hidden',
+    paddingHorizontal: dp(16),
   },
 });

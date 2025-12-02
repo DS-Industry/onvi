@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {IUser} from '../../../../types/models/User.ts';
 import {OrderDetailsType} from '../../../../state/order/OrderSlice.ts';
 import {Text, TouchableOpacity, View} from 'react-native';
-import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
+import Skeleton from 'react-native-reanimated-skeleton'; // Измененный импорт
 import Switch from '@styled/buttons/CustomSwitch';
 import {dp} from '@utils/dp.ts';
 import {
@@ -75,13 +75,24 @@ const PointsToggle: React.FC<PointsToggleProps> = ({
             flexDirection: 'row',
             alignItems: 'center',
           }}>
-          <SkeletonPlaceholder borderRadius={20}>
-            <SkeletonPlaceholder.Item
-              width={60}
-              height={25}
-              alignSelf={'flex-end'}
-            />
-          </SkeletonPlaceholder>
+          <Skeleton
+            isLoading={true}
+            layout={[
+              {
+                key: 'points-toggle-skeleton',
+                width: 60,
+                height: 25,
+                borderRadius: 20,
+                marginRight: dp(30),
+              },
+            ]}
+            boneColor="#f0f0f0"
+            highlightColor="#e0e0e0"
+            animationType="shiver"
+            animationDuration={1200}
+          >
+            <View />
+          </Skeleton>
         </View>
       </View>
     );

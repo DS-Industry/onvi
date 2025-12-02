@@ -1,41 +1,66 @@
 import React from 'react';
-import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
-import {dp} from '../../../utils/dp';
-import {View} from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import Skeleton from 'react-native-reanimated-skeleton';
+import { dp } from '../../../utils/dp';
 
 interface ICarwashesPlaceholderProps {
   heightItems?: number;
   gapItems?: number;
 }
 
-export default function CarwashesPlaceholder(
-  props: ICarwashesPlaceholderProps,
-) {
+export default function CarwashesPlaceholder(props: ICarwashesPlaceholderProps) {
+  const itemHeight = props.heightItems ? dp(props.heightItems) : dp(46);
+  const itemGap = props.gapItems ? dp(props.gapItems) : dp(8);
+
+  const layout = [
+    {
+      key: 'carwash-1',
+      width: '100%',
+      height: itemHeight,
+      borderRadius: dp(12),
+    },
+    {
+      key: 'carwash-2',
+      width: '100%',
+      height: itemHeight,
+      marginTop: itemGap,
+      borderRadius: dp(12),
+    },
+    {
+      key: 'carwash-3',
+      width: '100%',
+      height: itemHeight,
+      marginTop: itemGap,
+      borderRadius: dp(12),
+    },
+  ];
+
   return (
-    <SkeletonPlaceholder
-      borderRadius={12}
-      speed={1200}
-      highlightColor="#e0e0e0"
-      backgroundColor="#f2f2f2">
-      <View>
-        <SkeletonPlaceholder.Item
-          width="100%"
-          height={props.heightItems ? dp(props.heightItems) : dp(46)}
-          borderRadius={12}
-        />
-        <SkeletonPlaceholder.Item
-          width="100%"
-          height={props.heightItems ? dp(props.heightItems) : dp(46)}
-          borderRadius={12}
-          marginTop={props.gapItems ? dp(props.gapItems) : dp(8)}
-        />
-        <SkeletonPlaceholder.Item
-          width="100%"
-          height={props.heightItems ? dp(props.heightItems) : dp(46)}
-          borderRadius={12}
-          marginTop={props.gapItems ? dp(props.gapItems) : dp(8)}
-        />
-      </View>
-    </SkeletonPlaceholder>
+    <View style={styles.container}>
+      <Skeleton
+        isLoading={true}
+        containerStyle={styles.skeletonContainer}
+        layout={layout}
+        boneColor="#f2f2f2"
+        highlightColor="#e0e0e0"
+        animationType="shiver"
+        animationDuration={1200}
+      >
+        <View />
+        <View />
+        <View />
+      </Skeleton>
+    </View>
   );
-}
+};
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: 'white',
+    overflow: 'hidden',
+  },
+  skeletonContainer: {
+    flex: 1,
+  },
+});
+

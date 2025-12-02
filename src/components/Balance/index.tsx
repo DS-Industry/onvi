@@ -25,57 +25,59 @@ interface BalanceProps {
 
 const Balance = ({bottomSheetIndex}: BalanceProps) => {
   const {theme} = useTheme();
-
+  
   const {user, bottomSheetRef, bottomSheetSnapPoints} = useStore();
 
   return (
-    <>
+    <View style={styles.container}>
       {!user || !user.cards ? (
         <BalancePlaceholder bottomSheetIndex={bottomSheetIndex} />
       ) : (
-        <View
-          style={[
-            styles.container,
-            Platform.OS === 'android' && styles.androidShadow,
-            Platform.OS === 'ios' && styles.iosShadow,
-          ]}>
-          <TouchableOpacity
-            style={{
-              ...styles.button,
-              display: bottomSheetIndex > 2 ? 'none' : 'flex',
-              backgroundColor: theme.mainColor,
-            }}
-            onPress={() => {
-              navigateBottomSheet('History', {});
-              bottomSheetRef?.current?.snapToPosition(
-                bottomSheetSnapPoints[bottomSheetSnapPoints.length - 1],
-              );
-            }}>
-            <Image
-              source={require('../../assets/icons/small-icon.png')}
-              style={{width: dp(30), height: dp(30)}}
-            />
-            <Text style={{...styles.balance, color: theme.textColor}}>
-              {user.cards.balance}
-            </Text>
-            {/*<NotificationCircle number={4} /> */}
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          style={{
+            ...styles.button,
+            display: bottomSheetIndex > 2 ? 'none' : 'flex',
+            backgroundColor: theme.mainColor,
+          }}
+          onPress={() => {
+            navigateBottomSheet('History', {});
+            bottomSheetRef?.current?.snapToPosition(
+              bottomSheetSnapPoints[bottomSheetSnapPoints.length - 1],
+            );
+          }}>
+          <Image
+            source={require('../../assets/icons/small-icon.png')}
+            style={{width: dp(30), height: dp(30)}}
+          />
+          <Text style={{...styles.balance, color: theme.textColor}}>
+            {user.cards.balance}
+          </Text>
+          {/*<NotificationCircle number={4} /> */}
+        </TouchableOpacity>
       )}
-    </>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  button: {
-    height: dp(40),
+  container: {
     position: 'absolute',
     top: dp(10),
+    right: dp(6),
+    flexDirection: 'row',
+    alignItems: 'center',
+    ...Platform.select({
+      ios: {
+        top: dp(15),
+      },
+    }),
+  },
+  button: {
+    height: dp(40),
     paddingLeft: dp(6),
     paddingRight: dp(6),
     marginLeft: dp(4),
     marginRight: dp(4),
-    right: dp(10),
     borderRadius: 45,
     padding: dp(5),
     shadowColor: '#494949',
@@ -92,10 +94,6 @@ const styles = StyleSheet.create({
     paddingRight: dp(5),
     fontWeight: '600',
     display: 'flex',
-    flexDirection: 'row',
-  },
-  container: {
-    position: 'relative',
     flexDirection: 'row',
   },
   androidShadow: {

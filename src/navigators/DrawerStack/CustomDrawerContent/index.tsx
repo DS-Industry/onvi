@@ -13,7 +13,7 @@ import {DrawerContentScrollView} from '@react-navigation/drawer';
 
 import {dp} from '../../../utils/dp';
 
-import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
+import Skeleton from 'react-native-reanimated-skeleton'; 
 
 import {avatarSwitch} from '@screens/Settings';
 import {formatPhoneNumber} from '../../../utils/phoneFormat';
@@ -91,20 +91,21 @@ const CustomDrawerContent = ({
             {/*items*/}
             <View>
               {!user || !user.name ? (
-                <View style={{paddingTop: dp(20)}}>
-                  <SkeletonPlaceholder borderRadius={4}>
-                    <Text
-                      style={{
-                        paddingTop: dp(24),
-                        fontStyle: 'normal',
-                        fontSize: dp(24),
-                        fontWeight: '600',
-                        lineHeight: dp(23),
-                        color: theme.textColor,
-                      }}
-                    />
-                  </SkeletonPlaceholder>
-                </View>
+                  <Skeleton
+                    isLoading={true}
+                    layout={[
+                      {
+                        key: 'user-name-skeleton',
+                        width: dp(150), 
+                        height: dp(24), 
+                        borderRadius: 4, 
+                      },
+                    ]}
+                    boneColor="#f0f0f0"
+                    highlightColor="#e0e0e0"
+                    animationType="shiver"
+                  >
+                  </Skeleton>
               ) : (
                 <TouchableOpacity
                   style={{
@@ -131,22 +132,22 @@ const CustomDrawerContent = ({
                 </TouchableOpacity>
               )}
               {!user || !user.phone ? (
-                <View style={{paddingTop: dp(18)}}>
-                  <SkeletonPlaceholder borderRadius={4}>
-                    <Text
-                      style={{
-                        marginBottom: dp(45),
-                        fontStyle: 'normal',
-                        fontSize: dp(10),
-                        fontWeight: '800',
-                        lineHeight: dp(20),
-                        letterSpacing: 0.43,
-                        color: '#BEBEBE',
-                        width: '70%',
-                      }}
-                    />
-                  </SkeletonPlaceholder>
-                </View>
+                  <Skeleton
+                    isLoading={true}
+                    layout={[
+                      {
+                        key: 'user-phone-skeleton',
+                        width: dp(100), 
+                        height: dp(20), 
+                        borderRadius: 4,
+                        marginBottom: dp(45), 
+                      },
+                    ]}
+                    boneColor="#f0f0f0"
+                    highlightColor="#e0e0e0"
+                    animationType="shiver"
+                  >
+                  </Skeleton>
               ) : (
                 <Text
                   style={{

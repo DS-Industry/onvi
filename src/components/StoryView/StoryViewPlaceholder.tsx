@@ -1,36 +1,43 @@
 import React from 'react';
 import {View, StyleSheet} from 'react-native';
-import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
+import Skeleton from 'react-native-reanimated-skeleton';
 import {dp} from '@utils/dp.ts';
 
 const StoryViewPlaceholder = () => {
+  const layout = [
+    { key: 'story-1', width: dp(85), height: dp(85), marginRight: dp(16), borderRadius: dp(10) },
+    { key: 'story-2', width: dp(85), height: dp(85), marginRight: dp(16), borderRadius: dp(10) },
+    { key: 'story-3', width: dp(85), height: dp(85), borderRadius: dp(10) },
+  ];
+
   return (
     <View style={styles.container}>
-      <SkeletonPlaceholder borderRadius={10}>
-        <View style={styles.placeholderRow}>
-          {/* Render 3 rectangles of size 104x104 pixels */}
-          {[...Array(3)].map((_, index) => (
-            <View key={index} style={styles.rectangle} />
-          ))}
-        </View>
-      </SkeletonPlaceholder>
+      <Skeleton
+        isLoading={true}
+        containerStyle={styles.skeletonContainer}
+        layout={layout}
+        boneColor="#f2f2f2"
+        highlightColor="#e0e0e0"
+        animationType="shiver"
+        animationDuration={1200}
+      >
+        <View />
+        <View />
+        <View />
+      </Skeleton>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
+    padding: dp(16),
+    backgroundColor: 'white',
+    overflow: 'hidden',
   },
-  placeholderRow: {
+  skeletonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-  },
-  rectangle: {
-    width: dp(85), // Fixed width for the rectangle
-    height: dp(85), // Fixed height for the rectangle
-    marginRight: dp(16), // Space between placeholders
-    borderRadius: dp(10), // Slightly rounded corners
   },
 });
 
