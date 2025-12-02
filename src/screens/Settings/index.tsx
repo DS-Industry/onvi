@@ -176,8 +176,12 @@ const Settings = () => {
         avoidKeyboard
         propagateSwipe
         backdropOpacity={0.6}
-        animationIn="slideInUp"
-        animationOut="slideOutDown"
+        animationInTiming={200}
+        animationOutTiming={200}
+        backdropTransitionInTiming={110}
+        backdropTransitionOutTiming={110}
+        animationIn="bounce"
+        animationOut="bounceOutDown"
         useNativeDriverForBackdrop
         hideModalContentWhileAnimating
       >
