@@ -83,8 +83,6 @@ const Home = React.memo(({navigation}: any) => {
     easing: Easing.linear,
   });
 
-  const blockDragGesture = Gesture.Pan().enabled(!isDraggable);
-
   return (
     <GestureHandlerRootView style={styles.master}>
       <View style={styles.container}>
@@ -100,7 +98,7 @@ const Home = React.memo(({navigation}: any) => {
 
         <BottomSheet
           animationConfigs={animationConfigs}
-          // enableContentPanningGesture={isDraggable}
+          enableContentPanningGesture={isDraggable}
           enableHandlePanningGesture={isDraggable}
           ref={bsRef}
           handleIndicatorStyle={styles.handleIndicator}
@@ -116,12 +114,11 @@ const Home = React.memo(({navigation}: any) => {
             <View style={[styles.transparentBackground, styles.shadow]} />
           )}
           style={styles.shadow}
-          topInset={0}>
-          <GestureDetector gesture={blockDragGesture}>
+          topInset={0}
+        >
             <View style={styles.contentContainer}>
               {memoizedBottomSheetStack}
             </View>
-          </GestureDetector>
         </BottomSheet>
 
         <View style={[styles.burger]}>

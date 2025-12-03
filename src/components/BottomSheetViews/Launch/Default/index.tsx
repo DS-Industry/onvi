@@ -5,7 +5,6 @@ import {StyleSheet, Text, View} from 'react-native';
 import {BusinessHeader} from '@components/Business/Header';
 import {SumInput} from '@styled/inputs/SumInput';
 import {ActionButton} from '@styled/buttons/ActionButton';
-import {BottomSheetScrollView} from '@gorhom/bottom-sheet';
 import {FilterList} from '@components/FiltersList';
 
 // utils
@@ -44,13 +43,12 @@ export default function DefaultLaunch() {
   const isOpened = isBottomSheetOpen;
 
   return (
-    <BottomSheetScrollView
-      contentContainerStyle={{
+    <View
+      style={{
         ...styles.container,
         backgroundColor: theme.mainColor,
       }}
-      nestedScrollEnabled={true}
-      scrollEnabled={isOpened}>
+    >
       <View style={{paddingTop: dp(15)}} />
       <BusinessHeader type="box" box={order?.bayNumber ?? 0} />
       <View
@@ -245,7 +243,7 @@ export default function DefaultLaunch() {
           color="blue"
         />
       </View>
-    </BottomSheetScrollView>
+    </View>
   );
 }
 

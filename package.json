@@ -26,7 +26,7 @@
   "dependencies": {
     "@appmetrica/react-native-analytics": "^3.5.0",
     "@datadog/mobile-react-native": "^2.13.0",
-    "@gorhom/bottom-sheet": "^5.2.6",
+    "@gorhom/bottom-sheet": "github:gorhom/react-native-bottom-sheet#b8d5cd467145a0c3f3fbca06754e4a08de1c8b61",
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@react-native-clipboard/clipboard": "^1.16.3",
     "@react-native-community/checkbox": "^0.5.20",
