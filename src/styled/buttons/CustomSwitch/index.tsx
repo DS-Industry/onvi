@@ -1,11 +1,11 @@
-import React, {JSX, ReactElement, useEffect, useState} from 'react';
+import React, { JSX, ReactElement, useEffect, useState } from 'react';
 import {
   StyleSheet,
   TouchableWithoutFeedback,
   I18nManager,
   Image,
   TextStyle,
-  ViewStyle, // Import Image
+  ViewStyle,
 } from 'react-native';
 import Animated, {
   useAnimatedStyle,
@@ -34,12 +34,14 @@ interface SwitchProps {
   circleImageInactive?: ReactElement;
 }
 
-const spring = (_value: any, config: any = {damping: 12, stiffness: 80, mass: 0.7}) =>
-  withSpring(_value, config);
+const spring = (
+  _value: any,
+  config: any = { damping: 12, stiffness: 80, mass: 0.7 }
+) => withSpring(_value, config);
 
 const PADDINGHORIZONTAL = 2;
 
-const isNumbre = (value: any, defaultValue = 0) => {
+const isNumber = (value: any, defaultValue = 0) => {
   value = Number(value);
   if (typeof value === 'number' && !isNaN(value) && value !== null) {
     return value;
@@ -65,29 +67,28 @@ const Switch = (IProps: SwitchProps): JSX.Element => {
     switchPaddingRight,
     switchPaddingLeft,
     switchStyle,
-    circleImageActive, // New circle image prop for active state
-    circleImageInactive, // New circle image prop for inactive state
+    circleImageActive,
+    circleImageInactive,
   } = IProps;
 
-  const {isRTL} = I18nManager;
+  const { isRTL } = I18nManager;
   const circleTranslateX = useSharedValue<any>(0);
   const textTranslateXInActive = useSharedValue<any>(0);
   const textTranslateXActive = useSharedValue<any>(0);
-  const opacity = useSharedValue<number>(1);
   const circleColor = useSharedValue<string | undefined>(circleInActiveColor);
 
   const [defaultWidth, setDefaultWidth] = useState<number>(
-    isNumbre(width, 100),
+    isNumber(width, 100)
   );
   const [defaultCircleSize, setDefaultCircleSize] = useState<number>(
-    isNumbre(circleSize, 30),
+    isNumber(circleSize, 30)
   );
   const [defaultPadding, setDefaultPadding] = useState<{
     paddingLeft: number;
     paddingRight: number;
   }>({
-    paddingLeft: isNumbre(switchPaddingLeft, PADDINGHORIZONTAL),
-    paddingRight: isNumbre(switchPaddingRight, PADDINGHORIZONTAL),
+    paddingLeft: isNumber(switchPaddingLeft, PADDINGHORIZONTAL),
+    paddingRight: isNumber(switchPaddingRight, PADDINGHORIZONTAL),
   });
 
   const circleStyle = useAnimatedStyle(() => {
@@ -121,25 +122,19 @@ const Switch = (IProps: SwitchProps): JSX.Element => {
     };
   });
 
-  const switchAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: opacity.value,
-    };
-  });
-
   useEffect(() => {
-    setDefaultWidth(isNumbre(width, 100));
+    setDefaultWidth(isNumber(width, 100));
   }, [width]);
 
   useEffect(() => {
     setDefaultPadding({
-      paddingLeft: isNumbre(switchPaddingLeft, PADDINGHORIZONTAL),
-      paddingRight: isNumbre(switchPaddingRight, PADDINGHORIZONTAL),
+      paddingLeft: isNumber(switchPaddingLeft, PADDINGHORIZONTAL),
+      paddingRight: isNumber(switchPaddingRight, PADDINGHORIZONTAL),
     });
   }, [switchPaddingLeft, switchPaddingRight]);
 
   useEffect(() => {
-    setDefaultCircleSize(isNumbre(circleSize, 30));
+    setDefaultCircleSize(isNumber(circleSize, 30));
   }, [circleSize]);
 
   useEffect(() => {
@@ -169,105 +164,90 @@ const Switch = (IProps: SwitchProps): JSX.Element => {
     }
   }, [value, defaultWidth, defaultCircleSize, defaultPadding, isRTL]);
 
-  useEffect(() => {
-    const springConfig = { damping: 12, stiffness: 80, mass: 0.7 };
-    if (disabled) {
-      opacity.value = spring(0.8, springConfig);
-    } else {
-      opacity.value = spring(1, springConfig);
-    }
-  }, [disabled]);
-
   return (
-    <>
-      {!disabled ? (
-        <TouchableWithoutFeedback
-          onPress={() => {
-            if (onValueChange) {
-              onValueChange(!value);
-            }
-          }}
-          hitSlop={{top: 25, bottom: 25, left: 20, right: 20}}>
-          <Animated.View
+    <TouchableWithoutFeedback
+      onPress={() => {
+        if (!disabled && onValueChange) {
+          onValueChange(!value);
+        }
+      }}
+      hitSlop={{ top: 25, bottom: 25, left: 20, right: 20 }}>
+      <Animated.View
+        style={[
+          styles.switch,
+          {
+            borderRadius: isNumber(switchBorderRadius, 30),
+            width: defaultWidth,
+          },
+          switchStyle,
+          defaultPadding,
+          { opacity: disabled ? 0.6 : 1 }, 
+        ]}>
+        <Animated.View
+          style={[
+            styles.switchTextView,
+            styles.center,
+            {
+              width:
+                defaultWidth +
+                (defaultPadding.paddingLeft + defaultPadding.paddingRight) /
+                  2,
+              backgroundColor: backgroundActive,
+            },
+            textStyleViewActive,
+          ]}>
+          <Animated.Text
             style={[
-              styles.switch,
-              {
-                borderRadius: isNumbre(switchBorderRadius, 30),
-                width: defaultWidth,
-              },
-              switchStyle,
-              defaultPadding,
-              switchAnimatedStyle,
-            ]}>
-            <Animated.View
-              style={[
-                styles.switchTextView,
-                styles.center,
-                {
-                  width:
-                    defaultWidth +
-                    (defaultPadding.paddingLeft + defaultPadding.paddingRight) /
-                      2,
-                  backgroundColor: backgroundActive,
-                },
-                textStyleViewActive,
-              ]}>
-              <Animated.Text
-                style={[
-                  styles.textStyle,
-                  textStyle,
+              styles.textStyle,
+              textStyle,
                   {left: -(defaultCircleSize / 2)},
-                ]}>
-                {activeText}
-              </Animated.Text>
-            </Animated.View>
-            <Animated.View
-              style={[
-                styles.switchTextView,
-                styles.center,
-                {
-                  width: defaultWidth,
-                  backgroundColor: backgroundInActive,
-                },
-                textStyleViewInActive,
-              ]}>
-              <Animated.Text
-                style={[
-                  styles.textStyle,
-                  textStyle,
+            ]}>
+            {activeText}
+          </Animated.Text>
+        </Animated.View>
+        <Animated.View
+          style={[
+            styles.switchTextView,
+            styles.center,
+            {
+              width: defaultWidth,
+              backgroundColor: backgroundInActive,
+            },
+            textStyleViewInActive,
+          ]}>
+          <Animated.Text
+            style={[
+              styles.textStyle,
+              textStyle,
                   {left: defaultCircleSize / 2},
-                ]}>
-                {inActiveText}
-              </Animated.Text>
-            </Animated.View>
-            <Animated.View
-              style={[
-                styles.circleStyle,
-                {
-                  width: defaultCircleSize,
-                  height: defaultCircleSize,
-                  borderRadius: isNumbre(switchBorderRadius, 30),
-                },
-                circleStyle,
-              ]}>
-              {value ? (
-                <Image
-                  source={circleImageActive as any}
-                  style={styles.circleImage}
-                />
-              ) : (
-                <Image
-                  source={circleImageInactive as any}
-                  style={styles.circleImage}
-                />
-              )}
-            </Animated.View>
-          </Animated.View>
-        </TouchableWithoutFeedback>
-      ) : (
-        <></>
-      )}
-    </>
+            ]}>
+            {inActiveText}
+          </Animated.Text>
+        </Animated.View>
+        <Animated.View
+          style={[
+            styles.circleStyle,
+            {
+              width: defaultCircleSize,
+              height: defaultCircleSize,
+              borderRadius: isNumber(switchBorderRadius, 30),
+            },
+            circleStyle,
+          ]}>
+          {value ? (
+            <Image
+              source={circleImageActive as any}
+              style={styles.circleImage}
+            />
+          ) : (
+            <Image
+              source={circleImageInactive as any}
+              style={styles.circleImage}
+            />
+          )}
+        </Animated.View>
+      </Animated.View>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -327,7 +307,7 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   circleImage: {
-    width: '100%', // Adjust the width and height as needed
+    width: '100%',
     height: '100%',
     resizeMode: 'contain',
   },
