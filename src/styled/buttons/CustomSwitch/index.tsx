@@ -181,7 +181,6 @@ const Switch = (IProps: SwitchProps): JSX.Element => {
           },
           switchStyle,
           defaultPadding,
-          { opacity: disabled ? 0.6 : 1 }, 
         ]}>
         <Animated.View
           style={[
