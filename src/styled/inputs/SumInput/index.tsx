@@ -39,7 +39,7 @@ interface ISumInput {
   disabled?: boolean;
 }
 
-const MIN_FILL_HEIGHT = 20; // Minimum fill height in pixels
+const MIN_FILL_HEIGHT = 40; // Minimum fill height in pixels
 
 const SumInput: React.FC<ISumInput> = ({
   width = 200,
