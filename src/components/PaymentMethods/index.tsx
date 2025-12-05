@@ -66,7 +66,6 @@ const PaymentMethods: React.FC<PaymentMethodsProps> = ({
 
   return (
     <View style={styles.container}>
-      <Text style={styles.sectionTitle}>{t('app.payment.paymentMethod')}</Text>
       <View style={styles.buttonsContainer}>
         <FlatList
           data={paymentMethods}

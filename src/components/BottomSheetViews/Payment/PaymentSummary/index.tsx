@@ -3,7 +3,7 @@ import { IUser } from '../../../../types/models/User.ts';
 import { OrderDetailsType } from '../../../../state/order/OrderSlice.ts';
 import { CarWash } from '../../../../types/api/app/types.ts';
 import { StyleSheet, Text, View } from 'react-native';
-import Skeleton from 'react-native-reanimated-skeleton'; // Измененный импорт
+import Skeleton from 'react-native-reanimated-skeleton'; 
 import { Info } from 'react-native-feather';
 import { dp } from '@utils/dp.ts';
 import { useTranslation } from 'react-i18next';
@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
     marginTop: dp(10),
   },
   itemName: {
-    fontWeight: '300',
+    fontWeight: '400',
     fontSize: dp(15),
     color: 'rgba(0, 0, 0, 1)',
     flexShrink: 1,

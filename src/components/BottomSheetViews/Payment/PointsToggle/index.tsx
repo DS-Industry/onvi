@@ -109,7 +109,7 @@ const PointsToggle: React.FC<PointsToggleProps> = ({
       <View>
         <Text
           style={{
-            fontWeight: '300',
+            fontWeight: '400',
             fontSize: dp(15),
             color: 'rgba(0, 0, 0, 1)',
           }}>

@@ -33,15 +33,15 @@ const PromocodeSection: React.FC<PromocodeSectionProps> = ({
             backgroundColor: '#ffffff',
             display: 'flex',
             justifyContent: 'center',
-            width: dp(219),
-            height: dp(31),
+            width: "100%",
+            height: dp(42),
             paddingLeft: dp(12),
             paddingRight: dp(5.38),
-            borderRadius: dp(30),
+            borderRadius: dp(10),
           }}
           onPress={onPress}>
-          <Text style={{fontSize: dp(10), fontWeight: '500'}}>
-            {t('app.promos.promocode').toUpperCase()}
+          <Text style={{fontSize: dp(12), fontWeight: '500', color: "#8B8B8C"}}>
+            {t('app.promos.promocode')}
           </Text>
         </TouchableOpacity>
       </View>
