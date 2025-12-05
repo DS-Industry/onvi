@@ -186,7 +186,9 @@
       "promocode": "Промокод",
       "over": "Закончился",
       "use": "Использовать",
-      "to": "До"
+      "to": "До",
+      "promocodeApplied": "Промокод применен",
+      "promocodeNotFound": "Промокод не найден"
     },
     "transferBalance": {
       "transferBalance": "Перенос баланса",

@@ -26,7 +26,7 @@ export default function VacuumLaunch({onPay}: VacuumLaunchProps) {
   const {t} = useTranslation();
   const measureTypeData = [t('common.labels.rubles')];
 
-  const {isBottomSheetOpen, setOrderDetails, orderDetails} =
+  const {isBottomSheetOpen, setOrderDetails, orderDetails, bottomSheetRef} =
     useStore.getState();
 
   const {freeVacuum, setFreeVacuum} = useStore();
@@ -34,8 +34,6 @@ export default function VacuumLaunch({onPay}: VacuumLaunchProps) {
   const order = orderDetails;
   const isOpened = isBottomSheetOpen;
   const freeVacOn = freeVacuum?.remains > 0;
-
-  console.log('VacuumLaunch - freeVacOn:', freeVacOn);
 
   const updateFreeVacuume = async () => {
     const data = await getFreeVacuum();
@@ -55,7 +53,8 @@ export default function VacuumLaunch({onPay}: VacuumLaunchProps) {
             backgroundColor: WHITE,
           }}
           nestedScrollEnabled={true}
-          scrollEnabled={isOpened}>
+          scrollEnabled={isOpened}
+        >
           <Text
             style={{
               width: '100%',
@@ -138,6 +137,7 @@ export default function VacuumLaunch({onPay}: VacuumLaunchProps) {
               label={t('app.payment.vacuum.activateFree')}
               onClick={() => {
                 onPay(0); 
+                bottomSheetRef?.current?.snapToPosition('72%');
               }}
               color="blue"
             />

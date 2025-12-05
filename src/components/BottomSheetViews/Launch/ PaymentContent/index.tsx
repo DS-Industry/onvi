@@ -1,16 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { StyleSheet, Text, Pressable, View, Platform } from 'react-native';
-import { Button } from '@styled/buttons';
+import React, {useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
+import {StyleSheet, Text, View, ScrollView} from 'react-native';
+import {Button} from '@styled/buttons';
 import useStore from '@state/store';
-import { PromocodeModal } from '@styled/views/PromocodeModal';
 import PaymentMethods from '@components/PaymentMethods';
 import PaymentSummary from '@components/BottomSheetViews/Payment/PaymentSummary';
 import PointsToggle from '@components/BottomSheetViews/Payment/PointsToggle';
-import { useBonusPoints } from '@hooks/useBonusPoints.ts';
-import { usePaymentProcess } from '@hooks/usePaymentProcess.ts';
+import {useBonusPoints} from '@hooks/useBonusPoints.ts';
+import {usePaymentProcess} from '@hooks/usePaymentProcess.ts';
 import PromocodeSection from '@components/BottomSheetViews/Payment/PromocodeSection';
-import { usePromoCode } from '@hooks/usePromoCode.ts';
+import {usePromoCode} from '@hooks/usePromoCode.ts';
 import {
   calculateActualDiscount,
   calculateActualPointsUsed,
@@ -20,11 +19,10 @@ import AppMetrica from '@appmetrica/react-native-analytics';
 import { DiscountType, IPersonalPromotion } from '@app-types/models/PersonalPromotion';
 import { navigateBottomSheet } from '@navigators/BottomSheetStack';
 import { dp } from '@utils/dp';
-import { ScrollView } from 'react-native-gesture-handler';
 
 interface PaymentContentProps {
   onClose: () => void;
-  isFreeVacuum: boolean; // Передаем из Launch, когда это бесплатный вакуум
+  isFreeVacuum: boolean; 
 }
 
 const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }) => {
@@ -32,9 +30,7 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
   const { user, loadUser, selectedPos } = useStore.getState();
   const { orderDetails } = useStore();
 
-  // Определяем freeOn: true только для бесплатного вакуума с суммой 0
   const freeOn = isFreeVacuum && orderDetails?.sum === 0;
-
 
   const order = orderDetails;
 
@@ -80,19 +76,6 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
     applyPromoCode(promo.code);
   };
 
-  // Handle search input change
-  const handleSearchChange = (val: string) => {
-    setPromocode(val);
-  };
-
-  const [showPromocodeModal, setShowPromocodeModal] = useState(false);
-
-  // Effect to update UI when promo code is validated
-  useEffect(() => {
-    if (promoCodeId && showPromocodeModal) {
-      setShowPromocodeModal(false);
-    }
-  }, [promoCodeId, showPromocodeModal]);
 
   useEffect(() => {
     if (!order?.sum) return;
@@ -134,6 +117,12 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
     });
   };
 
+  const handleApplyPromocode = () => {
+    if (inputCodeValue && inputCodeValue.trim().length > 0) {
+      applyPromoCode(inputCodeValue);
+    }
+  };
+
   return (
     <ScrollView style={styles.container}>
       {freeOn &&
@@ -167,7 +156,11 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
 
               <PromocodeSection
                 promocode={inputCodeValue}
-                onPress={() => setShowPromocodeModal(true)}
+                onPromocodeChange={setPromocode}
+                onApplyPromocode={handleApplyPromocode}
+                promoError={promoError}
+                isMutating={isMutating}
+                discount={discount}
                 quickPromoSelect={handlePromoPress}
                 quickPromoDeselect={() => setPromocode(undefined)}
               />
@@ -242,16 +235,6 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
           </Text>
         </Pressable> */}
       </View>
-
-      <PromocodeModal
-        visible={showPromocodeModal}
-        onClose={() => setShowPromocodeModal(false)}
-        promocode={inputCodeValue || ''}
-        handleSearchChange={handleSearchChange}
-        apply={debouncedApplyPromoCode}
-        promocodeError={promoError}
-        fetching={isMutating}
-      />
     </ScrollView>
   );
 };
@@ -261,10 +244,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    fontSize: 24,
+    fontSize: dp(24),
     fontWeight: '600',
     color: '#000',
-    marginBottom: 12,
+    marginBottom: dp(12),
   },
   paymentCard: {
     backgroundColor: '#F5F5F5',
@@ -300,7 +283,7 @@ const styles = StyleSheet.create({
   },
   paymentActions: {
     marginTop: dp(30),
-    // paddingBottom: dp(90),
+    marginBottom: dp(30),
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
   },

@@ -33,7 +33,7 @@ const Launch = () => {
       ...orderDetails,
       sum: price,
       name: name,
-      free: false, // Портал всегда платный
+      free: false, 
     });
     setShowPayment(true); 
   };
@@ -50,9 +50,6 @@ const Launch = () => {
   const handleClosePayment = () => {
     setShowPayment(false); 
   };
-
-  console.log('Launch - orderDetails.free:', orderDetails.free);
-  console.log('Launch - isFreeVacuum:', isFreeVacuum);
 
   return (
     <View style={styles.container}>
