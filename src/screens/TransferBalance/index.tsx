@@ -123,7 +123,7 @@ const TransferBalance = () => {
         <ScrollView
           contentContainerStyle={styles.scrollContainer}
           keyboardShouldPersistTaps="handled">
-          <SafeAreaView style={styles.safeArea}>
+          <View style={styles.safeArea}>
             {(!showContent || showInstructions) && (
               < TransferBalanceOnboardingStory
                 onComplete={() => {
@@ -185,9 +185,8 @@ const TransferBalance = () => {
                         <TextInput
                           style={[
                             styles.input,
-                            error
-                              ? { color: 'red', borderBottomColor: 'red' }
-                              : { borderBottomColor: '#999' },
+                            styles.inputBorder, // Всегда применяем бордер
+                            error && { borderBottomColor: 'red' }, // Меняем только цвет при ошибке
                           ]}
                           value={cardNumber}
                           onChangeText={formatCardNumber}
@@ -346,7 +345,7 @@ const TransferBalance = () => {
                 });
               }}
             />
-          </SafeAreaView>
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
@@ -438,11 +437,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: dp(10),
     paddingBottom: dp(0),
     marginTop: 'auto',
-    marginBottom: dp(0),  
+    marginBottom: dp(0),
     fontSize: dp(16),
     fontWeight: '400',
     color: 'black',
+  },
+  inputBorder: {
     borderBottomWidth: dp(1),
+    borderBottomColor: '#999', 
   },
   balanceText: {
     paddingLeft: dp(10),
