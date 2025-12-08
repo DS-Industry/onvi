@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     width: '100%',
     borderRadius: dp(25),
     paddingHorizontal: dp(16),
-    paddingVertical: dp(16),
+    paddingVertical: dp(10),
 
     // ...Platform.select({
     //   ios: {
