@@ -227,11 +227,11 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
           showLoading={loading}
         />
 
-        <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
+        {/* <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
           <Text style={styles.cancelText}>
             {t('app.payment.cancelOrder')}
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     </ScrollView>
   );
@@ -302,6 +302,7 @@ const styles = StyleSheet.create({
   paymentActions: {
     alignItems: 'center',
     marginBottom: dp(20),
+    marginTop: dp(20),
   },
   cancelButton: {
     marginTop: dp(12),

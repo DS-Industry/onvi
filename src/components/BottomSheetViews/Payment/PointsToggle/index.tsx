@@ -110,7 +110,7 @@ const PointsToggle: React.FC<PointsToggleProps> = ({
         <Text
           style={{
             fontWeight: '400',
-            fontSize: dp(15),
+            fontSize: dp(14),
             color: 'rgba(0, 0, 0, 1)',
           }}>
           {t('app.bonus.withdrawOnviBonuses')}
