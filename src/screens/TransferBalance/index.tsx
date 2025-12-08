@@ -57,12 +57,11 @@ const TransferBalance = () => {
   const navigation =
     useNavigation<GeneralDrawerNavigationProp<'Перенести баланс'>>();
 
-  const formatCardNumber = (text: string) => {
-    setError('');
-    const digits = text.replace(/\D/g, '');
-    const formatted = digits.replace(/(\d{4})(?=\d)/g, '$1-');
-    setCardNumber(formatted);
-  };
+    const formatCardNumber = (text: string) => {
+      setError('');
+      const digits = text.replace(/\D/g, ''); 
+      setCardNumber(digits);
+    };
 
   const findBalance = async () => {
     setError('');
@@ -182,33 +181,31 @@ const TransferBalance = () => {
                       style={styles.imageBackground}
                       resizeMode="cover">
                       <View style={styles.overlay}>
-                        <View style={styles.inputContainer}>
-                          <TextInput
-                            style={[
-                              styles.input,
-                              error ? { color: 'red' } : undefined,
-                            ]}
-                            value={cardNumber}
-                            onChangeText={formatCardNumber}
-                            placeholder="xxxx-xxxx-xxxx"
-                            keyboardType="numeric"
-                            maxLength={19}
-                            placeholderTextColor="#999"
-                            editable={balance ? false : true}
-                          />
-                          {balance ? (
-                            <Text style={{ ...styles.balanceText, marginTop: 0 }}>
-                              {balance?.balance} {t('common.labels.points')}
-                            </Text>
-                          ) : (
-                            <></>
-                          )}
-                          {error ? (
-                            <Text style={styles.errorText}>{error}</Text>
-                          ) : (
-                            <></>
-                          )}
-                        </View>
+                      <View style={styles.inputContainer}>
+                        <TextInput
+                          style={[
+                            styles.input,
+                            error
+                              ? { color: 'red', borderBottomColor: 'red' }
+                              : { borderBottomColor: '#999' },
+                          ]}
+                          value={cardNumber}
+                          onChangeText={formatCardNumber}
+                          placeholder="Номер карты"
+                          keyboardType="numeric"
+                          maxLength={16}
+                          placeholderTextColor="#999"
+                          editable={balance ? false : true}
+                        />
+                        {balance ? (
+                          <Text style={{ ...styles.balanceText, marginTop: dp(0) }}>
+                            {balance?.balance} {t('common.labels.points')}
+                          </Text>
+                        ) : null}
+                        <Text style={[styles.errorText, error ? { color: 'red' } : null]}>
+                          {error || ' '} 
+                        </Text>
+                      </View>   
                       </View>
                     </ImageBackground>
                   </View>
@@ -432,15 +429,20 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     padding: dp(10),
-    width: '100%',
+    width: '80%',
+    height: dp(90), 
   },
   input: {
     height: 50,
     borderRadius: 8,
-    paddingHorizontal: 10,
-    fontSize: dp(20),
-    fontWeight: '700',
+    paddingHorizontal: dp(10),
+    paddingBottom: dp(0),
+    marginTop: 'auto',
+    marginBottom: dp(0),  
+    fontSize: dp(16),
+    fontWeight: '400',
     color: 'black',
+    borderBottomWidth: dp(1),
   },
   balanceText: {
     paddingLeft: dp(10),
@@ -452,8 +454,9 @@ const styles = StyleSheet.create({
   errorText: {
     paddingLeft: dp(10),
     fontSize: dp(14),
-    color: 'red',
+    color: 'transparent', 
     marginTop: dp(5),
+    height: dp(20), 
   },
   button: {
     borderRadius: 25,
