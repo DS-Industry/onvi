@@ -185,16 +185,20 @@ const TransferBalance = () => {
                         <TextInput
                           style={[
                             styles.input,
-                            styles.inputBorder, // Всегда применяем бордер
-                            error && { borderBottomColor: 'red' }, // Меняем только цвет при ошибке
+                            styles.inputBorder,
+                            error && {
+                              borderBottomColor: 'red',
+                              color: 'red', // <-- Добавляем красный цвет текста
+                            },
                           ]}
                           value={cardNumber}
                           onChangeText={formatCardNumber}
                           placeholder="Номер карты"
                           keyboardType="numeric"
                           maxLength={16}
-                          placeholderTextColor="#999"
+                          placeholderTextColor={error ? 'red' : '#999'} // <-- Меняем цвет плейсхолдера при ошибке
                           editable={balance ? false : true}
+                          underlineColorAndroid="transparent"
                         />
                         {balance ? (
                           <Text style={{ ...styles.balanceText, marginTop: dp(0) }}>
@@ -432,8 +436,8 @@ const styles = StyleSheet.create({
     height: dp(90), 
   },
   input: {
-    height: 50,
-    borderRadius: 8,
+    height: dp(50),
+    borderRadius: dp(8),
     paddingHorizontal: dp(10),
     paddingBottom: dp(0),
     marginTop: 'auto',
@@ -456,7 +460,6 @@ const styles = StyleSheet.create({
   errorText: {
     paddingLeft: dp(10),
     fontSize: dp(14),
-    color: 'transparent', 
     marginTop: dp(5),
     height: dp(20), 
   },
