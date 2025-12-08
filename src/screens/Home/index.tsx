@@ -1,9 +1,28 @@
-import React, {useRef, useState, useMemo, useEffect, useCallback} from 'react';
-import {View, StyleSheet, Dimensions, Platform} from 'react-native';
-import {Gesture, GestureDetector, GestureHandlerRootView} from 'react-native-gesture-handler';
+import React, {
+  useRef,
+  useState,
+  useMemo,
+  useEffect,
+  useCallback,
+  useImperativeHandle,
+  forwardRef,
+} from 'react';
+import {
+  View,
+  StyleSheet,
+  Dimensions,
+  Platform,
+} from 'react-native';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {BurgerButton} from '@navigators/BurgerButton';
 import {Balance} from '@components/Balance';
-import BottomSheet, {useBottomSheetTimingConfigs} from '@gorhom/bottom-sheet';
+import BottomSheet, {
+  useBottomSheetTimingConfigs,
+  BottomSheetModal,
+  BottomSheetModalProvider,
+  BottomSheetBackdrop,
+  BottomSheetView,
+} from '@gorhom/bottom-sheet';
 import {dp} from '../../utils/dp';
 import {BottomSheetStack} from '@navigators/BottomSheetStack';
 import useStore from '../../state/store';
@@ -12,38 +31,40 @@ import {useSharedValue, Easing} from 'react-native-reanimated';
 import {CameraReference, Map} from '@components/Map';
 import FindMeButton from '@screens/Home/FindMeButton.tsx';
 import {useSnapPoints} from '../../utils/snapPoints';
+import PaymentContent from '@components/BottomSheetViews/Launch/PaymentContent';
 
 const Home = React.memo(({navigation}: any) => {
   const [visible, setVisible] = useState(false);
   const [bottomSheetIndex, _] = useState(1);
 
-  const {setCameraRef} = useStore.getState();
+  const {setCameraRef, freeVacuum, setPaymentModalRef} = useStore.getState();
+  const isFreeVacuum = freeVacuum?.remains > 0;
 
   // Calculate dynamic snap points based on screen size
-  // Use the global snap points hook to ensure consistency across screens
   const snapPoints = useSnapPoints();
 
-  // Set snap points in global state for use in other components
   const {setBottomSheetSnapPoints} = useStore.getState();
 
-  // Update global snap points when local snap points change
   useEffect(() => {
     setBottomSheetSnapPoints(snapPoints);
   }, [snapPoints]);
 
   const userLocationRef = useRef<any>(null);
-  const {setIsBottomSheetOpen, setBottomSheetRef, business} =
-    useStore.getState();
-
+  const {setIsBottomSheetOpen, setBottomSheetRef, business} = useStore.getState();
   const {isDraggable} = useStore();
 
   const bsRef = useRef(null);
   const camRef = useRef<CameraReference>(null);
+  
+  const paymentModalRef = useRef<BottomSheetModal>(null);
 
   const currentPosition = useSharedValue(0);
   const [isButtonVisible, setIsButtonVisible] = useState<boolean>(false);
 
-  // set up bottom sheet reference to the store
+  useEffect(() => {
+    setPaymentModalRef(paymentModalRef);
+  }, [setPaymentModalRef]);
+
   useEffect(() => {
     if (bsRef.current) {
       setBottomSheetRef(bsRef);
@@ -83,51 +104,95 @@ const Home = React.memo(({navigation}: any) => {
     easing: Easing.linear,
   });
 
+  const paymentModalSnapPoints = useMemo(() => ['75%', '90%'], []);
+
+  const renderBackdrop = useCallback(
+    (props: any) => (
+      <BottomSheetBackdrop
+        {...props}
+        disappearsOnIndex={-1}
+        appearsOnIndex={0}
+        opacity={0.7}
+        pressBehavior="close"
+      />
+    ),
+    []
+  );
+
+  const handlePaymentModalClose = useCallback(() => {
+    paymentModalRef.current?.dismiss();
+  }, []);
+
   return (
     <GestureHandlerRootView style={styles.master}>
-      <View style={styles.container}>
-        <Map ref={camRef} userLocationRef={userLocationRef} />
+      <BottomSheetModalProvider>
+        <View style={styles.container}>
+          <Map ref={camRef} userLocationRef={userLocationRef} />
 
         {/* FindMe button with built-in position tracking and opacity fade */}
-        {isButtonVisible && !business && (
-          <FindMeButton
-            animatedPosition={currentPosition}
-            animatedIndex={currentPosition}
-          />
-        )}
-
-        <BottomSheet
-          animationConfigs={animationConfigs}
-          enableContentPanningGesture={isDraggable}
-          enableHandlePanningGesture={isDraggable}
-          ref={bsRef}
-          handleIndicatorStyle={styles.handleIndicator}
-          keyboardBlurBehavior="restore"
-          animatedPosition={currentPosition}
-          enableOverDrag={true}
-          enablePanDownToClose={false}
-          enableDynamicSizing={false}
-          snapPoints={snapPoints}
-          index={bottomSheetIndex}
-          onChange={handleSheetChanges}
-          backgroundComponent={() => (
-            <View style={[styles.transparentBackground, styles.shadow]} />
+          {isButtonVisible && !business && (
+            <FindMeButton
+              animatedPosition={currentPosition}
+              animatedIndex={currentPosition}
+            />
           )}
-          style={styles.shadow}
-          topInset={0}
-        >
+
+          <BottomSheet
+            animationConfigs={animationConfigs}
+            enableContentPanningGesture={isDraggable}
+            enableHandlePanningGesture={isDraggable}
+            ref={bsRef}
+            handleIndicatorStyle={styles.handleIndicator}
+            keyboardBlurBehavior="restore"
+            animatedPosition={currentPosition}
+            enableOverDrag={true}
+            enablePanDownToClose={false}
+            enableDynamicSizing={false}
+            snapPoints={snapPoints}
+            index={bottomSheetIndex}
+            onChange={handleSheetChanges}
+            backgroundComponent={() => (
+              <View style={[styles.transparentBackground, styles.shadow]} />
+            )}
+            style={styles.shadow}
+            topInset={0}
+          >
             <View style={styles.contentContainer}>
               {memoizedBottomSheetStack}
             </View>
-        </BottomSheet>
+          </BottomSheet>
 
-        <View style={[styles.burger]}>
-          <BurgerButton />
+          <BottomSheetModal
+            ref={paymentModalRef}
+            index={0}
+            snapPoints={paymentModalSnapPoints}
+            backdropComponent={renderBackdrop}
+            handleComponent={null}
+            backgroundStyle={styles.paymentModalBackground}
+            enablePanDownToClose={true}
+            enableDynamicSizing={false}
+            animateOnMount={true}
+            animationConfigs={{
+              duration: 300,
+              easing: Easing.out(Easing.exp),
+            }}
+          >
+            <BottomSheetView style={styles.paymentModalContent}>
+              <PaymentContent
+                onClose={handlePaymentModalClose}
+                isFreeVacuum={isFreeVacuum}
+              />
+            </BottomSheetView>
+          </BottomSheetModal>
+
+          <View style={[styles.burger]}>
+            <BurgerButton />
+          </View>
+          <View style={[styles.balance]}>
+            <Balance bottomSheetIndex={bottomSheetIndex} />
+          </View>
         </View>
-        <View style={[styles.balance]}>
-          <Balance bottomSheetIndex={bottomSheetIndex} />
-        </View>
-      </View>
+      </BottomSheetModalProvider>
     </GestureHandlerRootView>
   );
 });
@@ -167,41 +232,8 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  handle: {
-    paddingBottom: 2,
-  },
-  handleContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  scrollViewContent: {
-    flexDirection: 'row',
-    alignSelf: 'flex-end',
-  },
-  filterBox: {
-    height: dp(24),
-    borderRadius: dp(69),
-    backgroundColor: '#0B68E1',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: dp(16),
-  },
-  filterText: {
-    color: '#ffffff',
-    fontSize: dp(12),
-    fontWeight: '600',
-  },
-  lineContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: dp(18),
-  },
-  line: {
-    borderBottomWidth: 5,
-    borderColor: 'grey',
-    width: dp(134),
-    borderRadius: dp(10),
+  handleIndicator: {
+    display: 'none',
   },
   transparentBackground: {
     backgroundColor: 'transparent',
@@ -215,29 +247,18 @@ const styles = StyleSheet.create({
     shadowRadius: 9.11,
     elevation: 14,
   },
-  handleIndicator: {
-    display: 'none',
-  },
   contentContainer: {
     flex: 1,
   },
-  findMeContainer: {
-    position: 'absolute',
-    right: dp(20),
-    zIndex: 999,
-    backgroundColor: 'red',
-    // Add shadow for iOS
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: {width: 0, height: 2},
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-      },
-      android: {
-        elevation: 5,
-      },
-    }),
+  paymentModalBackground: {
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
+  },
+  paymentModalContent: {
+    flex: 1,
+    paddingHorizontal: dp(16),
+    paddingTop: dp(20),
   },
 });
 

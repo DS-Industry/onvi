@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {View, StyleSheet} from 'react-native';
 import useStore from '../../../state/store';
@@ -11,20 +11,17 @@ import {
   GeneralBottomSheetRouteProp,
 } from '../../../types/navigation/BottomSheetNavigation.ts';
 import {BayTypeEnum} from '@app-types/BayTypeEnum.ts';
-import PaymentContent from './ PaymentContent/index.tsx';
 
 const Launch = () => {
   const navigation =
     useNavigation<GeneralBottomSheetNavigationProp<'Launch'>>();
   const route = useRoute<GeneralBottomSheetRouteProp<'Launch'>>();
 
-  const {isBottomSheetOpen, setOrderDetails, orderDetails} = useStore.getState();
+  const {isBottomSheetOpen, setOrderDetails, orderDetails, setPaymentModalOpen} = useStore.getState();
   const {freeVacuum} = useStore();
 
   const isOpened = isBottomSheetOpen;
   const type: string = route.params.bayType;
-  
-  const [showPayment, setShowPayment] = useState(false);
 
   const isFreeVacuum = freeVacuum?.remains > 0;
 
@@ -33,51 +30,42 @@ const Launch = () => {
       ...orderDetails,
       sum: price,
       name: name,
-      free: false, 
+      free: false,
     });
-    setShowPayment(true); 
+
+    setPaymentModalOpen(true);
   };
 
   const handlePay = (cost: number) => {
     setOrderDetails({
       ...orderDetails,
       sum: cost,
-      free: isFreeVacuum && cost === 0, 
+      free: isFreeVacuum && cost === 0,
     });
-    setShowPayment(true);
-  };
 
-  const handleClosePayment = () => {
-    setShowPayment(false); 
+    setPaymentModalOpen(true);
   };
 
   return (
     <View style={styles.container}>
       <BusinessHeader type="box" box={orderDetails?.bayNumber ?? 0} />
 
-      {showPayment ? (
-        <PaymentContent
-          onClose={handleClosePayment}
-          isFreeVacuum={isFreeVacuum}
-        />
-      ) : (
-        (() => {
-          switch (type) {
-            case BayTypeEnum.BAY: {
-              return <DefaultLaunch onPay={handlePay} />;
-            }
-            case BayTypeEnum.VACUUME: {
-              return <VacuumLaunch onPay={handlePay} />;
-            }
-            case BayTypeEnum.PORTAL: {
-              return <PortalLaunch isOpened={isOpened} onSelect={onSelect} />;
-            }
-            default: {
-              return <DefaultLaunch onPay={handlePay} />;
-            }
+      {(() => {
+        switch (type) {
+          case BayTypeEnum.BAY: {
+            return <DefaultLaunch onPay={handlePay} />;
           }
-        })()
-      )}
+          case BayTypeEnum.VACUUME: {
+            return <VacuumLaunch onPay={handlePay} />;
+          }
+          case BayTypeEnum.PORTAL: {
+            return <PortalLaunch isOpened={isOpened} onSelect={onSelect} />;
+          }
+          default: {
+            return <DefaultLaunch onPay={handlePay} />;
+          }
+        }
+      })()}
     </View>
   );
 };
@@ -87,9 +75,9 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 22,
     paddingTop: 15,
-    backgroundColor: '#FFFFFF', 
-    borderTopLeftRadius: 25,    
-    borderTopRightRadius: 25,   
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
   },
 });
 

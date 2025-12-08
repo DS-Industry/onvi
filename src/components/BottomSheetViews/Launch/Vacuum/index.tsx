@@ -26,7 +26,7 @@ export default function VacuumLaunch({onPay}: VacuumLaunchProps) {
   const {t} = useTranslation();
   const measureTypeData = [t('common.labels.rubles')];
 
-  const {isBottomSheetOpen, setOrderDetails, orderDetails, bottomSheetRef} =
+  const {isBottomSheetOpen, setOrderDetails, orderDetails} =
     useStore.getState();
 
   const {freeVacuum, setFreeVacuum} = useStore();
@@ -137,7 +137,6 @@ export default function VacuumLaunch({onPay}: VacuumLaunchProps) {
               label={t('app.payment.vacuum.activateFree')}
               onClick={() => {
                 onPay(0); 
-                bottomSheetRef?.current?.snapToPosition('72%');
               }}
               color="blue"
             />

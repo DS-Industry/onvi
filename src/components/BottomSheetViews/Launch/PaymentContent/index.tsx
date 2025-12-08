@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {StyleSheet, Text, View, ScrollView} from 'react-native';
+import {StyleSheet, Text, View, ScrollView, TouchableOpacity} from 'react-native';
 import {Button} from '@styled/buttons';
 import useStore from '@state/store';
 import PaymentMethods from '@components/PaymentMethods';
@@ -22,7 +22,7 @@ import { dp } from '@utils/dp';
 
 interface PaymentContentProps {
   onClose: () => void;
-  isFreeVacuum: boolean; 
+  isFreeVacuum: boolean;
 }
 
 const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }) => {
@@ -63,46 +63,39 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
   );
 
   useEffect(() => {
-    AppMetrica.reportEvent('Open Payment Content');
+    AppMetrica.reportEvent('Open Payment Content Modal');
   }, []);
 
-  // Handle promo code selection from promotions slider
   const handlePromoPress = (promo: IPersonalPromotion) => {
     if (!promo) {
       return;
     }
-
     setPromocode(promo.code);
     applyPromoCode(promo.code);
   };
 
-
   useEffect(() => {
     if (!order?.sum) return;
 
-    // Calculate the actual discount amount
     const actualDiscount = calculateActualDiscount(discount, order.sum);
-
-    // Calculate actual points used
     const actualPoints = calculateActualPointsUsed(
       order.sum,
       actualDiscount,
       usedPoints,
     );
-
-    // Calculate the final amount
     const finalSum = calculateFinalAmount(
       order.sum,
       actualDiscount,
       actualPoints,
     );
-
-    // Update the state
     setFinalOrderCost(finalSum);
   }, [order?.sum, discount, usedPoints, toggled, user]);
 
   const handlePayment = () => {
     if (!order) return;
+
+    // Закрываем модалку перед переходом
+    onClose();
 
     // Переход на экран загрузки оплаты
     navigateBottomSheet('PaymentLoading', {
@@ -124,14 +117,19 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
   };
 
   return (
-    <ScrollView style={styles.container}>
-      {freeOn &&
+    <ScrollView 
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+      showsVerticalScrollIndicator={false}
+    >
+
+
+      {freeOn && (
         <Text style={styles.title}>
           {t('app.payment.vacuumActivation')}
         </Text>
-      }
+      )}
 
-      {/* Плашка с тенью */}
       <View style={styles.paymentCard}>
         <PaymentSummary
           order={order}
@@ -205,6 +203,7 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
               ) : null} */}
           </View>
         </View>
+        
         {!freeOn && (
           <PaymentMethods
             selectedMethod={paymentMethod}
@@ -226,14 +225,13 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
           fontSize={18}
           fontWeight={'600'}
           showLoading={loading}
-
         />
 
-        {/* <Pressable style={styles.cancelButton} onPress={onClose}>
+        <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
           <Text style={styles.cancelText}>
             {t('app.payment.cancelOrder')}
           </Text>
-        </Pressable> */}
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -242,6 +240,24 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  contentContainer: {
+    paddingBottom: dp(30),
+  },
+  closeButton: {
+    alignSelf: 'flex-end',
+    width: dp(30),
+    height: dp(30),
+    borderRadius: dp(15),
+    backgroundColor: '#F5F5F5',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: dp(10),
+  },
+  closeButtonText: {
+    fontSize: dp(24),
+    color: '#666',
+    lineHeight: dp(28),
   },
   title: {
     fontSize: dp(24),
@@ -277,16 +293,15 @@ const styles = StyleSheet.create({
   badgesContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    marginTop: dp(10),
   },
   badgeWrapper: {
     paddingTop: dp(15),
     marginRight: dp(10),
   },
   paymentActions: {
-    marginTop: dp(22),
-    marginBottom: dp(30),
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    marginBottom: dp(20),
   },
   cancelButton: {
     marginTop: dp(12),
