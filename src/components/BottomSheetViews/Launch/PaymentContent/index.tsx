@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {StyleSheet, Text, View, ScrollView, TouchableOpacity} from 'react-native';
+import {Platform, StyleSheet, Text, View, ScrollView} from 'react-native';
 import {Button} from '@styled/buttons';
 import useStore from '@state/store';
 import PaymentMethods from '@components/PaymentMethods';
@@ -94,10 +94,8 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
   const handlePayment = () => {
     if (!order) return;
 
-    // Закрываем модалку перед переходом
     onClose();
 
-    // Переход на экран загрузки оплаты
     navigateBottomSheet('PaymentLoading', {
       user,
       order,
@@ -122,8 +120,6 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
       contentContainerStyle={styles.contentContainer}
       showsVerticalScrollIndicator={false}
     >
-
-
       {freeOn && (
         <Text style={styles.title}>
           {t('app.payment.vacuumActivation')}
@@ -244,21 +240,6 @@ const styles = StyleSheet.create({
   contentContainer: {
     paddingBottom: dp(30),
   },
-  closeButton: {
-    alignSelf: 'flex-end',
-    width: dp(30),
-    height: dp(30),
-    borderRadius: dp(15),
-    backgroundColor: '#F5F5F5',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: dp(10),
-  },
-  closeButtonText: {
-    fontSize: dp(24),
-    color: '#666',
-    lineHeight: dp(28),
-  },
   title: {
     fontSize: dp(24),
     fontWeight: '600',
@@ -267,25 +248,25 @@ const styles = StyleSheet.create({
   },
   paymentCard: {
     backgroundColor: '#F5F5F5',
-    width: '100%',
     borderRadius: dp(25),
     paddingHorizontal: dp(16),
     paddingVertical: dp(10),
-
-    // ...Platform.select({
-    //   ios: {
-    //     shadowColor: '#000',
-    //     shadowOffset: {
-    //       width: 0,
-    //       height: 2,
-    //     },
-    //     shadowOpacity: 0.25,
-    //     shadowRadius: 3.84,
-    //   },
-    //   android: {
-    //     elevation: 5,
-    //   },
-    // }),
+    marginHorizontal: dp(18), 
+    
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: {
+          width: 0,
+          height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+      },
+      android: {
+        elevation: 5,
+      },
+    }),
   },
   choice: {
     marginTop: dp(15),
@@ -303,6 +284,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: dp(20),
     marginTop: dp(20),
+    paddingHorizontal: dp(16), 
   },
   cancelButton: {
     marginTop: dp(12),

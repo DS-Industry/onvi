@@ -4,8 +4,6 @@ import React, {
   useMemo,
   useEffect,
   useCallback,
-  useImperativeHandle,
-  forwardRef,
 } from 'react';
 import {
   View,
@@ -257,8 +255,7 @@ const styles = StyleSheet.create({
   },
   paymentModalContent: {
     flex: 1,
-    paddingHorizontal: dp(16),
-    paddingTop: dp(20),
+    paddingTop: dp(18),
   },
 });
 
