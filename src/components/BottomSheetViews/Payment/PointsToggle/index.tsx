@@ -101,7 +101,7 @@ const PointsToggle: React.FC<PointsToggleProps> = ({
   return (
     <View
       style={{
-        marginTop: dp(10),
+        marginTop: dp(0),
         display: 'flex',
         justifyContent: 'space-between',
         flexDirection: 'row',

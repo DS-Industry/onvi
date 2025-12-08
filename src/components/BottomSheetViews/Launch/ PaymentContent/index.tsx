@@ -167,10 +167,10 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
             </>
           )}
 
-          <View style={styles.row}>
+          {/* <View style={styles.row}>
             <Text style={styles.itemName}>Итого</Text>
             <Text style={styles.itemPrice}>{freeOn ? '0' : finalOrderCost} ₽</Text>
-          </View>
+          </View> */}
 
           <View style={styles.badgesContainer}>
             {/* {discount && !freeOn ? (
@@ -252,8 +252,9 @@ const styles = StyleSheet.create({
   paymentCard: {
     backgroundColor: '#F5F5F5',
     width: '100%',
-    borderRadius: 25,
-    padding: 25,
+    borderRadius: dp(25),
+    paddingHorizontal: dp(16),
+    paddingVertical: dp(16),
 
     // ...Platform.select({
     //   ios: {
@@ -282,7 +283,7 @@ const styles = StyleSheet.create({
     marginRight: dp(10),
   },
   paymentActions: {
-    marginTop: dp(30),
+    marginTop: dp(22),
     marginBottom: dp(30),
     alignItems: 'center',
     backgroundColor: '#FFFFFF',

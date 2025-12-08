@@ -105,11 +105,11 @@ const PromocodeSection: React.FC<PromocodeSectionProps> = ({
         )}
       </View>
 
-      <PromotionsSlider
+      {/* <PromotionsSlider
         value={promocode}
         onSelect={quickPromoSelect}
         onDeselect={quickPromoDeselect}
-      />
+      /> */}
     </>
   );
 };
@@ -131,8 +131,8 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    fontSize: dp(14),
-    fontWeight: '500',
+    fontSize: dp(12),
+    fontWeight: '400',
     color: '#000000',
     padding: 0,
     height: '100%',
