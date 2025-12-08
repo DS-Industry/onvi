@@ -148,18 +148,20 @@ const styles = StyleSheet.create({
     height: dp(24),
   },
   statusContainer: {
-    marginTop: dp(6),
+    // marginTop: dp(6),
     minHeight: dp(18),
   },
   successText: {
-    fontSize: dp(12),
+    fontSize: dp(10),
     color: '#0B68E1',
     fontWeight: '500',
+    marginLeft: dp(15),
   },
   errorText: {
-    fontSize: dp(12),
+    fontSize: dp(10),
     color: '#FF3B30',
     fontWeight: '500',
+    marginLeft: dp(15),
   },
 });
 
