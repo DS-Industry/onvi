@@ -90,7 +90,7 @@ const PaymentMethods: React.FC<PaymentMethodsProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: dp(15),
+    marginTop: dp(15),
   },
   sectionTitle: {
     fontSize: dp(16),
