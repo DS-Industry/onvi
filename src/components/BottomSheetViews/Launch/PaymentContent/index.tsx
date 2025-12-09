@@ -209,25 +209,32 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
       </View>
 
       <View style={styles.paymentActions}>
-        <Button
-          label={
-            freeOn
-              ? t('common.buttons.activate')
-              : t('app.payment.payAmount', { finalOrderCost })
-          }
-          onClick={handlePayment}
-          color="blue"
-          height={43}
-          fontSize={18}
-          fontWeight={'600'}
-          showLoading={loading}
-        />
-
-        {/* <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
-          <Text style={styles.cancelText}>
-            {t('app.payment.cancelOrder')}
-          </Text>
-        </TouchableOpacity> */}
+        {freeOn ? (
+          <Button
+            label={t('common.buttons.activate')}
+            onClick={handlePayment}
+            color="blue"
+            height={43}
+            width={'100%'}
+            fontSize={18}
+            fontWeight={'600'}
+            showLoading={loading}
+          />
+        ) : (
+          <Button
+            label={t('common.buttons.pay')} 
+            price={`${finalOrderCost}₽`}
+            onClick={handlePayment}
+            color="blue"
+            height={43}
+            width={'100%'}
+            fontSize={18}
+            fontWeight={'600'}
+            priceFontSize={18} 
+            priceFontWeight={'500'} 
+            showLoading={loading}
+          />
+        )}
       </View>
     </ScrollView>
   );
