@@ -236,22 +236,26 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    width: '100%', 
   },
   contentContainer: {
     paddingBottom: dp(30),
+    flexGrow: 1,
   },
   title: {
     fontSize: dp(24),
     fontWeight: '600',
     color: '#000',
     marginBottom: dp(12),
+    textAlign: 'center',
+    paddingHorizontal: dp(16), 
   },
   paymentCard: {
     backgroundColor: '#F5F5F5',
     borderRadius: dp(25),
     paddingHorizontal: dp(16),
     paddingVertical: dp(10),
-    marginHorizontal: dp(18), 
+    marginHorizontal: dp(16),
     
     ...Platform.select({
       ios: {
@@ -284,7 +288,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: dp(20),
     marginTop: dp(20),
-    paddingHorizontal: dp(16), 
+    paddingHorizontal: dp(16),
+    width: '100%',
   },
   cancelButton: {
     marginTop: dp(12),

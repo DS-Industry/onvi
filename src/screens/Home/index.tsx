@@ -102,8 +102,6 @@ const Home = React.memo(({navigation}: any) => {
     easing: Easing.linear,
   });
 
-  const paymentModalSnapPoints = useMemo(() => ['75%', '90%'], []);
-
   const renderBackdrop = useCallback(
     (props: any) => (
       <BottomSheetBackdrop
@@ -163,12 +161,11 @@ const Home = React.memo(({navigation}: any) => {
           <BottomSheetModal
             ref={paymentModalRef}
             index={0}
-            snapPoints={paymentModalSnapPoints}
             backdropComponent={renderBackdrop}
             handleComponent={null}
             backgroundStyle={styles.paymentModalBackground}
             enablePanDownToClose={true}
-            enableDynamicSizing={false}
+            enableDynamicSizing={true}
             animateOnMount={true}
             animationConfigs={{
               duration: 300,
