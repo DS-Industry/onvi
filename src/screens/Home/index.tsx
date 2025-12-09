@@ -167,6 +167,8 @@ const Home = React.memo(({navigation}: any) => {
             enablePanDownToClose={true}
             enableDynamicSizing={true}
             animateOnMount={true}
+            keyboardBehavior='interactive'
+            keyboardBlurBehavior='restore'
             animationConfigs={{
               duration: 300,
               easing: Easing.out(Easing.exp),

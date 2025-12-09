@@ -12,6 +12,7 @@ import {dp} from '@utils/dp.ts';
 import PromotionsSlider from '@components/BottomSheetViews/Payment/PromotionsSlider';
 import {IPersonalPromotion} from '@app-types/models/PersonalPromotion.ts';
 import {useTranslation} from 'react-i18next';
+import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
 
 interface PromocodeSectionProps {
   promocode: string | undefined;
@@ -60,7 +61,7 @@ const PromocodeSection: React.FC<PromocodeSectionProps> = ({
     <>
       <View style={styles.container}>
         <View style={styles.inputContainer}>
-          <TextInput
+          <BottomSheetTextInput
             ref={inputRef}
             style={styles.input}
             placeholder={t('app.promos.promocode')}
