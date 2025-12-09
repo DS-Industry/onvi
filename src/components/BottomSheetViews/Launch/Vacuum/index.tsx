@@ -1,14 +1,8 @@
 import {useEffect, useState} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
-
-// components
-import {BusinessHeader} from '@components/Business/Header';
 import {SumInput} from '@styled/inputs/SumInput';
 import {ActionButton} from '@styled/buttons/ActionButton';
-import {BottomSheetScrollView} from '@gorhom/bottom-sheet';
 import {FilterList} from '@components/FiltersList';
-
-// utils
 import {
   horizontalScale,
   moderateScale,
@@ -16,26 +10,21 @@ import {
   verticalScale,
 } from '../../../../utils/metrics';
 import {dp} from '../../../../utils/dp';
-import {useNavigation} from '@react-navigation/native';
-
-// state
 import useStore from '../../../../state/store';
-
-// types
 import {Button} from '@styled/buttons';
-
-import {GeneralBottomSheetNavigationProp} from '../../../../types/navigation/BottomSheetNavigation.ts';
 import {WHITE} from '@utils/colors.ts';
 import {useTranslation} from 'react-i18next';
 import {getFreeVacuum} from '@services/api/user/index.ts';
+import { ScrollView } from 'react-native-gesture-handler';
 
-export default function VacuumLaunch() {
+interface VacuumLaunchProps {
+  onPay: (cost: number) => void;
+}
+
+export default function VacuumLaunch({onPay}: VacuumLaunchProps) {
   const [value, setValue] = useState(50);
   const {t} = useTranslation();
   const measureTypeData = [t('common.labels.rubles')];
-
-  const navigation =
-    useNavigation<GeneralBottomSheetNavigationProp<'Launch'>>();
 
   const {isBottomSheetOpen, setOrderDetails, orderDetails} =
     useStore.getState();
@@ -43,10 +32,8 @@ export default function VacuumLaunch() {
   const {freeVacuum, setFreeVacuum} = useStore();
 
   const order = orderDetails;
-
   const isOpened = isBottomSheetOpen;
-
-  const freeVacOn = freeVacuum.remains > 0;
+  const freeVacOn = freeVacuum?.remains > 0;
 
   const updateFreeVacuume = async () => {
     const data = await getFreeVacuum();
@@ -60,15 +47,14 @@ export default function VacuumLaunch() {
   return (
     <>
       {freeVacOn ? (
-        <BottomSheetScrollView
+        <ScrollView
           contentContainerStyle={{
             ...styles.container,
             backgroundColor: WHITE,
           }}
           nestedScrollEnabled={true}
-          scrollEnabled={isOpened}>
-          <View style={{paddingTop: dp(15)}} />
-          <BusinessHeader type="box" box={order?.bayNumber ?? 0} />
+          scrollEnabled={isOpened}
+        >
           <Text
             style={{
               width: '100%',
@@ -150,27 +136,20 @@ export default function VacuumLaunch() {
             <Button
               label={t('app.payment.vacuum.activateFree')}
               onClick={() => {
-                setOrderDetails({
-                  ...orderDetails,
-                  sum: 0,
-                  free: freeVacOn,
-                });
-                navigation.navigate('Payment', {free: true});
+                onPay(0); 
               }}
               color="blue"
             />
           </View>
-        </BottomSheetScrollView>
+        </ScrollView>
       ) : (
-        <BottomSheetScrollView
+        <ScrollView
           contentContainerStyle={{
             ...styles.container,
             backgroundColor: WHITE,
           }}
           nestedScrollEnabled={true}
           scrollEnabled={isOpened}>
-          <View style={{paddingTop: dp(15)}} />
-          <BusinessHeader type="box" box={order?.bayNumber ?? 0} />
           <View
             style={{
               display: 'flex',
@@ -328,17 +307,12 @@ export default function VacuumLaunch() {
               label={t('common.buttons.pay')}
               onClick={() => {
                 let cost = value ? value : 10;
-                setOrderDetails({
-                  ...orderDetails,
-                  sum: cost,
-                });
-
-                navigation.navigate('Payment', {});
+                onPay(cost);
               }}
               color="blue"
             />
           </View>
-        </BottomSheetScrollView>
+        </ScrollView>
       )}
     </>
   );

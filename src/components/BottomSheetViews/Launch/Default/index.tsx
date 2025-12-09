@@ -2,7 +2,6 @@ import {useState} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 
 // components
-import {BusinessHeader} from '@components/Business/Header';
 import {SumInput} from '@styled/inputs/SumInput';
 import {ActionButton} from '@styled/buttons/ActionButton';
 import {FilterList} from '@components/FiltersList';
@@ -15,7 +14,6 @@ import {
   verticalScale,
 } from '../../../../utils/metrics';
 import {dp} from '../../../../utils/dp';
-import {useNavigation} from '@react-navigation/native';
 import {useTheme} from '@context/ThemeProvider';
 
 // state
@@ -25,16 +23,16 @@ import useStore from '../../../../state/store';
 import {Button} from '@styled/buttons';
 
 import {useTranslation} from 'react-i18next';
-import {GeneralBottomSheetNavigationProp} from '../../../../types/navigation/BottomSheetNavigation.ts';
 
-export default function DefaultLaunch() {
+interface DefaultLaunchProps {
+  onPay: (cost: number) => void;
+}
+
+export default function DefaultLaunch({onPay}: DefaultLaunchProps) {
   const {theme} = useTheme();
   const [value, setValue] = useState(50);
   const {t} = useTranslation();
   const measureTypeData = [t('common.labels.rubles')];
-
-  const navigation =
-    useNavigation<GeneralBottomSheetNavigationProp<'Launch'>>();
 
   const {isBottomSheetOpen, setOrderDetails, orderDetails, selectedPos} =
     useStore.getState();
@@ -49,8 +47,6 @@ export default function DefaultLaunch() {
         backgroundColor: theme.mainColor,
       }}
     >
-      <View style={{paddingTop: dp(15)}} />
-      <BusinessHeader type="box" box={order?.bayNumber ?? 0} />
       <View
         style={{
           display: 'flex',
@@ -238,7 +234,7 @@ export default function DefaultLaunch() {
               ...orderDetails,
               sum: cost,
             });
-            navigation.navigate('Payment', {});
+            onPay(cost);
           }}
           color="blue"
         />

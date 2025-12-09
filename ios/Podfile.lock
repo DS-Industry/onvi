@@ -2861,13 +2861,13 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - rnmapbox-maps (10.2.8):
+  - rnmapbox-maps (10.2.9):
     - MapboxMaps (~> 11.16.2)
     - React
     - React-Core
-    - rnmapbox-maps/DynamicLibrary (= 10.2.8)
+    - rnmapbox-maps/DynamicLibrary (= 10.2.9)
     - Turf
-  - rnmapbox-maps/DynamicLibrary (10.2.8):
+  - rnmapbox-maps/DynamicLibrary (10.2.9):
     - boost
     - DoubleConversion
     - fast_float
@@ -2921,7 +2921,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - RNReanimated (4.1.5):
+  - RNReanimated (4.2.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -2948,11 +2948,11 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNReanimated/reanimated (= 4.1.5)
+    - RNReanimated/reanimated (= 4.2.0)
     - RNWorklets
     - SocketRocket
     - Yoga
-  - RNReanimated/reanimated (4.1.5):
+  - RNReanimated/reanimated (4.2.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -2979,11 +2979,11 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNReanimated/reanimated/apple (= 4.1.5)
+    - RNReanimated/reanimated/apple (= 4.2.0)
     - RNWorklets
     - SocketRocket
     - Yoga
-  - RNReanimated/reanimated/apple (4.1.5):
+  - RNReanimated/reanimated/apple (4.2.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -3129,7 +3129,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - RNWorklets (0.6.1):
+  - RNWorklets (0.7.1):
     - boost
     - DoubleConversion
     - fast_float
@@ -3156,10 +3156,10 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNWorklets/worklets (= 0.6.1)
+    - RNWorklets/worklets (= 0.7.1)
     - SocketRocket
     - Yoga
-  - RNWorklets/worklets (0.6.1):
+  - RNWorklets/worklets (0.7.1):
     - boost
     - DoubleConversion
     - fast_float
@@ -3186,10 +3186,10 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNWorklets/worklets/apple (= 0.6.1)
+    - RNWorklets/worklets/apple (= 0.7.1)
     - SocketRocket
     - Yoga
-  - RNWorklets/worklets/apple (0.6.1):
+  - RNWorklets/worklets/apple (0.7.1):
     - boost
     - DoubleConversion
     - fast_float
@@ -3776,12 +3776,12 @@ SPEC CHECKSUMS:
   RNFBApp: 255fa19a91d6c1309e021ee75d5d209754e5961b
   RNFBMessaging: c304c1d8949f996d3eed1cf4eeba33148d13b4ea
   RNGestureHandler: e1cf8ef3f11045536eed6bd4f132b003ef5f9a5f
-  rnmapbox-maps: b649c8c3a1c14af14b32ec4ee8af3479a6fefdcd
+  rnmapbox-maps: ea86b78802f7e900df904cd3897f0021252e3738
   RNReactNativeHapticFeedback: be4f1b4bf0398c30b59b76ed92ecb0a2ff3a69c6
-  RNReanimated: ac06da53579693ab451941ef89f5a55afeab0dd9
+  RNReanimated: f1868b36f4b2b52a0ed00062cfda69506f75eaee
   RNScreens: d821082c6dd1cb397cc0c98b026eeafaa68be479
   RNSVG: 1bbfeab22b26db18b73d2e36b37a0f02a1180838
-  RNWorklets: ab618bf7d1c7fd2cb793b9f0f39c3e29274b3ebf
+  RNWorklets: d9c050940f140af5d8b611d937eab1cbfce5e9a5
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   SPaySDK: 488c8b3dff08541f9f9097d15279c6c2cfc14ada
   Turf: c9eb11a65d96af58cac523460fd40fec5061b081

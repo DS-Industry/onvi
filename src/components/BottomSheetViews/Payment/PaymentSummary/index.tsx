@@ -3,7 +3,7 @@ import { IUser } from '../../../../types/models/User.ts';
 import { OrderDetailsType } from '../../../../state/order/OrderSlice.ts';
 import { CarWash } from '../../../../types/api/app/types.ts';
 import { StyleSheet, Text, View } from 'react-native';
-import Skeleton from 'react-native-reanimated-skeleton'; // Измененный импорт
+import Skeleton from 'react-native-reanimated-skeleton'; 
 import { Info } from 'react-native-feather';
 import { dp } from '@utils/dp.ts';
 import { useTranslation } from 'react-i18next';
@@ -21,14 +21,14 @@ const PaymentSummary: React.FC<PaymentSummaryProps> = memo(
 
     return (
       <View style={styles.container}>
-        <View style={styles.row}>
+        {/* <View style={styles.row}>
           {order.name ? (
             <Text style={styles.itemName}>{order.name}</Text>
           ) : (
             <Text />
           )}
           <Text style={styles.itemPrice}>{order.sum ? order.sum : 0} ₽</Text>
-        </View>
+        </View> */}
 
         <View style={styles.row}>
           {selectedPos?.IsLoyaltyMember ? (
@@ -91,15 +91,15 @@ const styles = StyleSheet.create({
     marginTop: dp(10),
   },
   itemName: {
-    fontWeight: '300',
-    fontSize: dp(15),
-    color: 'rgba(0, 0, 0, 1)',
+    fontWeight: '400',
+    fontSize: dp(14),
+    color: 'black',
     flexShrink: 1,
     flex: 1,
     flexWrap: 'wrap',
   },
   itemPrice: {
-    color: 'rgba(0, 0, 0, 1)',
+    color: 'black',
     fontWeight: '700',
     fontSize: dp(16),
   },

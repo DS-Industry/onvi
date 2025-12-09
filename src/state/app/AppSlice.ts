@@ -1,9 +1,7 @@
 import {StoreSlice} from '../store.ts';
-
 import {SelectedFilters} from '@components/BottomSheetViews/Filters/index.tsx';
-
 import {BottomSheetMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
-
+import {BottomSheetModal} from '@gorhom/bottom-sheet';
 import {CameraReference} from '@components/Map';
 import {RefObject} from 'react';
 
@@ -39,9 +37,14 @@ export interface AppSlice {
 
   cameraRef: RefObject<CameraReference> | null;
   setCameraRef: (value: RefObject<CameraReference>) => void;
+  
+  isPaymentModalOpen: boolean;
+  setPaymentModalOpen: (open: boolean) => void;
+  paymentModalRef: React.RefObject<BottomSheetModal> | null;
+  setPaymentModalRef: (ref: React.RefObject<BottomSheetModal>) => void;
 }
 
-const createAppSlice: StoreSlice<AppSlice> = set => ({
+const createAppSlice: StoreSlice<AppSlice> = (set, get) => ({
   bottomSheetRef: null,
   setBottomSheetRef: value => set({bottomSheetRef: value}),
   filters: {},
@@ -76,6 +79,19 @@ const createAppSlice: StoreSlice<AppSlice> = set => ({
     set({
       cameraRef: value,
     }),
+    
+  isPaymentModalOpen: false,
+  setPaymentModalOpen: (open: boolean) => {
+    if (open) {
+      get().paymentModalRef?.current?.present();
+    } else {
+      get().paymentModalRef?.current?.dismiss();
+    }
+    set({ isPaymentModalOpen: open });
+  },
+  
+  paymentModalRef: null,
+  setPaymentModalRef: (ref) => set({ paymentModalRef: ref }),
 });
 
 export default createAppSlice;

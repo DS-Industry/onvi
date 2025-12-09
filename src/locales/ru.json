@@ -98,7 +98,7 @@
         "sessionEnded": "Сеанс пылесоса завершен!",
         "retrySession": "Хотите повторить сеанс?"
       },
-      "yourCashback": "Ваш Cashback",
+      "yourCashback": "Ваш кешбэк",
       "noCashbackMessage": "Кешбэк не начисляется. Автомойка не участвует в программе лояльности.",
       "cardNumber": "Номер карты"
     },
@@ -186,7 +186,9 @@
       "promocode": "Промокод",
       "over": "Закончился",
       "use": "Использовать",
-      "to": "До"
+      "to": "До",
+      "promocodeApplied": "Промокод применен",
+      "promocodeNotFound": "Промокод не найден"
     },
     "transferBalance": {
       "transferBalance": "Перенос баланса",

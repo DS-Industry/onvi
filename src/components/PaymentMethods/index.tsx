@@ -66,7 +66,6 @@ const PaymentMethods: React.FC<PaymentMethodsProps> = ({
 
   return (
     <View style={styles.container}>
-      <Text style={styles.sectionTitle}>{t('app.payment.paymentMethod')}</Text>
       <View style={styles.buttonsContainer}>
         <FlatList
           data={paymentMethods}
@@ -91,7 +90,7 @@ const PaymentMethods: React.FC<PaymentMethodsProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: dp(15),
+    marginTop: dp(15),
   },
   sectionTitle: {
     fontSize: dp(16),

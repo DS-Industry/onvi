@@ -101,7 +101,7 @@ const PointsToggle: React.FC<PointsToggleProps> = ({
   return (
     <View
       style={{
-        marginTop: dp(35),
+        marginTop: dp(0),
         display: 'flex',
         justifyContent: 'space-between',
         flexDirection: 'row',
@@ -109,8 +109,8 @@ const PointsToggle: React.FC<PointsToggleProps> = ({
       <View>
         <Text
           style={{
-            fontWeight: '300',
-            fontSize: dp(15),
+            fontWeight: '400',
+            fontSize: dp(14),
             color: 'rgba(0, 0, 0, 1)',
           }}>
           {t('app.bonus.withdrawOnviBonuses')}
