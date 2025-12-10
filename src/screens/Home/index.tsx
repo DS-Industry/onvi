@@ -17,7 +17,6 @@ import {Balance} from '@components/Balance';
 import BottomSheet, {
   useBottomSheetTimingConfigs,
   BottomSheetModal,
-  BottomSheetModalProvider,
   BottomSheetBackdrop,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
@@ -121,7 +120,6 @@ const Home = React.memo(({navigation}: any) => {
 
   return (
     <GestureHandlerRootView style={styles.master}>
-      <BottomSheetModalProvider>
         <View style={styles.container}>
           <Map ref={camRef} userLocationRef={userLocationRef} />
 
@@ -189,7 +187,6 @@ const Home = React.memo(({navigation}: any) => {
             <Balance bottomSheetIndex={bottomSheetIndex} />
           </View>
         </View>
-      </BottomSheetModalProvider>
     </GestureHandlerRootView>
   );
 });

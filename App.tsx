@@ -29,6 +29,8 @@ import MapboxGL from '@rnmapbox/maps';
 import Toast from 'react-native-toast-message';
 import {StoryViewContext} from './src/context/StoryViewContext'
 import {StoryView} from './src/components/StoryView'
+import NotificationModal from './src/components/NotificationModal/NotificationModal';
+import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 
 MapboxGL.setAccessToken(
   'sk.eyJ1Ijoib25pdm9uZSIsImEiOiJjbTBsN2Q2MzIwMnZ0MmtzN2U5d3lycTJ0In0.J57w_rOEzH4Mijty_YXoRA',
@@ -224,20 +226,23 @@ function App(): React.JSX.Element {
         <I18nextProvider i18n={i18n}>
           <StoryViewContext.Provider value={storyViewContextValue}>
             <GestureHandlerRootView style={{flex: 1}}>
-              <SafeAreaView style={styles.container} edges={[]}>
-                <View style={{flex: 1}}>
-                  {!isConnected && <FlashMessage position="top" />}
-                  <Application />
-                  {fullScreenStory.visible && fullScreenStory.stories && (
-                    <StoryView
-                      stories={fullScreenStory.stories}
-                      initialUserIndex={fullScreenStory.initialIndex}
-                      onClose={closeStoryView}
-                      isFullScreen={true}
-                    />
-                  )}
-                </View>
-              </SafeAreaView>
+              <BottomSheetModalProvider>
+                <SafeAreaView style={styles.container} edges={[]}>
+                  <View style={{flex: 1}}>
+                    {!isConnected && <FlashMessage position="top" />}
+                    <Application />
+                    {fullScreenStory.visible && fullScreenStory.stories && (
+                      <StoryView
+                        stories={fullScreenStory.stories}
+                        initialUserIndex={fullScreenStory.initialIndex}
+                        onClose={closeStoryView}
+                        isFullScreen={true}
+                      />
+                    )}
+                  </View>
+                  <NotificationModal />
+                </SafeAreaView>
+              </BottomSheetModalProvider>
             </GestureHandlerRootView>
           </StoryViewContext.Provider>
         </I18nextProvider>

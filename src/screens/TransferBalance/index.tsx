@@ -27,6 +27,7 @@ import TransferSuccessModal from '@components/TransferBalance/TransferSuccessMod
 import TransferBalanceOnboardingStory from '@components/TransferBalance/OnboardingStory';
 import useStore from '../../state/store';
 import ScreenHeader from '@components/ScreenHeader';
+import { showTranserWarning } from '@utils/notificationModal.ts';
 
 type FindBalanceResponse = {
   balance: number;
@@ -43,7 +44,6 @@ const TransferBalance = () => {
   const [showInstructions, setShowInstructions] = useState<boolean>(false);
   const [transferFailModal, setTransferFailModal] = useState(false);
   const [transferSuccessModal, setTransferSuccessModal] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
 
   const { loadUser } = useStore.getState();
 
@@ -89,7 +89,6 @@ const TransferBalance = () => {
   };
 
   const confirmTransfer = () => {
-    setModalVisible(false);
     transfer();
   };
 
@@ -277,7 +276,7 @@ const TransferBalance = () => {
                   ) : (
                     <TouchableOpacity
                       style={getButtonStyle()}
-                      onPress={() => setModalVisible(true)}
+                      onPress={() => showTranserWarning(confirmTransfer)}
                       disabled={
                         balance.balanceAfterTransfer === 0 &&
                         balance.bonusAsPromo < 50
@@ -290,43 +289,6 @@ const TransferBalance = () => {
                 </>
               )}
             </View>
-
-            <Modal
-              animationType="slide"
-              transparent={true}
-              visible={modalVisible}
-              onRequestClose={() => {
-                setModalVisible(!modalVisible);
-              }}>
-              <View style={styles.centeredView}>
-                <View style={styles.modalOverlay} />
-                <View style={styles.modalView}>
-                  <Text style={styles.modalText}>
-                    {t('app.transferBalance.modalTextPart1')}
-                    <Text style={styles.instructionsLink} onPress={handlePress}>
-                      {t('app.transferBalance.modalTextPart2')}
-                    </Text>
-                    {t('app.transferBalance.modalTextPart3')}
-                  </Text>
-                  <View style={styles.modalButtons}>
-                    <TouchableOpacity
-                      style={[styles.modalButton, styles.buttonClose]}
-                      onPress={() => setModalVisible(!modalVisible)}>
-                      <Text style={styles.buttonText}>
-                        {t('common.buttons.cancel')}
-                      </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[styles.modalButton, styles.buttonConfirm]}
-                      onPress={confirmTransfer}>
-                      <Text style={styles.buttonText}>
-                        {t('common.buttons.yes')}
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </View>
-            </Modal>
 
             <TransferFailModal
               visible={transferFailModal}

@@ -4,10 +4,22 @@ import {BottomSheetMethods} from '@gorhom/bottom-sheet/lib/typescript/types';
 import {BottomSheetModal} from '@gorhom/bottom-sheet';
 import {CameraReference} from '@components/Map';
 import {RefObject} from 'react';
+import { ImageSourcePropType } from 'react-native';
 
 export interface IUserLocation {
   latitude: number;
   longitude: number;
+}
+
+export interface NotificationModalConfig {
+  id?: string;
+  title: string;
+  description: string;
+  image?: ImageSourcePropType | string;
+  buttonText: string;
+  onButtonPress: () => void;
+  onClose?: () => void;
+  showCloseButton?: boolean;
 }
 
 export interface AppSlice {
@@ -42,6 +54,12 @@ export interface AppSlice {
   setPaymentModalOpen: (open: boolean) => void;
   paymentModalRef: React.RefObject<BottomSheetModal> | null;
   setPaymentModalRef: (ref: React.RefObject<BottomSheetModal>) => void;
+  isNotificationModalOpen: boolean;
+  notificationModalConfig: NotificationModalConfig | null;
+  setNotificationModalOpen: (open: boolean) => void;
+  setNotificationModalConfig: (config: NotificationModalConfig | null) => void;
+  openNotificationModal: (config: NotificationModalConfig) => void;
+  closeNotificationModal: () => void;
 }
 
 const createAppSlice: StoreSlice<AppSlice> = (set, get) => ({
@@ -92,6 +110,37 @@ const createAppSlice: StoreSlice<AppSlice> = (set, get) => ({
   
   paymentModalRef: null,
   setPaymentModalRef: (ref) => set({ paymentModalRef: ref }),
+  isNotificationModalOpen: false,
+  notificationModalConfig: null,
+  
+  setNotificationModalOpen: (open) => {
+    set({ isNotificationModalOpen: open });
+  },
+  
+  setNotificationModalConfig: (config) => {
+    set({ notificationModalConfig: config });
+  },
+  
+  openNotificationModal: (config) => {
+    set({ 
+      notificationModalConfig: {
+        ...config,
+        showCloseButton: config.showCloseButton ?? true,
+      },
+      isNotificationModalOpen: true 
+    });
+  },
+  
+  closeNotificationModal: () => {
+    const { notificationModalConfig } = get();
+    if (notificationModalConfig?.onClose) {
+      notificationModalConfig.onClose();
+    }
+    set({ 
+      notificationModalConfig: null,
+      isNotificationModalOpen: false 
+    });
+  },
 });
 
 export default createAppSlice;
