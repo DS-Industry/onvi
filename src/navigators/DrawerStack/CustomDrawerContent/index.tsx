@@ -92,70 +92,30 @@ const getIconComponent = (iconName: string, isActive: boolean) => {
 
 const CustomDrawerItem = ({ label, color, onPress, iconName, isActive }: CustomDrawerItemProps) => {
   return (
-    <TouchableOpacity
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingVertical: dp(4),
-      }}
-      onPress={onPress}
-    >
+    <TouchableOpacity style={styles.drawerItem} onPress={onPress}>
       {iconName && getIconComponent(iconName, isActive)}
-      <Text
-        style={{
-          marginLeft: dp(20),
-          color: color,
-          fontWeight: '400',
-          fontSize: dp(17),
-        }}>
-        {label}
-      </Text>
+      <Text style={[styles.drawerItemText, { color }]}>{label}</Text>
     </TouchableOpacity>
   );
 };
 
-const CustomDrawerContent = ({
-  navigation,
-  theme,
-  user,
-}: CustomDrawerContentProps) => {
+const CustomDrawerContent = ({ navigation, theme, user }: CustomDrawerContentProps) => {
   const initialAvatar = user.avatar;
-
   const avatarValue = avatarSwitch(initialAvatar);
   const route = navigation.getState().routes[navigation.getState().index].name;
   const { t } = useTranslation();
 
   return (
     <>
-      <View style={{ flex: 1 }}>
+      <View style={styles.container}>
         <DrawerContentScrollView scrollEnabled={false}>
-          <View
-            style={{
-              flex: 1,
-              alignItems: 'flex-start',
-              paddingTop: dp(20),
-              paddingLeft: dp(20),
-            }}>
-            <TouchableOpacity
-              style={{
-                flexDirection: 'row',
-                paddingBottom: dp(15),
-                borderRadius: dp(10),
-                alignItems: 'center',
-              }}
-              onPress={() => navigation.navigate('Настройки')}>
-              {/*Profile*/}
+          <View style={styles.content}>
+            <TouchableOpacity style={styles.profileButton} onPress={() => navigation.navigate('Настройки')}>
               <View style={styles.profileContainer}>
                 <Image source={avatarValue} style={styles.avatar} />
               </View>
             </TouchableOpacity>
-            {/*items*/}
-            <View
-              style={{
-                width: '100%',
-                paddingRight: dp(9),
-              }}
-            >
+            <View style={styles.itemsContainer}>
               {!user || !user.name ? (
                 <Skeleton
                   isLoading={true}
@@ -170,29 +130,17 @@ const CustomDrawerContent = ({
                   boneColor="#f0f0f0"
                   highlightColor="#e0e0e0"
                   animationType="shiver"
-                >
-                </Skeleton>
+                />
               ) : (
                 <TouchableOpacity
-                  style={{
-                    flexDirection: 'row',
-                    paddingBottom: dp(2),
-                  }}
+                  style={styles.userNameButton}
                   onPress={() =>
                     navigation.reset({
                       index: 0,
                       routes: [{ name: 'Настройки' }],
                     })
                   }>
-                  <Text
-                    style={{
-                      fontStyle: 'normal',
-                      fontSize: dp(20),
-                      fontWeight: '600',
-                      lineHeight: dp(23),
-                      letterSpacing: 0.43,
-                      color: theme.textColor,
-                    }}>
+                  <Text style={[styles.userNameText, { color: theme.textColor }]}>
                     {user.name}
                   </Text>
                 </TouchableOpacity>
@@ -212,28 +160,13 @@ const CustomDrawerContent = ({
                   boneColor="#f0f0f0"
                   highlightColor="#e0e0e0"
                   animationType="shiver"
-                >
-                </Skeleton>
+                />
               ) : (
-                <Text
-                  style={{
-                    marginBottom: dp(45),
-                    fontStyle: 'normal',
-                    fontSize: dp(11),
-                    fontWeight: '400',
-                    lineHeight: dp(20),
-                    color: theme.textColor,
-                    letterSpacing: 0.23,
-                  }}>
+                <Text style={[styles.userPhoneText, { color: theme.textColor }]}>
                   {formatPhoneNumber(user.phone)}
                 </Text>
               )}
-
-              <View
-                style={{
-                  gap: dp(35),
-                }}
-              >
+              <View style={styles.drawerItems}>
                 <CustomDrawerItem
                   label={t('navigation.home')}
                   color={route === 'Главная' ? theme.primary : theme.textColor}
@@ -246,7 +179,6 @@ const CustomDrawerContent = ({
                   iconName="home"
                   isActive={route === 'Главная'}
                 />
-
                 <CustomDrawerItem
                   label={t('navigation.stock')}
                   color={route === 'Промокоды' ? theme.primary : theme.textColor}
@@ -259,7 +191,6 @@ const CustomDrawerContent = ({
                   iconName="tag"
                   isActive={route === 'Промокоды'}
                 />
-
                 <CustomDrawerItem
                   label={t('navigation.favorites')}
                   color={route === 'Избранное' ? theme.primary : theme.textColor}
@@ -272,7 +203,6 @@ const CustomDrawerContent = ({
                   iconName="heart"
                   isActive={route === 'Избранное'}
                 />
-
                 <CustomDrawerItem
                   label={t('navigation.settings')}
                   color={route === 'Настройки' ? theme.primary : theme.textColor}
@@ -289,19 +219,9 @@ const CustomDrawerContent = ({
             </View>
           </View>
         </DrawerContentScrollView>
-        <View
-          style={{
-            // padding: dp(20),
-            paddingLeft: dp(20),
-            display: 'flex',
-            flexDirection: 'column',
-            marginBottom: dp(80),
-          }}>
+        <View style={styles.footer}>
           <TouchableOpacity
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-            }}
+            style={styles.transferButton}
             onPress={() => {
               navigation.reset({
                 index: 0,
@@ -310,57 +230,23 @@ const CustomDrawerContent = ({
             }}
           >
             {TransferIcon()}
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}
-            >
-              <Text
-                style={{
-                  color: theme.textColor,
-                  fontWeight: '400',
-                  fontSize: dp(17),
-                  marginLeft: dp(20),
-                }}
-              >
+            <View style={styles.transferTextContainer}>
+              <Text style={[styles.transferText, { color: theme.textColor }]}>
                 {t('app.main.transferBalance')}
-            </Text>
+              </Text>
               <Image
-                style={{
-                  marginLeft: dp(6),
-                  width: dp(85),
-                  objectFit: 'contain',
-                }}
+                style={styles.transferImage}
                 source={require('../../../assets/icons/moyka-transfer.png')}
               />
             </View>
           </TouchableOpacity>
-
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-              marginTop: dp(35),
-            }}>
+          <View style={styles.supportContainer}>
             <Image
-              style={{
-                marginRight: dp(20),
-                width: dp(25),
-                height: dp(25),
-              }}
+              style={styles.telegramIcon}
               source={require('../../../assets/icons/telegram.png')}
             />
-
-            <TouchableOpacity
-              onPress={() => Linking.openURL('https://t.me/OnviSupportBot')}>
-              <Text
-                style={{
-                  fontSize: dp(17),
-                  color: theme.textColor,
-                  fontWeight: '400',
-                }}>
+            <TouchableOpacity onPress={() => Linking.openURL('https://t.me/OnviSupportBot')}>
+              <Text style={[styles.supportText, { color: theme.textColor }]}>
                 {t('app.main.support')}
               </Text>
             </TouchableOpacity>
@@ -372,6 +258,21 @@ const CustomDrawerContent = ({
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  content: {
+    flex: 1,
+    alignItems: 'flex-start',
+    paddingTop: dp(20),
+    paddingLeft: dp(20),
+  },
+  profileButton: {
+    flexDirection: 'row',
+    paddingBottom: dp(15),
+    borderRadius: dp(10),
+    alignItems: 'center',
+  },
   profileContainer: {
     width: dp(68),
     height: dp(68),
@@ -385,6 +286,81 @@ const styles = StyleSheet.create({
     width: dp(58),
     height: dp(58),
     borderRadius: dp(58) / 2,
+  },
+  itemsContainer: {
+    width: '100%',
+    paddingRight: dp(9),
+  },
+  userNameButton: {
+    flexDirection: 'row',
+    paddingBottom: dp(2),
+  },
+  userNameText: {
+    fontStyle: 'normal',
+    fontSize: dp(20),
+    fontWeight: '600',
+    lineHeight: dp(23),
+    letterSpacing: 0.43,
+  },
+  userPhoneText: {
+    marginBottom: dp(45),
+    fontStyle: 'normal',
+    fontSize: dp(11),
+    fontWeight: '400',
+    lineHeight: dp(20),
+    letterSpacing: 0.23,
+  },
+  drawerItems: {
+    gap: dp(35),
+  },
+  drawerItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: dp(4),
+  },
+  drawerItemText: {
+    marginLeft: dp(20),
+    fontWeight: '400',
+    fontSize: dp(17),
+  },
+  footer: {
+    paddingLeft: dp(20),
+    display: 'flex',
+    flexDirection: 'column',
+    marginBottom: dp(80),
+  },
+  transferButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  transferTextContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  transferText: {
+    fontWeight: '400',
+    fontSize: dp(17),
+    marginLeft: dp(20),
+  },
+  transferImage: {
+    marginLeft: dp(6),
+    width: dp(85),
+    objectFit: 'contain',
+  },
+  supportContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    marginTop: dp(30),
+  },
+  telegramIcon: {
+    marginRight: dp(20),
+    width: dp(25),
+    height: dp(25),
+  },
+  supportText: {
+    fontSize: dp(17),
+    fontWeight: '400',
   },
 });
 
