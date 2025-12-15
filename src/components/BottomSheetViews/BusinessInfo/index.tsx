@@ -102,47 +102,53 @@ const BusinessInfo = () => {
       </Modal>
       <View style={styles.paddingTop} />
       <BusinessHeader type="navigate" />
-      <Pressable
-        style={styles.heartButton}
-        onPress={() => {
-          if (!isFavoriteCarwash(Number(business?.carwashes[0].id))) {
-            addToFavoritesCarwashes(Number(business?.carwashes[0].id));
-          }
-        }}>
-        <Image
-          style={styles.heartButtonImage}
-          source={
-            isFavoriteCarwash(Number(business?.carwashes[0].id))
-              ? require('../../../assets/icons/heart-active.png')
-              : require('../../../assets/icons/heart.png')
-          }
-        />
-      </Pressable>
-      <View style={styles.tagsContainer}>
-        {business &&
-          business.carwashes.length &&
-          orderDetails &&
-          typeof orderDetails.carwashIndex !== 'undefined' &&
-          business.carwashes[orderDetails.carwashIndex].tags &&
-          business.carwashes[orderDetails.carwashIndex].tags.length > 0 &&
-          business.carwashes[orderDetails.carwashIndex].tags.map(
-            (tag: Tag, index: number) => (
-              <View style={styles.tagPadding} key={`tag-${index}`}>
-                <CheckBox
-                  disable={true}
-                  borderRadius={dp(69)}
-                  text={'🚀 ' + tag.name}
-                  backgroundColor={'#BFFA00'}
-                  textColor={'#000000'}
-                  fontSize={dp(12)}
-                  fontWeight={'600'}
-                  height={dp(24)}
-                  onClick={() => null}
-                />
-              </View>
-            ),
-          )}
-      </View>
+      {business &&
+        business.carwashes.length &&
+        orderDetails &&
+        typeof orderDetails.carwashIndex !== 'undefined' &&
+        business.carwashes[orderDetails.carwashIndex].tags &&
+        business.carwashes[orderDetails.carwashIndex].tags.length > 0 &&
+        <>
+          <Pressable
+            style={styles.heartButton}
+            onPress={() => {
+              if (!isFavoriteCarwash(Number(business.carwashes[orderDetails.carwashIndex!].id))) {
+                console.log("add to favorite:", Number(business.carwashes[orderDetails.carwashIndex!].id));
+                
+                addToFavoritesCarwashes(Number(business.carwashes[orderDetails.carwashIndex!].id));
+              }
+              
+            }}>
+            <Image
+              style={styles.heartButtonImage}
+              source={
+                isFavoriteCarwash(Number(business.carwashes[orderDetails.carwashIndex].id))
+                  ? require('../../../assets/icons/heart-active.png')
+                  : require('../../../assets/icons/heart.png')
+              }
+            />
+          </Pressable>
+          <View style={styles.tagsContainer}>
+            {business.carwashes[orderDetails.carwashIndex].tags.map(
+              (tag: Tag, index: number) => (
+                <View style={styles.tagPadding} key={`tag-${index}`}>
+                  <CheckBox
+                    disable={true}
+                    borderRadius={dp(69)}
+                    text={'🚀 ' + tag.name}
+                    backgroundColor={'#BFFA00'}
+                    textColor={'#000000'}
+                    fontSize={dp(12)}
+                    fontWeight={'600'}
+                    height={dp(24)}
+                    onClick={() => null}
+                  />
+                </View>
+              ),
+            )}
+          </View>
+        </>
+      }
       <View
         style={[
           styles.buttonContainer,

@@ -18,7 +18,7 @@ const Business = () => {
     setSelectedPos,
   } = useStore.getState();
 
-  const selectCarwash = (carwash: any, index: number) => {
+  const selectCarwash = (carwash: any, index: number) => {    
     setOrderDetails({
       posId: carwash.id,
       type: carwash.type,

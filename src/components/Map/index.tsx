@@ -15,6 +15,7 @@ import useSWR from 'swr';
 import {getPOSList} from '@services/api/pos';
 import {throttle} from 'lodash';
 import { CameraRef } from 'node_modules/@rnmapbox/maps/lib/typescript/src/components/Camera';
+import { CarWash, Location } from '@app-types/api/app/types.ts';
 
 export type CameraReference = {
   setCameraPosition: (val?: {
@@ -30,10 +31,16 @@ const DEFAULT_LOCATION = {
   latitude: 55.751244,
 };
 
+export interface CarWashWithLocation extends CarWash {
+  location: Location;
+  distance?: number;
+};
+
 const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
-  const {posList, setPosList, location, setLocation, business} =
+  const {posList, setPosList, location, setLocation, business, setCarwashesList} =
     useStore.getState();
-  const {data} = useSWR(['getPOSList'], () => getPOSList({}), {
+  
+  const {data, error} = useSWR('getPOSList', () => getPOSList({}), {
     revalidateOnFocus: false,
   });
 
@@ -47,8 +54,23 @@ const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
   useEffect(() => {
     if (data && data.businessesLocations) {
       setPosList(data.businessesLocations);
-    }
-  }, [data]);
+      
+      const carWashesWithLocation: CarWashWithLocation[] = [];
+      
+      data.businessesLocations.forEach(carwashLocation => {
+        if (carwashLocation.carwashes && carwashLocation.carwashes.length > 0) {
+          carwashLocation.carwashes.forEach(carwash => {
+            carWashesWithLocation.push({
+              ...carwash,
+              location: carwashLocation.location
+            });
+          });
+        }
+      });
+      
+      setCarwashesList(carWashesWithLocation);
+    } 
+  }, [data, error, setPosList, setCarwashesList]);
 
   const memoizedBusinesses = useMemo(
     () =>
@@ -85,6 +107,7 @@ const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
           setHasLocationPermission(true);
         }
       } catch (err) {
+        console.error("Location permission error:", err);
       }
     };
 

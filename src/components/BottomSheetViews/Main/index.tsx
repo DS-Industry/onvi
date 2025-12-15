@@ -38,6 +38,7 @@ import {CarWashCard} from '@components/CarWashCard/CarWashCard.tsx';
 import CarwashesPlaceholder from '../CarwashesPlaceholder/index.tsx';
 import {NewsList} from './NewsList/NewsList.tsx';
 import { useStoryView } from '@context/StoryViewContext/index.tsx';
+import { CarWashWithLocation } from '@components/Map/index.tsx';
 
 const Main = () => {
   const {t} = useTranslation();
@@ -47,9 +48,10 @@ const Main = () => {
     setSelectedPos,
     setBusiness,
     latestCarwashes,
-    posList,
     loadLatestCarwashes,
     pinnedCarwashes,
+    carwashesList,
+    favoritesCarwashes
   } = useStore.getState();
   const {latestCarwashesIsLoading} = useStore();
   const ref = useRef<ICarouselInstance>(null);
@@ -66,7 +68,7 @@ const Main = () => {
   
   const {setIsMainScreen} = useNavStore.getState();
   const scrollViewRef = useRef<BottomSheetScrollViewMethods>(null);
-  const [latestCarwashesData, setLatestCarwashesData] = useState<CarWashLocation[]>([]);
+  const [latestCarwashesData, setLatestCarwashesData] = useState<CarWashWithLocation[]>([]);
 
   const {isLoading: campaignLoading, data: campaignData} = useSWR(
     ['getCampaignList'],
@@ -99,11 +101,11 @@ const Main = () => {
   useEffect(() => {
     if (latestCarwashes.length > 0) {
       const carwashMap = new Map();
-      posList.forEach(carwash => {
-        const id = Number(carwash?.carwashes[0]?.id) || undefined;
+      carwashesList.forEach(carwash => {
+        const id = Number(carwash.id) || undefined;
         carwashMap.set(id, carwash);
       });
-      const result: CarWashLocation[] = [];
+      const result: CarWashWithLocation[] = [];
       if (pinnedCarwashes && pinnedCarwashes.length > 0) {
         pinnedCarwashes.forEach(id => {
           const carwash = carwashMap.get(id);
@@ -120,8 +122,11 @@ const Main = () => {
         }
       });
       setLatestCarwashesData(result.slice(0, 3));
+
+      console.log(result.slice(0, 3));
+      console.log("favorites:", favoritesCarwashes);
     }
-  }, [latestCarwashes, pinnedCarwashes, posList]);
+  }, [latestCarwashes, pinnedCarwashes, carwashesList]);
 
   const handleCampaignItemPress = (data: Campaign) => {
     navigateBottomSheet('Campaign', {

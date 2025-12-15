@@ -13,6 +13,7 @@ import {
 import useStore from '@state/store';
 import {navigateBottomSheet} from '@navigators/BottomSheetStack';
 import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
+import { CarWashWithLocation } from '@components/Map';
 
 const HapticOptions = {
   enableVibrateFallback: true,
@@ -20,7 +21,7 @@ const HapticOptions = {
 };
 
 interface CarWashCardProps {
-  carWash: any;
+  carWash: CarWashWithLocation;
   showDistance?: boolean;
   showIsFavorite?: boolean;
   heartIsClickable?: boolean;
@@ -51,19 +52,16 @@ const CarWashCard = ({
     setOrderDetails,
     bottomSheetRef,
     cameraRef,
+    posList
   } = useStore.getState();
 
   const [menuVisible, setMenuVisible] = useState(false);
-
-  if (!carWash?.carwashes[0]) {
-    return null;
-  }
 
   if (!carWash?.distance) {
     showDistance = false;
   }
 
-  const id = carWash.carwashes[0].id;
+  const id = carWash.id;
   const numericId = Number(id);
   const isFavorite = !id || isNaN(numericId) ? false : isFavoriteCarwash(numericId);
   const isPinned = !id || isNaN(numericId) ? false : isPinnedCarwash(numericId);
@@ -71,9 +69,9 @@ const CarWashCard = ({
   const handleHeartPress = () => {
     try {
       if (isFavorite) {
-        removeFromFavoritesCarwashes(Number(carWash.carwashes[0].id));
+        removeFromFavoritesCarwashes(Number(carWash.id));
       } else {
-        addToFavoritesCarwashes(Number(carWash.carwashes[0].id));
+        addToFavoritesCarwashes(Number(carWash.id));
       }
     } catch (error) {}
     setMenuVisible(false);
@@ -82,9 +80,9 @@ const CarWashCard = ({
   const handleClip = () => {
     try {
       if (isPinned) {
-        removeFromPinnedCarwashes(Number(carWash.carwashes[0].id));
+        removeFromPinnedCarwashes(Number(carWash.id));
       } else {
-        addToPinnedCarwashes(Number(carWash.carwashes[0].id));
+        addToPinnedCarwashes(Number(carWash.id));
       }
     } catch (error) {}
     setMenuVisible(false);
@@ -100,7 +98,14 @@ const CarWashCard = ({
   const handleCardPress = () => {
     if (cardIsClickable) {
       navigateBottomSheet('Business', {});
-      setBusiness(carWash);
+
+      const result = posList.find(carwashLocation =>
+        carwashLocation.carwashes.some(carwash => carwash.id === carWash.id)
+      );
+      if (result) {
+        setBusiness(result);
+      }
+
       setOrderDetails({
         posId: 0,
         sum: 0,
@@ -158,13 +163,13 @@ const CarWashCard = ({
           )}
           <View style={localStyles.textContainer}>
             <Text style={localStyles.title} ellipsizeMode="tail" numberOfLines={1}>
-              {carWash.carwashes[0].name}
+              {carWash.name}
             </Text>
             <Text
               style={localStyles.subtitle}
               ellipsizeMode="tail"
               numberOfLines={1}>
-              {carWash.carwashes[0].address}
+              {carWash.address}
             </Text>
             {showDistance && (
               <Text
@@ -176,6 +181,7 @@ const CarWashCard = ({
             )}
           </View>
         </View>
+        <Text>{carWash.id}</Text>
         {showIsFavorite && isFavorite && (
           <TouchableOpacity
             style={localStyles.heartButton}
