@@ -52,7 +52,9 @@ const CarWashCard = ({
     setOrderDetails,
     bottomSheetRef,
     cameraRef,
-    posList
+    resetFilters, 
+    resetPosList,
+    originalPosList
   } = useStore.getState();
 
   const [menuVisible, setMenuVisible] = useState(false);
@@ -97,9 +99,12 @@ const CarWashCard = ({
 
   const handleCardPress = () => {
     if (cardIsClickable) {
+      resetFilters();
+      resetPosList();
+      
       navigateBottomSheet('Business', {});
 
-      const result = posList.find(carwashLocation =>
+      const result = originalPosList.find(carwashLocation =>
         carwashLocation.carwashes.some(carwash => carwash.id === carWash.id)
       );
       if (result) {

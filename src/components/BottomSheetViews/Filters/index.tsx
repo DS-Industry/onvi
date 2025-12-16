@@ -131,9 +131,9 @@ const Filters = () => {
     getPOSList({filter: filtersQuery}).then((dataRes: any) => {
       setFilters({});
       setPosList(dataRes.businessesLocations);
-      navigation.reset({
-        index: 0,
-        routes: [{name: 'Main'}],
+    navigation.reset({
+      index: 0,
+      routes: [{name: 'Main'}],
       });
     });
   };

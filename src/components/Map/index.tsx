@@ -37,11 +37,21 @@ export interface CarWashWithLocation extends CarWash {
 };
 
 const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
-  const {posList, setPosList, location, setLocation, business, setCarwashesList} =
-    useStore.getState();
+  const {
+    posList, 
+    setPosList, 
+    location, 
+    setLocation, 
+    business, 
+    setCarwashesList,
+    setFilteredCarwashesList,
+    setOriginalPosList, 
+  } = useStore.getState();
   
   const {data, error} = useSWR('getPOSList', () => getPOSList({}), {
     revalidateOnFocus: false,
+    shouldRetryOnError: true,
+    errorRetryCount: 3,
   });
 
   const [locationFound, setLocationFound] = useState(false);
@@ -53,6 +63,7 @@ const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
 
   useEffect(() => {
     if (data && data.businessesLocations) {
+      setOriginalPosList(data.businessesLocations);
       setPosList(data.businessesLocations);
       
       const carWashesWithLocation: CarWashWithLocation[] = [];
@@ -69,8 +80,8 @@ const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
       });
       
       setCarwashesList(carWashesWithLocation);
-    } 
-  }, [data, error, setPosList, setCarwashesList]);
+    }
+  }, [data, error, setPosList, setOriginalPosList, setCarwashesList, setFilteredCarwashesList]);
 
   const memoizedBusinesses = useMemo(
     () =>

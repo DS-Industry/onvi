@@ -25,6 +25,7 @@ export interface NotificationModalConfig {
 export interface AppSlice {
   filters: SelectedFilters;
   setFilters: (values: SelectedFilters) => void;
+  resetFilters: () => void; 
   news: any[];
   setNews: (values: any[]) => void;
   partners: any[];
@@ -68,6 +69,8 @@ const createAppSlice: StoreSlice<AppSlice> = (set, get) => ({
   filters: {},
   setFilters: (values: SelectedFilters) =>
     set(state => ({...state, filters: values})),
+  resetFilters: () =>
+    set(state => ({...state, filters: {}})),
   news: [],
   setNews: (values: any[]) => set(state => ({...state, news: values})),
   partners: [],
