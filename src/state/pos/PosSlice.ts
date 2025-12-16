@@ -1,6 +1,5 @@
 import {StoreSlice} from '../store.ts';
 import {CarWash, CarWashLocation} from '../../types/api/app/types.ts';
-import { CarWashWithLocation } from '@components/Map/index.tsx';
 
 export interface PosSlice {
   posList: CarWashLocation[];
@@ -12,17 +11,11 @@ export interface PosSlice {
   setSelectedPos: (value: CarWash | null) => void;
   nearByPos: CarWashLocation | null;
   setNearByPos: (value: CarWashLocation) => void;
-  carwashesList: CarWashWithLocation[];
-  setCarwashesList: (values: CarWashWithLocation[]) => void;
-  filteredCarwashesList: CarWashWithLocation[];
-  setFilteredCarwashesList: (values: CarWashWithLocation[]) => void;
 }
 
 const createPoSSlice: StoreSlice<PosSlice> = set => ({
   posList: [],
-  originalPosList: [], 
-  carwashesList: [],
-  filteredCarwashesList: [],
+  originalPosList: [],
   
   setPosList: (values: any[]) =>
     set(state => {
@@ -38,17 +31,6 @@ const createPoSSlice: StoreSlice<PosSlice> = set => ({
     set(state => {
       return {...state, posList: state.originalPosList};
     }),
-
-  setCarwashesList: (values: CarWashWithLocation[]) =>
-    set(state => {
-      return {...state, carwashesList: values};
-    }),
-
-  setFilteredCarwashesList: (values: CarWashWithLocation[]) =>
-    set(state => {
-      return {...state, filteredCarwashesList: values};
-    }),
-
   selectedPos: null,
   setSelectedPos: (value: any) =>
     set(state => ({...state, selectedPos: value})),

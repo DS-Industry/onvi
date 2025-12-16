@@ -181,6 +181,11 @@ export type CarWashLocation = {
   distance?: number;
 };
 
+export interface CarWashWithLocation extends CarWash {
+  location: Location;
+  distance?: number;
+};
+
 export type BusinessSuccessRequestPayload = {
   businessesLocations: CarWashLocation[];
 };

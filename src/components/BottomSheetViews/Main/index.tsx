@@ -38,7 +38,6 @@ import {CarWashCard} from '@components/CarWashCard/CarWashCard.tsx';
 import CarwashesPlaceholder from '../CarwashesPlaceholder/index.tsx';
 import {NewsList} from './NewsList/NewsList.tsx';
 import { useStoryView } from '@context/StoryViewContext/index.tsx';
-import { CarWashWithLocation } from '@components/Map/index.tsx';
 
 const Main = () => {
   const {t} = useTranslation();
@@ -50,8 +49,8 @@ const Main = () => {
     latestCarwashes,
     loadLatestCarwashes,
     pinnedCarwashes,
-    carwashesList,
-    favoritesCarwashes
+    favoritesCarwashes,
+    posList
   } = useStore.getState();
   const {latestCarwashesIsLoading} = useStore();
   const ref = useRef<ICarouselInstance>(null);
@@ -68,7 +67,7 @@ const Main = () => {
   
   const {setIsMainScreen} = useNavStore.getState();
   const scrollViewRef = useRef<BottomSheetScrollViewMethods>(null);
-  const [latestCarwashesData, setLatestCarwashesData] = useState<CarWashWithLocation[]>([]);
+  const [latestCarwashesData, setLatestCarwashesData] = useState<CarWashLocation[]>([]);
 
   const {isLoading: campaignLoading, data: campaignData} = useSWR(
     ['getCampaignList'],
@@ -101,11 +100,14 @@ const Main = () => {
   useEffect(() => {
     if (latestCarwashes.length > 0) {
       const carwashMap = new Map();
-      carwashesList.forEach(carwash => {
-        const id = Number(carwash.id) || undefined;
-        carwashMap.set(id, carwash);
+      posList.forEach(carwashLocation => {
+        carwashLocation.carwashes.forEach(carwash => {
+          const id = Number(carwash?.id) || undefined;
+          carwashMap.set(id, carwashLocation);
+        })
       });
-      const result: CarWashWithLocation[] = [];
+      
+      const result: CarWashLocation[] = [];
       if (pinnedCarwashes && pinnedCarwashes.length > 0) {
         pinnedCarwashes.forEach(id => {
           const carwash = carwashMap.get(id);
@@ -121,12 +123,14 @@ const Main = () => {
           result.push(carwash);
         }
       });
+      console.log(result.slice(0, 3));
+      
       setLatestCarwashesData(result.slice(0, 3));
 
       console.log(result.slice(0, 3));
       console.log("favorites:", favoritesCarwashes);
     }
-  }, [latestCarwashes, pinnedCarwashes, carwashesList]);
+  }, [latestCarwashes, pinnedCarwashes]);
 
   const handleCampaignItemPress = (data: Campaign) => {
     navigateBottomSheet('Campaign', {
@@ -213,7 +217,15 @@ const Main = () => {
             ) : (
               <>
                 <View style={{marginTop: dp(12), gap: dp(8)}}>
-                  {latestCarwashesData.map((item, index) => (
+                  {latestCarwashesData.flatMap(pose =>
+                    pose.carwashes.map(carwash => ({
+                      ...carwash,
+                      location: pose.location,
+                      distance: pose.distance,
+                    }))
+                  )
+                  .slice(0, 3)
+                  .map((item, index) => (
                     <CarWashCard
                       key={index}
                       carWash={item}

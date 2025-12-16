@@ -6,7 +6,6 @@ import {useNavigation} from '@react-navigation/core';
 import ScreenHeader from '@components/ScreenHeader';
 import {GeneralDrawerNavigationProp} from '../../types/navigation/DrawerNavigation.ts';
 import calculateDistance from '@utils/calculateDistance.ts';
-import {CarWashLocation} from '@app-types/api/app/types.ts';
 import {CarWashCard} from '@components/CarWashCard/CarWashCard.tsx';
 import useStore from '@state/store.ts';
 import CarwashesPlaceholder from '@components/BottomSheetViews/CarwashesPlaceholder/index.tsx';
@@ -16,22 +15,31 @@ const Favorites = () => {
   const navigation = useNavigation<GeneralDrawerNavigationProp<'Избранное'>>();
   const {t} = useTranslation();
   const [sortedData, setSortedData] = useState<CarWashWithLocation[]>([]);
-  const {location, carwashesList} = useStore.getState();
+  const {location, posList} = useStore.getState();
   const {favoritesCarwashesIsLoading, favoritesCarwashes} = useStore();
 
   useEffect(() => {
     if (
       location?.latitude &&
       location?.longitude &&
-      carwashesList.length > 0 &&
       favoritesCarwashes.length > 0
     ) {
-      const favoriteCarWashes = carwashesList.filter(carwash =>
+      
+
+      const carwashes = posList.flatMap(pose =>
+        pose.carwashes.map(carwash => ({
+          ...carwash,
+          location: pose.location,
+          distance: pose.distance,
+        }))
+      );
+
+      const favoriteCarWashes = carwashes.filter(carwash =>
         favoritesCarwashes.includes(Number(carwash.id)),
       );
 
-      console.log(favoriteCarWashes);
-      
+
+
       const favoriteCarWashesDistance = favoriteCarWashes.map(carwash => {
         const distance = calculateDistance(
           location.latitude,
@@ -49,7 +57,7 @@ const Favorites = () => {
     } else {
       setSortedData([]);
     }
-  }, [location, carwashesList, favoritesCarwashes]);
+  }, [location, favoritesCarwashes]);
 
   const renderBusiness = ({item}: {item: CarWashWithLocation}) => {
     return (

@@ -43,8 +43,6 @@ const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
     location, 
     setLocation, 
     business, 
-    setCarwashesList,
-    setFilteredCarwashesList,
     setOriginalPosList, 
   } = useStore.getState();
   
@@ -65,23 +63,8 @@ const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
     if (data && data.businessesLocations) {
       setOriginalPosList(data.businessesLocations);
       setPosList(data.businessesLocations);
-      
-      const carWashesWithLocation: CarWashWithLocation[] = [];
-      
-      data.businessesLocations.forEach(carwashLocation => {
-        if (carwashLocation.carwashes && carwashLocation.carwashes.length > 0) {
-          carwashLocation.carwashes.forEach(carwash => {
-            carWashesWithLocation.push({
-              ...carwash,
-              location: carwashLocation.location
-            });
-          });
-        }
-      });
-      
-      setCarwashesList(carWashesWithLocation);
     }
-  }, [data, error, setPosList, setOriginalPosList, setCarwashesList, setFilteredCarwashesList]);
+  }, [data, error, setPosList, setOriginalPosList]);
 
   const memoizedBusinesses = useMemo(
     () =>

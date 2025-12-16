@@ -8,7 +8,6 @@ import {
   Text,
   Image,
   TouchableOpacity,
-  ActivityIndicator,
 } from 'react-native';
 import useStore from '@state/store';
 import {navigateBottomSheet} from '@navigators/BottomSheetStack';
