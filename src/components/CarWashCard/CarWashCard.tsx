@@ -12,7 +12,7 @@ import {
 import useStore from '@state/store';
 import {navigateBottomSheet} from '@navigators/BottomSheetStack';
 import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
-import { CarWashWithLocation } from '@components/Map';
+import { CarWashWithLocation } from '@app-types/api/app/types';
 
 const HapticOptions = {
   enableVibrateFallback: true,

@@ -50,7 +50,7 @@ const Main = () => {
     loadLatestCarwashes,
     pinnedCarwashes,
     favoritesCarwashes,
-    posList
+    originalPosList
   } = useStore.getState();
   const {latestCarwashesIsLoading} = useStore();
   const ref = useRef<ICarouselInstance>(null);
@@ -100,7 +100,7 @@ const Main = () => {
   useEffect(() => {
     if (latestCarwashes.length > 0) {
       const carwashMap = new Map();
-      posList.forEach(carwashLocation => {
+      originalPosList.forEach(carwashLocation => {
         carwashLocation.carwashes.forEach(carwash => {
           const id = Number(carwash?.id) || undefined;
           carwashMap.set(id, carwashLocation);

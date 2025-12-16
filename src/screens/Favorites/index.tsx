@@ -9,13 +9,13 @@ import calculateDistance from '@utils/calculateDistance.ts';
 import {CarWashCard} from '@components/CarWashCard/CarWashCard.tsx';
 import useStore from '@state/store.ts';
 import CarwashesPlaceholder from '@components/BottomSheetViews/CarwashesPlaceholder/index.tsx';
-import { CarWashWithLocation } from '@components/Map/index.tsx';
+import { CarWashWithLocation } from '@app-types/api/app/types.ts';
 
 const Favorites = () => {
   const navigation = useNavigation<GeneralDrawerNavigationProp<'Избранное'>>();
   const {t} = useTranslation();
   const [sortedData, setSortedData] = useState<CarWashWithLocation[]>([]);
-  const {location, posList} = useStore.getState();
+  const {location, originalPosList} = useStore.getState();
   const {favoritesCarwashesIsLoading, favoritesCarwashes} = useStore();
 
   useEffect(() => {
@@ -25,8 +25,7 @@ const Favorites = () => {
       favoritesCarwashes.length > 0
     ) {
       
-
-      const carwashes = posList.flatMap(pose =>
+      const carwashes = originalPosList.flatMap(pose =>
         pose.carwashes.map(carwash => ({
           ...carwash,
           location: pose.location,

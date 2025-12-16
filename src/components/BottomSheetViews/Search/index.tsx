@@ -10,8 +10,7 @@ import SearchPlaceholder from './SearchPlaceholder';
 import useSWRMutation from 'swr/mutation';
 import {getPOSList} from '@services/api/pos';
 import calculateDistance from '@utils/calculateDistance.ts';
-import {CarWashLocation, CarWash} from '@app-types/api/app/types.ts';
-import {CarWashWithLocation} from '@components/Map';
+import {CarWashLocation, CarWash, CarWashWithLocation} from '@app-types/api/app/types.ts';
 import {CarWashCard} from '@components/CarWashCard/CarWashCard';
 
 const Search = () => {

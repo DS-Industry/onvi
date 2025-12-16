@@ -31,10 +31,6 @@ const DEFAULT_LOCATION = {
   latitude: 55.751244,
 };
 
-export interface CarWashWithLocation extends CarWash {
-  location: Location;
-  distance?: number;
-};
 
 const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
   const {
