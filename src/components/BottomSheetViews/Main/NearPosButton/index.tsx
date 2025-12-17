@@ -53,10 +53,10 @@ export default function NearPosButton() {
     for (const carWash of posList) {
       const {lat, lon} = carWash.location;
       const distance = calculateDistance(
-        location.longitude,
         location.latitude,
-        lon,
+        location.longitude,
         lat,
+        lon,
       );
       if (distance < minDistance && distance <= 5) {
         minDistance = distance;

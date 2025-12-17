@@ -58,9 +58,7 @@ const CarWashCard = ({
 
   const [menuVisible, setMenuVisible] = useState(false);
 
-  if (!carWash?.distance) {
-    showDistance = false;
-  }
+  const shouldShowDistance = showDistance && typeof carWash?.distance === 'number';
 
   const id = carWash.id;
   const numericId = Number(id);
@@ -142,7 +140,7 @@ const CarWashCard = ({
         style={[
           localStyles.card,
           {
-            height: showDistance ? dp(63) : dp(46),
+            height: shouldShowDistance ? dp(63) : dp(46),
             borderWidth: showBorder ? 1 : 0,
           },
         ]}
@@ -175,7 +173,7 @@ const CarWashCard = ({
               numberOfLines={1}>
               {carWash.address}
             </Text>
-            {showDistance && (
+            {shouldShowDistance && (
               <Text
                 style={localStyles.subtitle}
                 ellipsizeMode="tail"
@@ -185,7 +183,6 @@ const CarWashCard = ({
             )}
           </View>
         </View>
-        <Text>{carWash.id}</Text>
         {showIsFavorite && isFavorite && (
           <TouchableOpacity
             style={localStyles.heartButton}
