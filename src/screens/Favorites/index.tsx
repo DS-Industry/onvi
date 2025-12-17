@@ -15,8 +15,12 @@ const Favorites = () => {
   const navigation = useNavigation<GeneralDrawerNavigationProp<'Избранное'>>();
   const {t} = useTranslation();
   const [sortedData, setSortedData] = useState<CarWashWithLocation[]>([]);
-  const {location, originalPosList} = useStore.getState();
-  const {favoritesCarwashesIsLoading, favoritesCarwashes} = useStore();
+  const location = useStore(state => state.location);
+  const originalPosList = useStore(state => state.originalPosList);
+  const favoritesCarwashesIsLoading = useStore(
+    state => state.favoritesCarwashesIsLoading,
+  );
+  const favoritesCarwashes = useStore(state => state.favoritesCarwashes);
 
   useEffect(() => {
     if (
@@ -56,7 +60,7 @@ const Favorites = () => {
     } else {
       setSortedData([]);
     }
-  }, [location, favoritesCarwashes]);
+  }, [location, favoritesCarwashes, originalPosList]);
 
   const renderBusiness = ({item}: {item: CarWashWithLocation}) => {
     return (
@@ -88,7 +92,7 @@ const Favorites = () => {
               <FlatList
                 data={sortedData}
                 renderItem={renderBusiness}
-                keyExtractor={(_, index: number) => index.toString()}
+                keyExtractor={(item: CarWashWithLocation) => String(item.id)}
                 scrollEnabled={true}
                 showsVerticalScrollIndicator={false}
                 bounces={true}

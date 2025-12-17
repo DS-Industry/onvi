@@ -10,13 +10,11 @@ import useStore from '../../../state/store';
 import {OrderDetailsType} from 'src/state/order/OrderSlice';
 
 const Business = () => {
-  const {
-    setOrderDetails,
-    business,
-    bottomSheetRef,
-    bottomSheetSnapPoints,
-    setSelectedPos,
-  } = useStore.getState();
+  const business = useStore(state => state.business);
+  const setOrderDetails = useStore(state => state.setOrderDetails);
+  const bottomSheetRef = useStore(state => state.bottomSheetRef);
+  const bottomSheetSnapPoints = useStore(state => state.bottomSheetSnapPoints);
+  const setSelectedPos = useStore(state => state.setSelectedPos);
 
   const selectCarwash = (carwash: any, index: number) => {    
     setOrderDetails({

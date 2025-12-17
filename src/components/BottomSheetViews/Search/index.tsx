@@ -1,4 +1,4 @@
-import React, {useState, useCallback, useEffect} from 'react';
+import React, {useState, useCallback, useEffect, useMemo} from 'react';
 import {useTranslation} from 'react-i18next';
 import {View, StyleSheet, TextInput, Text} from 'react-native';
 import {BottomSheetFlatList} from '@gorhom/bottom-sheet';
@@ -17,7 +17,8 @@ const Search = () => {
   const {t} = useTranslation();
   const [search, setSearch] = useState('');
 
-  const {location, favoritesCarwashes} = useStore.getState();
+  const location = useStore(state => state.location);
+  const favoritesCarwashes = useStore(state => state.favoritesCarwashes);
 
   const [sortedData, setSortedData] = useState<CarWashWithLocation[]>([]);
 
@@ -94,15 +95,22 @@ const Search = () => {
     return <CarWashCard carWash={item} showIsFavorite={true} />;
   };
 
-  const doSearch = useCallback(
-    debounce(async (val: string) => {
+  const doSearch = useMemo(() => {
+    return debounce(async (val: string) => {
       const res = await trigger({search: val});
       if (res?.businessesLocations?.length > 0) {
         setSortedData(processCarwashes(res.businessesLocations));
+      } else {
+        setSortedData([]);
       }
-    }, 1300),
-    [trigger, processCarwashes],
-  );
+    }, 1300);
+  }, [trigger, processCarwashes]);
+  
+  useEffect(() => {
+    return () => {
+      doSearch.cancel?.();
+    };
+  }, [doSearch]);
 
   return (
     <View style={styles.container}>
@@ -133,9 +141,7 @@ const Search = () => {
               <BottomSheetFlatList
                 data={sortedData}
                 renderItem={renderBusiness}
-                keyExtractor={(item: CarWashWithLocation, index: number) =>
-                  index.toString()
-                }
+                keyExtractor={(item: CarWashWithLocation) => String(item.id)}
                 scrollEnabled={true}
                 showsVerticalScrollIndicator={false}
                 bounces={true}

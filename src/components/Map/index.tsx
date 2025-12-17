@@ -14,8 +14,6 @@ import useStore from '../../state/store.ts';
 import useSWR from 'swr';
 import {getPOSList} from '@services/api/pos';
 import {throttle} from 'lodash';
-import { CameraRef } from 'node_modules/@rnmapbox/maps/lib/typescript/src/components/Camera';
-import { CarWash, Location } from '@app-types/api/app/types.ts';
 
 export type CameraReference = {
   setCameraPosition: (val?: {
@@ -33,14 +31,12 @@ const DEFAULT_LOCATION = {
 
 
 const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
-  const {
-    posList, 
-    setPosList, 
-    location, 
-    setLocation, 
-    business, 
-    setOriginalPosList, 
-  } = useStore.getState();
+  const posList = useStore(state => state.posList);
+  const setPosList = useStore(state => state.setPosList);
+  const location = useStore(state => state.location);
+  const setLocation = useStore(state => state.setLocation);
+  const business = useStore(state => state.business);
+  const setOriginalPosList = useStore(state => state.setOriginalPosList);
   
   const {data, error} = useSWR('getPOSList', () => getPOSList({}), {
     revalidateOnFocus: false,
@@ -50,7 +46,7 @@ const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
 
   const [locationFound, setLocationFound] = useState(false);
 
-  const cameraRef = React.useRef<CameraRef>(null);
+  const cameraRef = React.useRef<any>(null);
   const [hasLocationPermission, setHasLocationPermission] = useState(false);
   
   const shouldAutoSetCameraRef = useRef(true);
@@ -96,8 +92,8 @@ const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
         } else {
           setHasLocationPermission(true);
         }
-      } catch (err) {
-        console.error("Location permission error:", err);
+      } catch {
+        // noop (permission errors are expected on denial)
       }
     };
 
@@ -132,14 +128,18 @@ const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
   const onUserLocationUpdateThrottled = useMemo(
     () =>
       throttle(userLocation => {
-        if (!locationFound) {
-          setLocationFound(true);
-        }
+        setLocationFound(true);
         const {latitude: lat, longitude: lon} = userLocation.coords;        
         setLocation({latitude: lat, longitude: lon});
       }, 1000),
-    [setLocation, locationFound], 
+    [setLocation], 
   );
+  
+  useEffect(() => {
+    return () => {
+      onUserLocationUpdateThrottled.cancel?.();
+    };
+  }, [onUserLocationUpdateThrottled]);
 
   const setCameraPosition = useCallback((val?: {
     longitude?: number;
@@ -197,7 +197,7 @@ const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
         zoomEnabled={true}
         scaleBarEnabled={false}
         styleURL={'mapbox://styles/mapbox/light-v11'}
-        preferredFramesPerSecond={120}>
+        preferredFramesPerSecond={60}>
         {memoizedBusinesses}
         <MapboxGL.Camera
           ref={cameraRef}
