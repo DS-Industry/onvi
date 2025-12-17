@@ -18,7 +18,7 @@ interface ICheckboxButtonProps {
   textColor?: string;
   fontSize?: number;
   fontWeight?: TextStyle['fontWeight'];
-  onClick: (isChecked: boolean) => void;
+  onClick?: (isChecked: boolean) => void;
 }
 
 const CheckBox: React.FC<ICheckboxButtonProps> = ({
@@ -37,7 +37,9 @@ const CheckBox: React.FC<ICheckboxButtonProps> = ({
 
   const handlePress = () => {
     setIsChecked(!isChecked);
-    onClick(!isChecked);
+    if (onClick) {
+      onClick(!isChecked);
+    }
   };
 
   return (

@@ -138,7 +138,6 @@ const BusinessInfo = () => {
                     fontSize={dp(12)}
                     fontWeight={'600'}
                     height={dp(24)}
-                    onClick={() => null}
                   />
                 </View>
               ),
