@@ -113,7 +113,6 @@ const BusinessInfo = () => {
             style={styles.heartButton}
             onPress={() => {
               if (!isFavorite) {
-                console.log("add to favorite:", carwashId);
                 addToFavoritesCarwashes(carwashId);
               }
             }}>
