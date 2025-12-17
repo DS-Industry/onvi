@@ -51,7 +51,7 @@ export const usePaymentProcess = (
   const [orderStatus, setOrderStatus] = useState<OrderProcessingStatus | null>(
     null,
   );
-  const {setNeedUpdateLatest} = useStore.getState();
+  const {loadLatestCarwashes} = useStore.getState();
 
   const [paymentMethod, setPaymentMethod] =
     useState<PaymentMethodType>(initialPaymentMethod);
@@ -157,7 +157,7 @@ export const usePaymentProcess = (
   };
 
   const sideEffects = () => {
-    setNeedUpdateLatest(true);
+    loadLatestCarwashes();
   };
 
   const processPayment = useCallback(async () => {

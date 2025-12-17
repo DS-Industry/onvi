@@ -9,7 +9,6 @@ export interface CarwashSlice {
   pinnedCarwashes: number[];
   favoritesCarwashesIsLoading: boolean;
   latestCarwashesIsLoading: boolean;
-  needUpdateLatest: boolean;
   addToFavoritesCarwashes: (id: number) => void;
   removeFromFavoritesCarwashes: (id: number) => void;
   loadFavoritesCarwashes: () => Promise<void>;
@@ -20,7 +19,6 @@ export interface CarwashSlice {
   removeFromPinnedCarwashes: (id: number) => void;
   isPinnedCarwash: (id: number) => boolean;
   loadPinnedCarwashes: () => Promise<void>;
-  setNeedUpdateLatest: (value: boolean) => void;
 }
 
 const createCarwashSlice: StoreSlice<CarwashSlice> = (set, get) => ({
@@ -29,11 +27,6 @@ const createCarwashSlice: StoreSlice<CarwashSlice> = (set, get) => ({
   pinnedCarwashes: [],
   favoritesCarwashesIsLoading: false,
   latestCarwashesIsLoading: false,
-  needUpdateLatest: false,
-
-  setNeedUpdateLatest: (value: boolean) => {
-    set({ needUpdateLatest: value });
-  },
 
   addToFavoritesCarwashes: async (id: number) => {
     try {

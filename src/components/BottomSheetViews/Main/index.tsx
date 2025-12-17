@@ -50,7 +50,7 @@ const Main = () => {
     originalPosList,
     loadLatestCarwashes,
   } = useStore.getState();
-  const {latestCarwashesIsLoading, latestCarwashes, needUpdateLatest, setNeedUpdateLatest} = useStore();
+  const {latestCarwashesIsLoading, latestCarwashes} = useStore();
   const ref = useRef<ICarouselInstance>(null);
   const progress = useSharedValue<number>(0);
   
@@ -86,9 +86,8 @@ const Main = () => {
       setSelectedPos(null);
       setBusiness(null);
 
-      if (needUpdateLatest || latestCarwashes.length === 0) {
+      if (latestCarwashes.length === 0) {
         loadLatestCarwashes();
-        setNeedUpdateLatest(false);
       }
 
       if (scrollViewRef.current) {
