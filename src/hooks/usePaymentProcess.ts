@@ -35,6 +35,7 @@ import AppMetrica from '@appmetrica/react-native-analytics';
 import i18n from '../locales';
 import {OrderStatusCode} from '@app-types/api/order/status/OrderStatusCode.ts';
 import {BayTypeEnum} from '@app-types/BayTypeEnum.ts';
+import useStore from '@state/store.ts';
 
 export const usePaymentProcess = (
   user: IUser,
@@ -50,6 +51,7 @@ export const usePaymentProcess = (
   const [orderStatus, setOrderStatus] = useState<OrderProcessingStatus | null>(
     null,
   );
+  const {setNeedUpdateLatest} = useStore.getState();
 
   const [paymentMethod, setPaymentMethod] =
     useState<PaymentMethodType>(initialPaymentMethod);
@@ -152,6 +154,10 @@ export const usePaymentProcess = (
           break;
       }
     }
+  };
+
+  const sideEffects = () => {
+    setNeedUpdateLatest(true);
   };
 
   const processPayment = useCallback(async () => {
@@ -325,6 +331,7 @@ export const usePaymentProcess = (
           if (response.status === OrderStatusCode.COMPLETED) {
             setOrderStatus(OrderProcessingStatus.END);
             setLoading(false);
+            sideEffects();
             DdLogs.info('Successful order creation', {order});
             // При успешном окончании оплаты через 3 секунды закрываем BottomSheet и переходим на страницу PostPayment
             setTimeout(() => {
@@ -436,6 +443,7 @@ export const usePaymentProcess = (
         if (response.status === OrderStatusCode.COMPLETED) {
           setOrderStatus(OrderProcessingStatus.END_FREE);
           setLoading(false);
+          sideEffects();
           DdLogs.info('Successful order creation (free vacuume)', {order});
           // При успешном окончании оплаты через 3 секунды закрываем BottomSheet и переходим на страницу PostPayment
           setTimeout(() => {

@@ -46,13 +46,11 @@ const Main = () => {
     bottomSheetSnapPoints,
     setSelectedPos,
     setBusiness,
-    latestCarwashes,
-    loadLatestCarwashes,
     pinnedCarwashes,
-    favoritesCarwashes,
-    originalPosList
+    originalPosList,
+    loadLatestCarwashes,
   } = useStore.getState();
-  const {latestCarwashesIsLoading} = useStore();
+  const {latestCarwashesIsLoading, latestCarwashes, needUpdateLatest, setNeedUpdateLatest} = useStore();
   const ref = useRef<ICarouselInstance>(null);
   const progress = useSharedValue<number>(0);
   
@@ -87,7 +85,12 @@ const Main = () => {
       setIsMainScreen(true);
       setSelectedPos(null);
       setBusiness(null);
-      loadLatestCarwashes();
+
+      if (needUpdateLatest || latestCarwashes.length === 0) {
+        loadLatestCarwashes();
+        setNeedUpdateLatest(false);
+      }
+
       if (scrollViewRef.current) {
         scrollViewRef.current.scrollTo({y: 0, animated: false});
       }
@@ -98,7 +101,7 @@ const Main = () => {
   );
 
   useEffect(() => {
-    if (latestCarwashes.length > 0) {
+    if (latestCarwashes.length > 0 && originalPosList.length > 0) {
       const carwashMap = new Map();
       originalPosList.forEach(carwashLocation => {
         carwashLocation.carwashes.forEach(carwash => {
@@ -123,14 +126,10 @@ const Main = () => {
           result.push(carwash);
         }
       });
-      console.log(result.slice(0, 3));
       
       setLatestCarwashesData(result.slice(0, 3));
-
-      console.log(result.slice(0, 3));
-      console.log("favorites:", favoritesCarwashes);
     }
-  }, [latestCarwashes, pinnedCarwashes]);
+  }, [latestCarwashes, pinnedCarwashes, originalPosList]);
 
   const handleCampaignItemPress = (data: Campaign) => {
     navigateBottomSheet('Campaign', {
