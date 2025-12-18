@@ -15,6 +15,7 @@ import useSWR from 'swr';
 import {getPOSList} from '@services/api/pos';
 import {throttle} from 'lodash';
 import { CameraRef } from 'node_modules/@rnmapbox/maps/lib/typescript/src/components/Camera';
+import { CarWash, Location } from '@app-types/api/app/types.ts';
 
 export type CameraReference = {
   setCameraPosition: (val?: {
@@ -30,11 +31,21 @@ const DEFAULT_LOCATION = {
   latitude: 55.751244,
 };
 
+
 const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
-  const {posList, setPosList, location, setLocation, business} =
-    useStore.getState();
-  const {data} = useSWR(['getPOSList'], () => getPOSList({}), {
+  const {
+    posList, 
+    setPosList, 
+    location, 
+    setLocation, 
+    business, 
+    setOriginalPosList, 
+  } = useStore.getState();
+  
+  const {data, error} = useSWR('getPOSList', () => getPOSList({}), {
     revalidateOnFocus: false,
+    shouldRetryOnError: true,
+    errorRetryCount: 3,
   });
 
   const [locationFound, setLocationFound] = useState(false);
@@ -46,9 +57,10 @@ const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
 
   useEffect(() => {
     if (data && data.businessesLocations) {
+      setOriginalPosList(data.businessesLocations);
       setPosList(data.businessesLocations);
     }
-  }, [data]);
+  }, [data, error, setPosList, setOriginalPosList]);
 
   const memoizedBusinesses = useMemo(
     () =>
@@ -85,6 +97,7 @@ const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
           setHasLocationPermission(true);
         }
       } catch (err) {
+        console.error("Location permission error:", err);
       }
     };
 

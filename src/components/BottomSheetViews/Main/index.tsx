@@ -46,12 +46,11 @@ const Main = () => {
     bottomSheetSnapPoints,
     setSelectedPos,
     setBusiness,
-    latestCarwashes,
-    posList,
-    loadLatestCarwashes,
     pinnedCarwashes,
+    originalPosList,
+    loadLatestCarwashes,
   } = useStore.getState();
-  const {latestCarwashesIsLoading} = useStore();
+  const {latestCarwashesIsLoading, latestCarwashes} = useStore();
   const ref = useRef<ICarouselInstance>(null);
   const progress = useSharedValue<number>(0);
   
@@ -86,7 +85,11 @@ const Main = () => {
       setIsMainScreen(true);
       setSelectedPos(null);
       setBusiness(null);
-      loadLatestCarwashes();
+
+      if (latestCarwashes.length === 0) {
+        loadLatestCarwashes();
+      }
+
       if (scrollViewRef.current) {
         scrollViewRef.current.scrollTo({y: 0, animated: false});
       }
@@ -97,12 +100,15 @@ const Main = () => {
   );
 
   useEffect(() => {
-    if (latestCarwashes.length > 0) {
+    if (latestCarwashes.length > 0 && originalPosList.length > 0) {
       const carwashMap = new Map();
-      posList.forEach(carwash => {
-        const id = Number(carwash?.carwashes[0]?.id) || undefined;
-        carwashMap.set(id, carwash);
+      originalPosList.forEach(carwashLocation => {
+        carwashLocation.carwashes.forEach(carwash => {
+          const id = Number(carwash?.id) || undefined;
+          carwashMap.set(id, carwashLocation);
+        })
       });
+      
       const result: CarWashLocation[] = [];
       if (pinnedCarwashes && pinnedCarwashes.length > 0) {
         pinnedCarwashes.forEach(id => {
@@ -119,9 +125,10 @@ const Main = () => {
           result.push(carwash);
         }
       });
+      
       setLatestCarwashesData(result.slice(0, 3));
     }
-  }, [latestCarwashes, pinnedCarwashes, posList]);
+  }, [latestCarwashes, pinnedCarwashes, originalPosList]);
 
   const handleCampaignItemPress = (data: Campaign) => {
     navigateBottomSheet('Campaign', {
@@ -208,7 +215,15 @@ const Main = () => {
             ) : (
               <>
                 <View style={{marginTop: dp(12), gap: dp(8)}}>
-                  {latestCarwashesData.map((item, index) => (
+                  {latestCarwashesData.flatMap(pose =>
+                    pose.carwashes.map(carwash => ({
+                      ...carwash,
+                      location: pose.location,
+                      distance: pose.distance,
+                    }))
+                  )
+                  .slice(0, 3)
+                  .map((item, index) => (
                     <CarWashCard
                       key={index}
                       carWash={item}

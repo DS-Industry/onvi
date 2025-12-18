@@ -1,20 +1,16 @@
 import React, {useState, useCallback, useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
-
 import {View, StyleSheet, TextInput, Text} from 'react-native';
 import {BottomSheetFlatList} from '@gorhom/bottom-sheet';
-
 //@ts-ignore
 import {debounce} from 'lodash';
-
 import {dp} from '@utils/dp';
 import useStore from '@state/store';
 import SearchPlaceholder from './SearchPlaceholder';
-
 import useSWRMutation from 'swr/mutation';
 import {getPOSList} from '@services/api/pos';
 import calculateDistance from '@utils/calculateDistance.ts';
-import {CarWashLocation} from '@app-types/api/app/types.ts';
+import {CarWashLocation, CarWash, CarWashWithLocation} from '@app-types/api/app/types.ts';
 import {CarWashCard} from '@components/CarWashCard/CarWashCard';
 
 const Search = () => {
@@ -23,7 +19,7 @@ const Search = () => {
 
   const {location, favoritesCarwashes} = useStore.getState();
 
-  const [sortedData, setSortedData] = useState<CarWashLocation[]>([]);
+  const [sortedData, setSortedData] = useState<CarWashWithLocation[]>([]);
 
   const {isMutating, trigger, data} = useSWRMutation(
     'getPOSList',
@@ -41,8 +37,16 @@ const Search = () => {
 
   const processCarwashes = useCallback(
     (carwashes: CarWashLocation[]) => {
-      return carwashes
-        .map((carwash: CarWashLocation) => {
+      // Преобразуем CarWashLocation[] в CarWashWithLocation[]
+      const transformedCarwashes = carwashes.flatMap((carwashLocation: CarWashLocation) =>
+        carwashLocation.carwashes.map((carwash: CarWash) => ({
+          ...carwash,
+          location: carwashLocation.location,
+        }))
+      );
+
+      return transformedCarwashes
+        .map((carwash: CarWashWithLocation) => {
           const carwashLat = carwash.location.lat;
           const carwashLon = carwash.location.lon;
           const distance = calculateDistance(
@@ -53,7 +57,7 @@ const Search = () => {
           );
 
           const isFavorite = favoritesCarwashes.includes(
-            Number(carwash.carwashes[0].id),
+            Number(carwash.id),
           );
 
           return {
@@ -86,7 +90,7 @@ const Search = () => {
     }
   }, [location, trigger, processCarwashes]);
 
-  const renderBusiness = ({item}: {item: CarWashLocation}) => {
+  const renderBusiness = ({item}: {item: CarWashWithLocation & {distance?: number, isFavorite: boolean}}) => {
     return <CarWashCard carWash={item} showIsFavorite={true} />;
   };
 
@@ -129,7 +133,7 @@ const Search = () => {
               <BottomSheetFlatList
                 data={sortedData}
                 renderItem={renderBusiness}
-                keyExtractor={(item: CarWashLocation, index: number) =>
+                keyExtractor={(item: CarWashWithLocation, index: number) =>
                   index.toString()
                 }
                 scrollEnabled={true}

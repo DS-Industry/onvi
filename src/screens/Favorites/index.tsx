@@ -6,28 +6,39 @@ import {useNavigation} from '@react-navigation/core';
 import ScreenHeader from '@components/ScreenHeader';
 import {GeneralDrawerNavigationProp} from '../../types/navigation/DrawerNavigation.ts';
 import calculateDistance from '@utils/calculateDistance.ts';
-import {CarWashLocation} from '@app-types/api/app/types.ts';
 import {CarWashCard} from '@components/CarWashCard/CarWashCard.tsx';
 import useStore from '@state/store.ts';
 import CarwashesPlaceholder from '@components/BottomSheetViews/CarwashesPlaceholder/index.tsx';
+import { CarWashWithLocation } from '@app-types/api/app/types.ts';
 
 const Favorites = () => {
   const navigation = useNavigation<GeneralDrawerNavigationProp<'Избранное'>>();
   const {t} = useTranslation();
-  const [sortedData, setSortedData] = useState<CarWashLocation[]>([]);
-  const {location, posList} = useStore.getState();
+  const [sortedData, setSortedData] = useState<CarWashWithLocation[]>([]);
+  const {location, originalPosList} = useStore.getState();
   const {favoritesCarwashesIsLoading, favoritesCarwashes} = useStore();
 
   useEffect(() => {
     if (
       location?.latitude &&
       location?.longitude &&
-      posList.length > 0 &&
       favoritesCarwashes.length > 0
     ) {
-      const favoriteCarWashes = posList.filter(carwash =>
-        favoritesCarwashes.includes(Number(carwash.carwashes[0].id)),
+      
+      const carwashes = originalPosList.flatMap(pose =>
+        pose.carwashes.map(carwash => ({
+          ...carwash,
+          location: pose.location,
+          distance: pose.distance,
+        }))
       );
+
+      const favoriteCarWashes = carwashes.filter(carwash =>
+        favoritesCarwashes.includes(Number(carwash.id)),
+      );
+
+
+
       const favoriteCarWashesDistance = favoriteCarWashes.map(carwash => {
         const distance = calculateDistance(
           location.latitude,
@@ -45,9 +56,9 @@ const Favorites = () => {
     } else {
       setSortedData([]);
     }
-  }, [location, posList, favoritesCarwashes]);
+  }, [location, favoritesCarwashes]);
 
-  const renderBusiness = ({item}: {item: CarWashLocation}) => {
+  const renderBusiness = ({item}: {item: CarWashWithLocation}) => {
     return (
       <CarWashCard
         carWash={item}
