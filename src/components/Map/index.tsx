@@ -7,7 +7,7 @@ import React, {
   useCallback,
   useRef,
 } from 'react';
-import {View, Dimensions, Platform, PermissionsAndroid} from 'react-native';
+import {View, Dimensions, Platform, PermissionsAndroid, Image} from 'react-native';
 import MapboxGL, {UserLocation} from '@rnmapbox/maps';
 import Marker from './Marker';
 import useStore from '../../state/store.ts';
@@ -16,6 +16,7 @@ import {getPOSList} from '@services/api/pos';
 import {throttle} from 'lodash';
 import { CameraRef } from 'node_modules/@rnmapbox/maps/lib/typescript/src/components/Camera';
 import { CarWash, Location } from '@app-types/api/app/types.ts';
+import { dp } from '@utils/dp.ts';
 
 export type CameraReference = {
   setCameraPosition: (val?: {
@@ -220,6 +221,34 @@ const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
         />
 
       </MapboxGL.MapView>
+
+      <View
+        style={{
+          position: 'absolute',
+          top: dp(0),
+          left: dp(0),
+          right: dp(0),
+          height: dp(85),
+          justifyContent: 'center',
+          alignItems: 'center',
+          pointerEvents: 'none',
+          ...Platform.select({
+            ios: {
+              top: dp(20),
+            },
+          }),
+        }}
+        >
+        <Image
+          source={require('../../assets/images/garland.webp')}
+          style={{
+            width: '100%',
+            height: dp(85),
+            resizeMode: 'stretch',
+          }}
+        />
+      </View>
+      
       {business && (
         <View
           style={{
