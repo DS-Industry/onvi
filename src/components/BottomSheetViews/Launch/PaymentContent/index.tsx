@@ -1,15 +1,15 @@
-import React, {useEffect, useState} from 'react';
-import {useTranslation} from 'react-i18next';
-import {Platform, StyleSheet, Text, View, ScrollView} from 'react-native';
-import {Button} from '@styled/buttons';
+import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Platform, StyleSheet, Text, View, ScrollView } from 'react-native';
+import { Button } from '@styled/buttons';
 import useStore from '@state/store';
 import PaymentMethods from '@components/PaymentMethods';
 import PaymentSummary from '@components/BottomSheetViews/Payment/PaymentSummary';
 import PointsToggle from '@components/BottomSheetViews/Payment/PointsToggle';
-import {useBonusPoints} from '@hooks/useBonusPoints.ts';
-import {usePaymentProcess} from '@hooks/usePaymentProcess.ts';
+import { useBonusPoints } from '@hooks/useBonusPoints.ts';
+import { usePaymentProcess } from '@hooks/usePaymentProcess.ts';
 import PromocodeSection from '@components/BottomSheetViews/Payment/PromocodeSection';
-import {usePromoCode} from '@hooks/usePromoCode.ts';
+import { usePromoCode } from '@hooks/usePromoCode.ts';
 import {
   calculateActualDiscount,
   calculateActualPointsUsed,
@@ -115,7 +115,7 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
   };
 
   return (
-    <ScrollView 
+    <ScrollView
       style={styles.container}
       contentContainerStyle={styles.contentContainer}
       showsVerticalScrollIndicator={false}
@@ -126,48 +126,51 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
         </Text>
       )}
 
-      <View style={styles.paymentCard}>
-        <PaymentSummary
-          order={order}
-          user={user}
-          selectedPos={selectedPos}
-          finalOrderCost={freeOn ? 0 : finalOrderCost}
-        />
+      {
+        !freeOn
+        &&
+        <View style={styles.paymentCard}>
+          <PaymentSummary
+            order={order}
+            user={user}
+            selectedPos={selectedPos}
+            finalOrderCost={freeOn ? 0 : finalOrderCost}
+          />
 
-        <View style={styles.choice}>
-          {!freeOn && (
-            <>
-              {selectedPos?.IsLoyaltyMember && (
-                <PointsToggle
-                  user={user}
-                  order={order}
+          <View style={styles.choice}>
+            {!freeOn && (
+              <>
+                {selectedPos?.IsLoyaltyMember && (
+                  <PointsToggle
+                    user={user}
+                    order={order}
+                    discount={discount}
+                    toggled={toggled}
+                    onToggle={togglePoints}
+                    applyPoints={applyPoints}
+                  />
+                )}
+
+                <PromocodeSection
+                  promocode={inputCodeValue}
+                  onPromocodeChange={setPromocode}
+                  onApplyPromocode={handleApplyPromocode}
+                  promoError={promoError}
+                  isMutating={isMutating}
                   discount={discount}
-                  toggled={toggled}
-                  onToggle={togglePoints}
-                  applyPoints={applyPoints}
+                  quickPromoSelect={handlePromoPress}
+                  quickPromoDeselect={() => setPromocode(undefined)}
                 />
-              )}
+              </>
+            )}
 
-              <PromocodeSection
-                promocode={inputCodeValue}
-                onPromocodeChange={setPromocode}
-                onApplyPromocode={handleApplyPromocode}
-                promoError={promoError}
-                isMutating={isMutating}
-                discount={discount}
-                quickPromoSelect={handlePromoPress}
-                quickPromoDeselect={() => setPromocode(undefined)}
-              />
-            </>
-          )}
-
-          {/* <View style={styles.row}>
+            {/* <View style={styles.row}>
             <Text style={styles.itemName}>Итого</Text>
             <Text style={styles.itemPrice}>{freeOn ? '0' : finalOrderCost} ₽</Text>
           </View> */}
 
-          <View style={styles.badgesContainer}>
-            {/* {discount && !freeOn ? (
+            <View style={styles.badgesContainer}>
+              {/* {discount && !freeOn ? (
               <View style={styles.badgeWrapper}>
                 <Button
                   label={`${t(
@@ -185,7 +188,7 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
               </View>
             ) : null} */}
 
-            {/* {usedPoints ? (
+              {/* {usedPoints ? (
                 <View style={styles.badgeWrapper}>
                   <Button
                     label={t('app.payment.usedPoints', {usedPoints})}
@@ -197,16 +200,16 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
                   />
                 </View>
               ) : null} */}
+            </View>
           </View>
-        </View>
-        
-        {!freeOn && (
+
           <PaymentMethods
             selectedMethod={paymentMethod}
             onSelectMethod={setPaymentMethod}
           />
-        )}
-      </View>
+
+        </View>
+      }
 
       <View style={styles.paymentActions}>
         {freeOn ? (
@@ -222,7 +225,7 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
           />
         ) : (
           <Button
-            label={t('common.buttons.pay')} 
+            label={t('common.buttons.pay')}
             price={`${finalOrderCost}₽`}
             onClick={handlePayment}
             color="blue"
@@ -230,8 +233,8 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
             width={'100%'}
             fontSize={18}
             fontWeight={'600'}
-            priceFontSize={18} 
-            priceFontWeight={'500'} 
+            priceFontSize={18}
+            priceFontWeight={'500'}
             showLoading={loading}
           />
         )}
@@ -243,7 +246,7 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    width: '100%', 
+    width: '100%',
   },
   contentContainer: {
     paddingBottom: dp(30),
@@ -255,7 +258,7 @@ const styles = StyleSheet.create({
     color: '#000',
     marginBottom: dp(12),
     textAlign: 'center',
-    paddingHorizontal: dp(16), 
+    paddingHorizontal: dp(16),
   },
   paymentCard: {
     backgroundColor: '#F5F5F5',
@@ -263,7 +266,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: dp(16),
     paddingVertical: dp(10),
     marginHorizontal: dp(16),
-    
+
     ...Platform.select({
       ios: {
         shadowColor: '#000',
