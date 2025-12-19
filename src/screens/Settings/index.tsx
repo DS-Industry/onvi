@@ -52,7 +52,7 @@ const validateEmail = (email: string) => {
 };
 
 const Settings = () => {
-  const {user, signOut, loadUser, deleteUser} = useStore.getState();
+  const {user, signOut, loadUser, deleteUser, resetLatestCarwashes} = useStore.getState();
   const navigation = useNavigation<GeneralDrawerNavigationProp<'Настройки'>>();
   const {t} = useTranslation();
 
@@ -463,13 +463,19 @@ const Settings = () => {
             </View>
           </View>
           <View style={styles.footerBtns}>
-            <TouchableOpacity style={styles.btnDelete} onPress={deleteUser}>
+            <TouchableOpacity style={styles.btnDelete} onPress={() => {
+              resetLatestCarwashes();
+              deleteUser();
+            }}>
               <Text
                 style={{fontSize: dp(10), fontWeight: '400', color: '#AFAEAE'}}>
                 {t('app.settings.deleteAccount')}
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.btnExit} onPress={signOut}>
+            <TouchableOpacity style={styles.btnExit} onPress={() => {
+              resetLatestCarwashes();
+              signOut();
+            }}>
               <Text style={styles.text}>{t('app.settings.exit')}</Text>
               <LogOut height={dp(20)} width={dp(20)} stroke={'#000000'} />
             </TouchableOpacity>

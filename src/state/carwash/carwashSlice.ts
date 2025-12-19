@@ -13,6 +13,7 @@ export interface CarwashSlice {
   removeFromFavoritesCarwashes: (id: number) => void;
   loadFavoritesCarwashes: () => Promise<void>;
   loadLatestCarwashes: () => Promise<void>;
+  resetLatestCarwashes: () => void; 
   isFavoriteCarwash: (id: number) => boolean;
   refreshFavoritesCarwashes: () => Promise<void>;
   addToPinnedCarwashes: (id: number) => void;
@@ -106,6 +107,11 @@ const createCarwashSlice: StoreSlice<CarwashSlice> = (set, get) => ({
     } finally {
       set({latestCarwashesIsLoading: false});
     }
+  },
+
+  resetLatestCarwashes: () => {
+    set({ latestCarwashes: [] });
+    LocalStorage.set('latest', JSON.stringify([]));
   },
 
   addToPinnedCarwashes: async (id: number) => {

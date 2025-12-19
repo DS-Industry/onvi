@@ -26,7 +26,7 @@ import useSWR from 'swr';
 import {getCampaignList} from '@services/api/campaign';
 import CampaignPlaceholder from './CampaignPlaceholder';
 import {useNavStore} from '@state/useNavStore/index.ts';
-import {Campaign, CarWashLocation} from '@app-types/api/app/types.ts';
+import {Campaign, CarWashWithLocation} from '@app-types/api/app/types.ts';
 import {getStoryView} from '@services/api/story-view';
 import {StoryViewPlaceholder} from '@components/StoryView/StoryViewPlaceholder.tsx';
 import {transformContentDataToUserStories} from '@shared/mappers/StoryViewMapper.ts';
@@ -65,7 +65,7 @@ const Main = () => {
   
   const {setIsMainScreen} = useNavStore.getState();
   const scrollViewRef = useRef<BottomSheetScrollViewMethods>(null);
-  const [latestCarwashesData, setLatestCarwashesData] = useState<CarWashLocation[]>([]);
+  const [latestCarwashesData, setLatestCarwashesData] = useState<CarWashWithLocation[]>([]);
 
   const {isLoading: campaignLoading, data: campaignData} = useSWR(
     ['getCampaignList'],
@@ -102,14 +102,21 @@ const Main = () => {
   useEffect(() => {
     if (latestCarwashes.length > 0 && originalPosList.length > 0) {
       const carwashMap = new Map();
-      originalPosList.forEach(carwashLocation => {
-        carwashLocation.carwashes.forEach(carwash => {
-          const id = Number(carwash?.id) || undefined;
-          carwashMap.set(id, carwashLocation);
-        })
+
+      const carwashesList = originalPosList.flatMap(pose =>
+        pose.carwashes.map(carwash => ({
+          ...carwash,
+          location: pose.location,
+          distance: pose.distance,
+        }))
+      )
+
+      carwashesList.forEach(carwash => {
+        const id = Number(carwash?.id) || undefined;
+          carwashMap.set(id, carwash);
       });
       
-      const result: CarWashLocation[] = [];
+      const result: CarWashWithLocation[] = [];
       if (pinnedCarwashes && pinnedCarwashes.length > 0) {
         pinnedCarwashes.forEach(id => {
           const carwash = carwashMap.get(id);
@@ -215,23 +222,17 @@ const Main = () => {
             ) : (
               <>
                 <View style={{marginTop: dp(12), gap: dp(8)}}>
-                  {latestCarwashesData.flatMap(pose =>
-                    pose.carwashes.map(carwash => ({
-                      ...carwash,
-                      location: pose.location,
-                      distance: pose.distance,
-                    }))
-                  )
-                  .slice(0, 3)
-                  .map((item, index) => (
-                    <CarWashCard
-                      key={index}
-                      carWash={item}
-                      showDistance={false}
-                      longPressPinAction={true}
-                      enablePinIcon={true}
-                    />
-                  ))}
+                  {
+                    latestCarwashesData.map((item, index) => (
+                      <CarWashCard
+                        key={index}
+                        carWash={item}
+                        showDistance={false}
+                        longPressPinAction={true}
+                        enablePinIcon={true}
+                      />
+                    ))
+                  }
                 </View>
               </>
             )}
