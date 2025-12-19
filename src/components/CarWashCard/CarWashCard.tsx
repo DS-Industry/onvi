@@ -185,7 +185,6 @@ const CarWashCard = ({
             )}
           </View>
         </View>
-        <Text>{carWash.id}</Text>
         {showIsFavorite && isFavorite && (
           <TouchableOpacity
             style={localStyles.heartButton}
