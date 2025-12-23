@@ -231,6 +231,16 @@ const CustomDrawerContent = ({ navigation, theme, user }: CustomDrawerContentPro
                   iconName="settings"
                   isActive={route === 'Настройки'}
                 />
+                <CustomDrawerItem
+                  label={t('navigation.game')}
+                  color={route === 'Игра' ? theme.primary : theme.textColor}
+                  onPress={() => {
+                    navigation.reset({
+                      index: 0,
+                      routes: [{name: 'Игра'}],
+                    });
+                  }}
+                />
               </View>
             </View>
           </View>

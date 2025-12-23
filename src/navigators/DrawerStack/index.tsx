@@ -31,6 +31,9 @@ const TransferBalance = React.lazy(() =>
 const Legals = React.lazy(() =>
   import('@screens/Legals').then(module => ({default: module.Legals})),
 );
+const Game = React.lazy(() =>
+  import('@screens/Game').then(module => ({default: module.Game})),
+);
 
 import {useTheme} from '@context/ThemeProvider';
 import useStore from '../../state/store';
@@ -88,6 +91,13 @@ const DrawerStack = () => {
         {() => (
           <Suspense fallback={<LoadingScreen />}>
             <Favorites />
+          </Suspense>
+        )}
+      </Drawer.Screen>
+      <Drawer.Screen name="Игра">
+        {() => (
+          <Suspense fallback={<LoadingScreen />}>
+            <Game />
           </Suspense>
         )}
       </Drawer.Screen>
