@@ -15,6 +15,9 @@ const Settings = React.lazy(() =>
 const Favorites = React.lazy(() =>
   import('@screens/Favorites').then(module => ({default: module.Favorites})),
 );
+const History = React.lazy(() =>
+  import('@screens/History').then(module => ({default: module.History})),
+);
 const About = React.lazy(() =>
   import('@screens/About').then(module => ({default: module.About})),
 );
@@ -88,6 +91,13 @@ const DrawerStack = () => {
         {() => (
           <Suspense fallback={<LoadingScreen />}>
             <Favorites />
+          </Suspense>
+        )}
+      </Drawer.Screen>
+      <Drawer.Screen name="История">
+        {() => (
+          <Suspense fallback={<LoadingScreen />}>
+            <History />
           </Suspense>
         )}
       </Drawer.Screen>

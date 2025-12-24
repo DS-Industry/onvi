@@ -12,7 +12,6 @@ import CarwashesPlaceholder from '@components/BottomSheetViews/CarwashesPlacehol
 import { CarWashWithLocation } from '@app-types/api/app/types.ts';
 
 const Favorites = () => {
-  const navigation = useNavigation<GeneralDrawerNavigationProp<'Избранное'>>();
   const {t} = useTranslation();
   const [sortedData, setSortedData] = useState<CarWashWithLocation[]>([]);
   const {location, originalPosList} = useStore.getState();
@@ -72,11 +71,7 @@ const Favorites = () => {
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: '#fff'}}>
       <View style={{flex: 1, padding: dp(16), flexDirection: 'column'}}>
-        <ScreenHeader
-          screenTitle={t('navigation.favorites')}
-          btnType="back"
-          btnCallback={() => navigation.navigate('Главная')}
-        />
+        <ScreenHeader screenTitle={t('navigation.favorites')} />
         {favoritesCarwashesIsLoading ? (
           <>
             <View style={{marginTop: dp(25)}} />

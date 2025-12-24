@@ -9,6 +9,7 @@ export type DrawerParamList = {
   Партнеры: undefined; // No params needed for Partners
   Настройки: undefined; // No params needed for Settings
   Избранное: undefined;
+  История: undefined;
   'О приложении': undefined; // No params needed for About
   Партнер: {data: Partner}; // Example of params needed for Partner
   'Ввод Промокода': {

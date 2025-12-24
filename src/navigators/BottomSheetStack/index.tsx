@@ -25,11 +25,6 @@ const Notifications = React.lazy(() =>
     default: module.Notifications,
   })),
 );
-const History = React.lazy(() =>
-  import('@components/BottomSheetViews').then(module => ({
-    default: module.History,
-  })),
-);
 const Search = React.lazy(() =>
   import('@components/BottomSheetViews/Search').then(module => ({
     default: module.Search,
@@ -200,13 +195,6 @@ const BottomSheetStack = React.memo(({ active }: BottomSheetStackInterface) => {
             {() => (
               <Suspense fallback={<LoadingScreen />}>
                 <Notifications />
-              </Suspense>
-            )}
-          </RootStack.Screen>
-          <RootStack.Screen name="History" key="HistoryScreen">
-            {() => (
-              <Suspense fallback={<LoadingScreen />}>
-                <History />
               </Suspense>
             )}
           </RootStack.Screen>

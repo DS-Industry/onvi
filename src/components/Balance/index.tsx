@@ -40,10 +40,10 @@ const Balance = ({bottomSheetIndex}: BalanceProps) => {
             backgroundColor: theme.mainColor,
           }}
           onPress={() => {
-            navigateBottomSheet('History', {});
-            bottomSheetRef?.current?.snapToPosition(
-              bottomSheetSnapPoints[bottomSheetSnapPoints.length - 1],
-            );
+            // navigateBottomSheet('History', {});
+            // bottomSheetRef?.current?.snapToPosition(
+            //   bottomSheetSnapPoints[bottomSheetSnapPoints.length - 1],
+            // );
           }}>
           <Image
             source={require('../../assets/icons/small-icon.png')}
