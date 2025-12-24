@@ -2,25 +2,21 @@ import {
   FlatList,
   SafeAreaView,
   View,
-  Text,
   StyleSheet,
-  Image,
-  TouchableOpacity,
 } from 'react-native';
 import {dp} from '@utils/dp';
 import React from 'react';
 import ScreenHeader from '@components/ScreenHeader';
 import {useTranslation} from 'react-i18next';
 import {WHITE} from '@utils/colors';
-import {Settings} from 'react-native-feather';
 import {avatarSwitch} from '@screens/Settings';
 import EmptyPlaceholder from '@components/EmptyPlaceholder';
-import {navigateBottomSheet} from '@navigators/BottomSheetStack';
 import useSWR from 'swr';
 import {getOrderHistory} from '@services/api/user';
 import {useNavStore} from '@state/useNavStore/index.ts';
 import {BalanceCard} from '@styled/cards/BalanceCard';
 import useStore from '@state/store';
+import HistoryPlaceholder from './HistoryPlaceholder';
 
 const History = () => {
   const {t} = useTranslation();
@@ -46,7 +42,7 @@ const History = () => {
 
         <View style={styles.listContainer}>
           {isLoading ? (
-            <EmptyPlaceholder text={t('app.history.loading')} />
+            <HistoryPlaceholder />
           ) : (
             <FlatList
               data={orderData}
