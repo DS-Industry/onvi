@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { View, StyleSheet, Alert, Platform, ActivityIndicator, Text } from 'react-native';
 import { WebView } from 'react-native-webview';
+import { imagesBase64 } from './imageBase64'; 
 
 // Inline HTML with embedded CSS and JavaScript
 const getGameHTML = () => {
@@ -137,6 +138,10 @@ const getGameHTML = () => {
             <button id="restart-btn">Tap to Restart</button>
         </div>
     </div>
+    <img id="bird-sprite" src="${imagesBase64.bird}" style="display:none" />
+    <img id="brush-img" src="${imagesBase64.brush}" style="display:none" />
+    <img id="road-img"  src="${imagesBase64.road}"  style="display:none" />
+    
     <script>
         // Beautiful Flappy Bird Game with enhanced graphics and animations
         class FlappyBirdGame {
@@ -148,8 +153,8 @@ const getGameHTML = () => {
                 this.bird = {
                     x: 100,
                     y: this.height / 2,
-                    width: 50,
-                    height: 35,
+                    width: 75,
+                    height: 50,
                     velocity: 0,
                     gravity: 0.5,
                     jumpPower: -10,
@@ -171,7 +176,10 @@ const getGameHTML = () => {
                 this.groundY = this.height - 80;
                 this.groundOffset = 0;
                 this.frameCount = 0;
-                
+                this.roadSpeed = this.pipeSpeed; // чтобы совпадала скорость
+                this.roadImg = null;
+                this.brushWidth = 90;
+
                 // Initialize clouds
                 for (let i = 0; i < 5; i++) {
                     this.clouds.push({
@@ -199,6 +207,8 @@ const getGameHTML = () => {
                 container.appendChild(this.canvas);
                 
                 this.ctx = this.canvas.getContext('2d');
+
+                this.roadImg = document.getElementById('road-img');
                 
                 // Handle resize
                 window.addEventListener('resize', () => {
@@ -265,7 +275,10 @@ const getGameHTML = () => {
                 
                 // Update ground scrolling
                 if (this.gameStarted && !this.gameOver) {
-                    this.groundOffset = (this.groundOffset - this.pipeSpeed) % 50;
+                    this.groundOffset -= this.roadSpeed;
+                    if (this.roadImg && this.groundOffset <= -this.roadImg.width) {
+                        this.groundOffset = 0;
+                    }
                 }
                 
                 // Update particles
@@ -371,18 +384,54 @@ const getGameHTML = () => {
                 this.ctx.arc(x + size * 0.4, y - size * 0.3, size * 0.5, 0, Math.PI * 2);
                 this.ctx.fill();
             }
+
+            drawBrushImage(img, x, gapEdgeY, isTop) {
+                const ctx = this.ctx;
+                const scale = this.brushWidth / img.width;
+                const drawHeight = img.height * scale;
+
+                if (isTop) {
+                    ctx.drawImage(
+                        img,
+                        x,
+                        gapEdgeY - drawHeight,
+                        this.brushWidth,
+                        drawHeight
+                    );
+                } else {
+                    ctx.drawImage(
+                        img,
+                        x,
+                        gapEdgeY,
+                        this.brushWidth,
+                        drawHeight
+                    );
+                }
+            }
             
             drawPipes() {
+                const img = document.getElementById('brush-img');
+                if (!img) return;
+
                 this.pipes.forEach(pipe => {
-                    const topHeight = pipe.gapY - pipe.gapSize / 2;
-                    const bottomY = pipe.gapY + pipe.gapSize / 2;
-                    const bottomHeight = this.groundY - bottomY;
-                    
-                    // Top pipe
-                    this.drawPipe(pipe.x, 0, this.pipeWidth, topHeight, true);
-                    
-                    // Bottom pipe
-                    this.drawPipe(pipe.x, bottomY, this.pipeWidth, bottomHeight, false);
+                    const gapTop = pipe.gapY - pipe.gapSize / 2;
+                    const gapBottom = pipe.gapY + pipe.gapSize / 2;
+
+                    // 🔼 Верхняя труба
+                    this.drawBrushImage(
+                        img,
+                        pipe.x,
+                        gapTop,        // нижняя точка трубы
+                        true
+                    );
+
+                    // 🔽 Нижняя труба
+                    this.drawBrushImage(
+                        img,
+                        pipe.x,
+                        gapBottom,     // верхняя точка трубы
+                        false
+                    );
                 });
             }
             
@@ -422,93 +471,43 @@ const getGameHTML = () => {
             }
             
             drawGround() {
-                // Ground gradient
-                const groundGradient = this.ctx.createLinearGradient(0, this.groundY, 0, this.height);
-                groundGradient.addColorStop(0, '#deb887');
-                groundGradient.addColorStop(0.3, '#d2b48c');
-                groundGradient.addColorStop(1, '#c19a6b');
-                this.ctx.fillStyle = groundGradient;
-                this.ctx.fillRect(0, this.groundY, this.width, this.height - this.groundY);
-                
-                // Ground texture (grass)
-                this.ctx.fillStyle = '#8b7355';
-                for (let x = this.groundOffset; x < this.width; x += 50) {
-                    this.ctx.fillRect(x, this.groundY, 2, 5);
-                }
-                
-                // Ground border
-                this.ctx.strokeStyle = '#8b6f47';
-                this.ctx.lineWidth = 2;
-                this.ctx.beginPath();
-                this.ctx.moveTo(0, this.groundY);
-                this.ctx.lineTo(this.width, this.groundY);
-                this.ctx.stroke();
+                const ctx = this.ctx;
+                const img = document.getElementById('road-img');
+                if (!img || !img.complete) return;
+
+                const ROAD_SRC_HEIGHT = 270;
+                const ROAD_DST_HEIGHT = 120;
+                const sy = img.height - ROAD_SRC_HEIGHT;
+                const y = this.height - ROAD_DST_HEIGHT;
+
+                // Рисуем дорогу дважды для плавности
+                ctx.drawImage(img, 0, sy, img.width, ROAD_SRC_HEIGHT, this.groundOffset, y, img.width, ROAD_DST_HEIGHT);
+                ctx.drawImage(img, 0, sy, img.width, ROAD_SRC_HEIGHT, this.groundOffset + img.width, y, img.width, ROAD_DST_HEIGHT);
             }
             
             drawBird() {
-                const centerX = this.bird.x + this.bird.width / 2;
-                const centerY = this.bird.y + this.bird.height / 2;
+                const birdImg = document.getElementById('bird-sprite');
+                if (!birdImg) return; // Если картинка не загружена, выходим
+
+                // Поворачиваем птицу в зависимости от скорости падения
                 const birdAngle = Math.min(Math.max(this.bird.velocity * 2.5, -25), 70);
-                
+
                 this.ctx.save();
-                this.ctx.translate(centerX, centerY);
+                this.ctx.translate(
+                    this.bird.x + this.bird.width / 2,
+                    this.bird.y + this.bird.height / 2
+                );
                 this.ctx.rotate(birdAngle * Math.PI / 180);
-                
-                // Bird body (ellipse)
-                const bodyGradient = this.ctx.createRadialGradient(0, 0, 0, 0, 0, this.bird.width / 2);
-                bodyGradient.addColorStop(0, '#ffd700');
-                bodyGradient.addColorStop(0.7, '#ffeb3b');
-                bodyGradient.addColorStop(1, '#ffc107');
-                this.ctx.fillStyle = bodyGradient;
-                this.ctx.beginPath();
-                this.ctx.ellipse(0, 0, this.bird.width / 2, this.bird.height / 2, 0, 0, Math.PI * 2);
-                this.ctx.fill();
-                
-                // Bird body border
-                this.ctx.strokeStyle = '#ffa000';
-                this.ctx.lineWidth = 2;
-                this.ctx.stroke();
-                
-                // Wing animation
-                const wingOffset = Math.sin(this.bird.wingAngle) * 8;
-                this.ctx.save();
-                this.ctx.translate(-this.bird.width / 4, wingOffset);
-                this.ctx.rotate(Math.sin(this.bird.wingAngle) * 0.5);
-                
-                // Wing
-                const wingGradient = this.ctx.createLinearGradient(-10, 0, 10, 0);
-                wingGradient.addColorStop(0, '#ff9800');
-                wingGradient.addColorStop(1, '#ffc107');
-                this.ctx.fillStyle = wingGradient;
-                this.ctx.beginPath();
-                this.ctx.ellipse(0, 0, 12, 8, 0, 0, Math.PI * 2);
-                this.ctx.fill();
-                this.ctx.strokeStyle = '#ff6f00';
-                this.ctx.lineWidth = 1.5;
-                this.ctx.stroke();
-                this.ctx.restore();
-                
-                // Eye
-                this.ctx.fillStyle = '#000';
-                this.ctx.beginPath();
-                this.ctx.arc(this.bird.width / 4, -this.bird.height / 6, 4, 0, Math.PI * 2);
-                this.ctx.fill();
-                
-                // Eye highlight
-                this.ctx.fillStyle = '#fff';
-                this.ctx.beginPath();
-                this.ctx.arc(this.bird.width / 4 + 1, -this.bird.height / 6 - 1, 1.5, 0, Math.PI * 2);
-                this.ctx.fill();
-                
-                // Beak
-                this.ctx.fillStyle = '#ff6f00';
-                this.ctx.beginPath();
-                this.ctx.moveTo(this.bird.width / 2 - 2, 0);
-                this.ctx.lineTo(this.bird.width / 2 + 8, -3);
-                this.ctx.lineTo(this.bird.width / 2 + 8, 3);
-                this.ctx.closePath();
-                this.ctx.fill();
-                
+
+                // Рисуем картинку
+                this.ctx.drawImage(
+                    birdImg,
+                    -this.bird.width / 2, // Центрируем по X
+                    -this.bird.height / 2, // Центрируем по Y
+                    this.bird.width, // Ширина
+                    this.bird.height  // Высота
+                );
+
                 this.ctx.restore();
             }
             
@@ -557,11 +556,11 @@ const getGameHTML = () => {
             draw() {
                 // Draw all layers
                 this.drawBackground();
-                this.drawClouds();
-                this.drawPipes();
-                this.drawGround();
-                this.drawParticles();
-                this.drawBird();
+                this.drawClouds();     
+                this.drawGround();    
+                this.drawPipes();     
+                this.drawParticles();  
+                this.drawBird(); 
                 
                 // Draw instructions
                 if (!this.gameStarted && !this.gameOver) {
@@ -798,5 +797,5 @@ const styles = StyleSheet.create({
   },
 });
 
-export {Game};
+export { Game };
 
