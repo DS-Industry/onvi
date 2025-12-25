@@ -103,10 +103,10 @@ const getIconComponent = (iconName: string, isActive: boolean) => {
 
 const CustomDrawerItem = ({ label, color, onPress, iconName, isActive }: CustomDrawerItemProps) => {
   return (
-    <TouchableOpacity 
-      style={styles.drawerItem} 
+    <TouchableOpacity
+      style={styles.drawerItem}
       onPress={onPress}
-      hitSlop={{ top: dp(10), bottom: dp(10)}}
+      hitSlop={{ top: dp(10), bottom: dp(10) }}
     >
       {iconName && getIconComponent(iconName, isActive)}
       <Text style={[styles.drawerItemText, { color }]}>{label}</Text>
@@ -137,62 +137,56 @@ const CustomDrawerContent = ({ navigation, theme, user }: CustomDrawerContentPro
       <View style={styles.container}>
         <DrawerContentScrollView scrollEnabled={false}>
           <View style={styles.content}>
-            <TouchableOpacity style={styles.profileButton} onPress={() => navigation.navigate('Настройки')}>
-              <View style={styles.profileContainer}>
-                <Image source={avatarValue} style={styles.avatar} />
-              </View>
-            </TouchableOpacity>
-            <View style={styles.itemsContainer}>
-              {!user || !user.name ? (
-                <Skeleton
-                  isLoading={true}
-                  layout={[
-                    {
-                      key: 'user-name-skeleton',
-                      width: dp(150),
-                      height: dp(24),
-                      borderRadius: 4,
-                    },
-                  ]}
-                  boneColor="#f0f0f0"
-                  highlightColor="#e0e0e0"
-                  animationType="shiver"
-                />
-              ) : (
-                <TouchableOpacity
-                  style={styles.userNameButton}
-                  onPress={() =>
-                    navigation.reset({
-                      index: 0,
-                      routes: [{ name: 'Настройки' }],
-                    })
-                  }>
+            <TouchableOpacity
+              style={styles.profileButton}
+              onPress={() => navigation.navigate('Настройки')}
+            >
+              <Image source={avatarValue} style={styles.avatar} />
+              <View style={styles.userInfoContainer}>
+                {!user || !user.name ? (
+                  <Skeleton
+                    isLoading={true}
+                    layout={[
+                      {
+                        key: 'user-name-skeleton',
+                        width: dp(150),
+                        height: dp(24),
+                        borderRadius: 4,
+                      },
+                    ]}
+                    boneColor="#f0f0f0"
+                    highlightColor="#e0e0e0"
+                    animationType="shiver"
+                  />
+                ) : (
                   <Text style={[styles.userNameText, { color: theme.textColor }]}>
                     {user.name}
                   </Text>
-                </TouchableOpacity>
-              )}
-              {!user || !user.phone ? (
-                <Skeleton
-                  isLoading={true}
-                  layout={[
-                    {
-                      key: 'user-phone-skeleton',
-                      width: dp(100),
-                      height: dp(20),
-                      borderRadius: 4,
-                      marginBottom: dp(45),
-                    },
-                  ]}
-                  boneColor="#f0f0f0"
-                  highlightColor="#e0e0e0"
-                  animationType="shiver"
-                />
-              ) : (
-                <Text style={[styles.userPhoneText, { color: theme.textColor }]}>
-                  {formatPhoneNumber(user.phone)}
-                </Text>
-              )}
+                )}
+                {!user || !user.phone ? (
+                  <Skeleton
+                    isLoading={true}
+                    layout={[
+                      {
+                        key: 'user-phone-skeleton',
+                        width: dp(100),
+                        height: dp(20),
+                        borderRadius: 4,
+                        marginTop: dp(5),
+                      },
+                    ]}
+                    boneColor="#f0f0f0"
+                    highlightColor="#e0e0e0"
+                    animationType="shiver"
+                  />
+                ) : (
+                  <Text style={[styles.userPhoneText, { color: theme.textColor }]}>
+                    {formatPhoneNumber(user.phone)}
+                  </Text>
+                )}
+              </View>
+            </TouchableOpacity>
+            <View style={styles.itemsContainer}>
               <View style={styles.drawerItems}>
                 <CustomDrawerItem
                   label={t('navigation.home')}
@@ -308,31 +302,20 @@ const styles = StyleSheet.create({
   },
   profileButton: {
     flexDirection: 'row',
+    alignItems: 'center',
     paddingBottom: dp(15),
     borderRadius: dp(10),
-    alignItems: 'center',
-  },
-  profileContainer: {
-    width: dp(68),
-    height: dp(68),
-    borderRadius: dp(68) / 2,
-    borderWidth: dp(1),
-    borderColor: '#eeeeee',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   avatar: {
     width: dp(58),
     height: dp(58),
     borderRadius: dp(58) / 2,
+    marginRight: dp(10),
   },
-  itemsContainer: {
-    width: '100%',
-    paddingRight: dp(9),
-  },
-  userNameButton: {
-    flexDirection: 'row',
-    paddingBottom: dp(2),
+  userInfoContainer: {
+    flexDirection: 'column',
+    justifyContent: 'center',
+    flex: 1,
   },
   userNameText: {
     fontStyle: 'normal',
@@ -342,12 +325,17 @@ const styles = StyleSheet.create({
     letterSpacing: 0.43,
   },
   userPhoneText: {
-    marginBottom: dp(45),
     fontStyle: 'normal',
     fontSize: dp(11),
     fontWeight: '400',
-    lineHeight: dp(20),
+    lineHeight: dp(14),
     letterSpacing: 0.23,
+    marginTop: dp(3),
+  },
+  itemsContainer: {
+    width: '100%',
+    paddingRight: dp(9),
+    marginTop: dp(20),
   },
   drawerItems: {
     gap: dp(35),

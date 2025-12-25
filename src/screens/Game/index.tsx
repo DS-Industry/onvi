@@ -2,6 +2,8 @@ import React, { useRef, useState } from 'react';
 import { View, StyleSheet, Alert, Platform, ActivityIndicator, Text } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { imagesBase64 } from './imageBase64'; 
+import { dp } from '@utils/dp';
+import ScreenHeader from '@components/ScreenHeader';
 
 // Inline HTML with embedded CSS and JavaScript
 const getGameHTML = () => {
@@ -38,7 +40,7 @@ const getGameHTML = () => {
         }
         #score-display {
             position: absolute;
-            top: 30px;
+            top: 60px;
             left: 50%;
             transform: translateX(-50%);
             font-size: 42px;
@@ -53,6 +55,7 @@ const getGameHTML = () => {
             background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 165, 0, 0.3));
             padding: 10px 25px;
             border-radius: 15px;
+            white-space: nowrap;
             border: 2px solid rgba(255, 255, 255, 0.3);
             backdrop-filter: blur(10px);
         }
@@ -130,12 +133,12 @@ const getGameHTML = () => {
 </head>
 <body>
     <div id="game-container"></div>
-    <div id="score-display">Score: 0</div>
+    <div id="score-display">Счет: 0</div>
     <div id="game-over" class="hidden">
         <div class="game-over-content">
-            <h2>Game Over!</h2>
-            <p>Final Score: <span id="final-score">0</span></p>
-            <button id="restart-btn">Tap to Restart</button>
+            <h2>Игра окончена!</h2>
+            <p>Итого: <span id="final-score">0</span></p>
+            <button id="restart-btn">Переиграть</button>
         </div>
     </div>
     <img id="bird-sprite" src="${imagesBase64.bird}" style="display:none" />
@@ -571,10 +574,10 @@ const getGameHTML = () => {
                     this.ctx.textAlign = 'center';
                     this.ctx.strokeStyle = '#000000';
                     this.ctx.lineWidth = 4;
-                    this.ctx.strokeText('Tap to Start', this.width / 2, this.height / 2 - 30);
-                    this.ctx.fillText('Tap to Start', this.width / 2, this.height / 2 - 30);
-                    this.ctx.strokeText('Tap to Fly', this.width / 2, this.height / 2 + 10);
-                    this.ctx.fillText('Tap to Fly', this.width / 2, this.height / 2 + 10);
+                    this.ctx.strokeText('Нажмите чтобы начать', this.width / 2, this.height / 2 - 30);
+                    this.ctx.fillText('Нажмите чтобы начать', this.width / 2, this.height / 2 - 30);
+                    // this.ctx.strokeText('Tap to Fly', this.width / 2, this.height / 2 + 10);
+                    // this.ctx.fillText('Tap to Fly', this.width / 2, this.height / 2 + 10);
                     this.ctx.globalAlpha = 1;
                 }
             }
@@ -589,7 +592,7 @@ const getGameHTML = () => {
                 this.score++;
                 const scoreDisplay = document.getElementById('score-display');
                 if (scoreDisplay) {
-                    scoreDisplay.textContent = 'Score: ' + this.score;
+                    scoreDisplay.textContent = 'Счет: ' + this.score;
                 }
                 this.sendToReactNative({ type: 'SCORE_UPDATE', score: this.score });
                 
@@ -639,7 +642,7 @@ const getGameHTML = () => {
                 
                 const scoreDisplay = document.getElementById('score-display');
                 if (scoreDisplay) {
-                    scoreDisplay.textContent = 'Score: 0';
+                    scoreDisplay.textContent = 'Счет: 0';
                 }
                 
                 this.sendToReactNative({ type: 'GAME_RESTART' });
@@ -735,6 +738,10 @@ const Game = () => {
 
   return (
     <View style={styles.container}>
+      <View style={styles.burger}>
+        <ScreenHeader />
+      </View>
+      
       {loading && (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#3498db" />
@@ -781,19 +788,32 @@ const styles = StyleSheet.create({
   },
   loadingContainer: {
     position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    top: dp(0),
+    left: dp(0),
+    right: dp(0),
+    bottom: dp(0),
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#70c5ce',
     zIndex: 1000,
   },
   loadingText: {
-    marginTop: 10,
-    fontSize: 16,
+    marginTop: dp(10),
+    fontSize: dp(16),
     color: '#fff',
+  },
+  burger: {
+    position: 'absolute',
+    top: dp(26),
+    left: dp(10),
+    zIndex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    ...Platform.select({
+      ios: {
+        top: dp(50),
+      },
+    }),
   },
 });
 

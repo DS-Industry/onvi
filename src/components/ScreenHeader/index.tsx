@@ -5,7 +5,7 @@ import {BurgerButton} from '@navigators/BurgerButton';
 import {BackButton} from '@components/BackButton';
 
 interface ScreenHeaderProps {
-  screenTitle: string;
+  screenTitle?: string;
   btnType?: 'burger' | 'back';
   btnCallback?: () => void;
 }
@@ -19,7 +19,10 @@ export default function ScreenHeader({
     <View style={styles.header}>
       {btnType === 'burger' && <BurgerButton isDrawerStack={true} />}
       {btnType === 'back' && <BackButton callback={btnCallback} />}
-      <Text style={styles.screenTitle}>{screenTitle}</Text>
+      {
+        screenTitle &&
+        <Text style={styles.screenTitle}>{screenTitle}</Text>
+      }
       <View style={{width: dp(50)}} />
     </View>
   );
