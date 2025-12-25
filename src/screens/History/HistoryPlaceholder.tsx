@@ -1,7 +1,7 @@
+import { dp } from '@utils/dp';
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import Skeleton from 'react-native-reanimated-skeleton';
-import { dp } from '../../../utils/dp';
 
 export default function HistoryPlaceholder() {
   const [containerWidth, setContainerWidth] = useState(0);

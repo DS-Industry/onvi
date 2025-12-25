@@ -2,9 +2,7 @@ import {FlatList, SafeAreaView, View, Text} from 'react-native';
 import {dp} from '@utils/dp';
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {useNavigation} from '@react-navigation/core';
 import ScreenHeader from '@components/ScreenHeader';
-import {GeneralDrawerNavigationProp} from '../../types/navigation/DrawerNavigation.ts';
 import calculateDistance from '@utils/calculateDistance.ts';
 import {CarWashCard} from '@components/CarWashCard/CarWashCard.tsx';
 import useStore from '@state/store.ts';
@@ -12,7 +10,6 @@ import CarwashesPlaceholder from '@components/BottomSheetViews/CarwashesPlacehol
 import { CarWashWithLocation } from '@app-types/api/app/types.ts';
 
 const Favorites = () => {
-  const navigation = useNavigation<GeneralDrawerNavigationProp<'Избранное'>>();
   const {t} = useTranslation();
   const [sortedData, setSortedData] = useState<CarWashWithLocation[]>([]);
   const {location, originalPosList} = useStore.getState();
@@ -72,11 +69,7 @@ const Favorites = () => {
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: '#fff'}}>
       <View style={{flex: 1, padding: dp(16), flexDirection: 'column'}}>
-        <ScreenHeader
-          screenTitle={t('navigation.favorites')}
-          btnType="back"
-          btnCallback={() => navigation.navigate('Главная')}
-        />
+        <ScreenHeader screenTitle={t('navigation.favorites')} />
         {favoritesCarwashesIsLoading ? (
           <>
             <View style={{marginTop: dp(25)}} />

@@ -13,9 +13,6 @@
 		8B147E3F2EC73FFD00B3ADFE /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8B147E3E2EC73FFD00B3ADFE /* Images.xcassets */; };
 		8B147E432EC740DB00B3ADFE /* PaymentGatewayModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B147E422EC740DB00B3ADFE /* PaymentGatewayModule.swift */; };
 		8B1813622ECC577A000AF3EA /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8B1813612ECC577A000AF3EA /* GoogleService-Info.plist */; };
-		8B6A0B6B2EFBC6E5002B1362 /* brush.png in Resources */ = {isa = PBXBuildFile; fileRef = 8B6A0B682EFBC6E5002B1362 /* brush.png */; };
-		8B6A0B6C2EFBC6E5002B1362 /* road.png in Resources */ = {isa = PBXBuildFile; fileRef = 8B6A0B6A2EFBC6E5002B1362 /* road.png */; };
-		8B6A0B6D2EFBC6E5002B1362 /* Onvi.png in Resources */ = {isa = PBXBuildFile; fileRef = 8B6A0B692EFBC6E5002B1362 /* Onvi.png */; };
 		8BDD639A2ECDBBFA00B417E4 /* PaymentGatewayModuleBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BDD63992ECDBBFA00B417E4 /* PaymentGatewayModuleBridge.m */; };
 		93BE33EBD02445A0FCE6FF76 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
 		AD1344E46471B7BF60DD86AC /* libPods-OnviMobile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 18CBD2BC5C9EA0A19778CC0C /* libPods-OnviMobile.a */; };
@@ -32,9 +29,6 @@
 		8B147E3E2EC73FFD00B3ADFE /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = ../../oldOnviMobile/OnviMobile/ios/OnviMobile/Images.xcassets; sourceTree = "<group>"; };
 		8B147E422EC740DB00B3ADFE /* PaymentGatewayModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentGatewayModule.swift; sourceTree = "<group>"; };
 		8B1813612ECC577A000AF3EA /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
-		8B6A0B682EFBC6E5002B1362 /* brush.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = brush.png; sourceTree = "<group>"; };
-		8B6A0B692EFBC6E5002B1362 /* Onvi.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Onvi.png; sourceTree = "<group>"; };
-		8B6A0B6A2EFBC6E5002B1362 /* road.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = road.png; sourceTree = "<group>"; };
 		8BDD63962ECDBB6E00B417E4 /* OnviMobile-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "OnviMobile-Bridging-Header.h"; sourceTree = "<group>"; };
 		8BDD63992ECDBBFA00B417E4 /* PaymentGatewayModuleBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PaymentGatewayModuleBridge.m; sourceTree = "<group>"; };
 		9D378428CA39B2FD55D85CDF /* Pods-OnviMobile.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OnviMobile.release.xcconfig"; path = "Target Support Files/Pods-OnviMobile/Pods-OnviMobile.release.xcconfig"; sourceTree = "<group>"; };
@@ -59,9 +53,6 @@
 		13B07FAE1A68108700A75B9A /* OnviMobile */ = {
 			isa = PBXGroup;
 			children = (
-				8B6A0B682EFBC6E5002B1362 /* brush.png */,
-				8B6A0B692EFBC6E5002B1362 /* Onvi.png */,
-				8B6A0B6A2EFBC6E5002B1362 /* road.png */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				761780EC2CA45674006654EE /* AppDelegate.swift */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
@@ -188,9 +179,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8B6A0B6B2EFBC6E5002B1362 /* brush.png in Resources */,
-				8B6A0B6C2EFBC6E5002B1362 /* road.png in Resources */,
-				8B6A0B6D2EFBC6E5002B1362 /* Onvi.png in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				8B147E3F2EC73FFD00B3ADFE /* Images.xcassets in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,

@@ -48,6 +48,15 @@ const TagIcon = ({ active = false }: { active?: boolean }) => (
   </Svg>
 );
 
+const HistoryIcon = ({ active = false }: { active?: boolean }) => (
+  <Svg width={dp(24)} height={dp(24)} viewBox="0 0 24 24" fill="none" style={{ zIndex: 0 }}>
+    <Path
+      d="M12 21C9.7 21 7.696 20.2377 5.988 18.713C4.28 17.1883 3.30067 15.284 3.05 13H5.1C5.33333 14.7333 6.10433 16.1667 7.413 17.3C8.72167 18.4333 10.2507 19 12 19C13.95 19 15.6043 18.321 16.963 16.963C18.3217 15.605 19.0007 13.9507 19 12C18.9993 10.0493 18.3203 8.39533 16.963 7.038C15.6057 5.68067 13.9513 5.00133 12 5C10.85 5 9.775 5.26667 8.775 5.8C7.775 6.33333 6.93333 7.06667 6.25 8H9V10H3V4H5V6.35C5.85 5.28333 6.88767 4.45833 8.113 3.875C9.33833 3.29167 10.634 3 12 3C13.25 3 14.421 3.23767 15.513 3.713C16.605 4.18833 17.555 4.82967 18.363 5.637C19.171 6.44433 19.8127 7.39433 20.288 8.487C20.7633 9.57967 21.0007 10.7507 21 12C20.9993 13.2493 20.762 14.4203 20.288 15.513C19.814 16.6057 19.1723 17.5557 18.363 18.363C17.5537 19.1703 16.6037 19.812 15.513 20.288C14.4223 20.764 13.2513 21.0013 12 21ZM14.8 16.2L11 12.4V7H13V11.6L16.2 14.8L14.8 16.2Z"
+      fill={active ? "#0B68E1" : "#000000"}
+    />
+  </Svg>
+);
+
 const HeartIcon = ({ active = false }: { active?: boolean }) => (
   <Svg width={dp(24)} height={dp(24)} viewBox="0 0 24 24" fill="none" style={{ zIndex: 0 }}>
     <Path
@@ -81,6 +90,8 @@ const getIconComponent = (iconName: string, isActive: boolean) => {
       return <HomeIcon active={isActive} />;
     case 'tag':
       return <TagIcon active={isActive} />;
+    case 'history':
+      return <HistoryIcon active={isActive} />;
     case 'heart':
       return <HeartIcon active={isActive} />;
     case 'settings':
@@ -208,6 +219,18 @@ const CustomDrawerContent = ({ navigation, theme, user }: CustomDrawerContentPro
                   isActive={route === 'Промокоды'}
                 />
                 <CustomDrawerItem
+                  label={t('navigation.history')}
+                  color={route === 'История' ? theme.primary : theme.textColor}
+                  onPress={() => {
+                    navigation.reset({
+                      index: 0,
+                      routes: [{ name: 'История' }],
+                    });
+                  }}
+                  iconName="history"
+                  isActive={route === 'История'}
+                />
+                <CustomDrawerItem
                   label={t('navigation.favorites')}
                   color={route === 'Избранное' ? theme.primary : theme.textColor}
                   onPress={() => {
@@ -230,16 +253,6 @@ const CustomDrawerContent = ({ navigation, theme, user }: CustomDrawerContentPro
                   }}
                   iconName="settings"
                   isActive={route === 'Настройки'}
-                />
-                <CustomDrawerItem
-                  label={t('navigation.game')}
-                  color={route === 'Игра' ? theme.primary : theme.textColor}
-                  onPress={() => {
-                    navigation.reset({
-                      index: 0,
-                      routes: [{name: 'Игра'}],
-                    });
-                  }}
                 />
               </View>
             </View>
