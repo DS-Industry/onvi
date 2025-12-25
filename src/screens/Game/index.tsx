@@ -46,7 +46,7 @@ const getGameHTML = () => {
             font-size: 42px;
             font-weight: bold;
             color: #fff;
-            text-shadow: 
+            text-shadow:
                 3px 3px 0px rgba(0, 0, 0, 0.5),
                 0px 0px 10px rgba(255, 215, 0, 0.5);
             z-index: 100;
@@ -144,7 +144,13 @@ const getGameHTML = () => {
     <img id="bird-sprite" src="${imagesBase64.bird}" style="display:none" />
     <img id="brush-img" src="${imagesBase64.brush}" style="display:none" />
     <img id="road-img"  src="${imagesBase64.road}"  style="display:none" />
-    
+
+    <img id="redCar" src="${imagesBase64.redCar}" style="display:none" />
+    <img id="yellowCar" src="${imagesBase64.yellowCar}" style="display:none" />
+    <img id="grayCar" src="${imagesBase64.grayCar}" style="display:none" />
+    <img id="greenCar" src="${imagesBase64.greenCar}" style="display:none" />
+    <img id="blueCar" src="${imagesBase64.blueCar}" style="display:none" />
+
     <script>
         // Beautiful Flappy Bird Game with enhanced graphics and animations
         class FlappyBirdGame {
@@ -192,10 +198,34 @@ const getGameHTML = () => {
                         speed: 0.2 + Math.random() * 0.3
                     });
                 }
-                
+
+                // Initialize cars
+                this.cars = [];
+                const carSettings = [
+                    { speed: -3, imageId: "redCar", yOffset: 20 },       
+                    { speed: 2, imageId: "yellowCar", yOffset: 45 },    
+                    { speed: 4, imageId: "grayCar", yOffset: 45 }, 
+                    { speed: -2, imageId: "greenCar", yOffset: 20 },
+                    { speed: -3.5, imageId: "blueCar", yOffset: 20 },
+                ];
+
+                carSettings.forEach((setting, index) => {
+                    this.cars.push({
+                        x: setting.speed > 0
+                            ? -100 - Math.random() * 200
+                            : this.width + 100 + Math.random() * 200,
+                        y: this.groundY - 40 + setting.yOffset, // Используем yOffset из настроек
+                        width: 60,
+                        height: 30,
+                        originalSpeed: setting.speed,
+                        speed: setting.speed,
+                        imageId: setting.imageId
+                    });
+                });
+
                 window.gameInstance = this;
             }
-            
+
             init() {
                 this.canvas = document.createElement('canvas');
                 this.canvas.width = this.width;
@@ -204,15 +234,15 @@ const getGameHTML = () => {
                 this.canvas.style.height = '100%';
                 this.canvas.style.display = 'block';
                 this.canvas.style.touchAction = 'none';
-                
+
                 const container = document.getElementById('game-container');
                 container.innerHTML = '';
                 container.appendChild(this.canvas);
-                
+
                 this.ctx = this.canvas.getContext('2d');
 
                 this.roadImg = document.getElementById('road-img');
-                
+
                 // Handle resize
                 window.addEventListener('resize', () => {
                     this.width = window.innerWidth;
@@ -220,7 +250,7 @@ const getGameHTML = () => {
                     this.canvas.width = this.width;
                     this.canvas.height = this.height;
                 });
-                
+
                 // Handle input
                 this.canvas.addEventListener('touchstart', (e) => {
                     e.preventDefault();
@@ -230,28 +260,33 @@ const getGameHTML = () => {
                     e.preventDefault();
                     this.handleTap();
                 });
-                
+
                 this.gameLoop();
             }
-            
+
             handleTap() {
-                    if (!this.gameStarted) {
-                        this.gameStarted = true;
+                if (!this.gameStarted) {
+                    this.gameStarted = true;
+                    this.cars.forEach(car => {
+                        // Для машинок с положительной скоростью: уменьшаем скорость на скорость дороги
+                        // Для машинок с отрицательной скоростью: увеличиваем отрицательную скорость на скорость дороги
+                        car.speed = car.originalSpeed - this.roadSpeed;
+                    });
                     this.bird.velocity = 0;
-                        this.spawnPipe();
+                    this.spawnPipe();
                     this.lastPipeTime = Date.now();
-                    }
-                    if (!this.gameOver) {
+                }
+                if (!this.gameOver) {
                     this.bird.velocity = this.bird.jumpPower;
                     this.sendToReactNative({ type: 'BIRD_JUMP' });
                 }
             }
-            
+
             spawnPipe() {
                 const minGap = this.pipeGap + 100;
                 const maxGap = this.height - this.pipeGap - 100;
                 const gapY = Math.random() * (maxGap - minGap) + minGap;
-                
+
                 this.pipes.push({
                     x: this.width,
                     gapY: gapY,
@@ -259,15 +294,15 @@ const getGameHTML = () => {
                     scored: false
                 });
             }
-            
+
             update() {
                 this.frameCount++;
-                
+
                 // Update bird wing animation
                 if (this.gameStarted && !this.gameOver) {
                     this.bird.wingAngle += this.bird.wingSpeed;
                 }
-                
+
                 // Update clouds
                 this.clouds.forEach(cloud => {
                     cloud.x -= cloud.speed;
@@ -275,7 +310,17 @@ const getGameHTML = () => {
                         cloud.x = this.width + cloud.size;
                     }
                 });
-                
+
+                // Update cars
+                this.cars.forEach(car => {
+                    car.x += car.speed;
+                    if (car.speed > 0 && car.x > this.width + 100) {
+                        car.x = -100;
+                    } else if (car.speed < 0 && car.x < -100) {
+                        car.x = this.width + 100;
+                    }
+                });
+
                 // Update ground scrolling
                 if (this.gameStarted && !this.gameOver) {
                     this.groundOffset -= this.roadSpeed;
@@ -283,7 +328,7 @@ const getGameHTML = () => {
                         this.groundOffset = 0;
                     }
                 }
-                
+
                 // Update particles
                 for (let i = this.particles.length - 1; i >= 0; i--) {
                     const p = this.particles[i];
@@ -295,63 +340,63 @@ const getGameHTML = () => {
                         this.particles.splice(i, 1);
                     }
                 }
-                
+
                 if (!this.gameStarted || this.gameOver) return;
-                
+
                 // Update bird
                 this.bird.velocity += this.bird.gravity;
                 this.bird.y += this.bird.velocity;
-                
+
                 // Spawn pipes
                 const now = Date.now();
                 if (now - this.lastPipeTime > this.pipeSpawnInterval) {
                     this.spawnPipe();
                     this.lastPipeTime = now;
                 }
-                
+
                 // Update pipes
                 for (let i = this.pipes.length - 1; i >= 0; i--) {
                     const pipe = this.pipes[i];
                     pipe.x -= this.pipeSpeed;
-                    
+
                     // Check scoring
                     if (!pipe.scored && pipe.x + this.pipeWidth < this.bird.x) {
                         pipe.scored = true;
                         this.addScore();
                         this.createScoreParticles(pipe.x + this.pipeWidth / 2, pipe.gapY);
                     }
-                    
+
                     // Check collision
                     if (this.checkCollision(pipe)) {
                         this.createCrashParticles();
                         this.endGame();
                         return;
                     }
-                    
+
                     // Remove off-screen pipes
                     if (pipe.x + this.pipeWidth < 0) {
                         this.pipes.splice(i, 1);
                     }
                 }
-                
+
                 // Check boundaries
                 if (this.bird.y < 0 || this.bird.y + this.bird.height > this.groundY) {
                     this.createCrashParticles();
                     this.endGame();
                 }
             }
-            
+
             checkCollision(pipe) {
                 // More precise collision detection with bird's circular shape
                 const birdCenterX = this.bird.x + this.bird.width / 2;
                 const birdCenterY = this.bird.y + this.bird.height / 2;
                 const birdRadius = Math.min(this.bird.width, this.bird.height) / 2;
-                
+
                 const pipeLeft = pipe.x;
                 const pipeRight = pipe.x + this.pipeWidth;
                 const gapTop = pipe.gapY - pipe.gapSize / 2;
                 const gapBottom = pipe.gapY + pipe.gapSize / 2;
-                
+
                 // Check if bird center is within pipe's x range
                 if (birdCenterX + birdRadius > pipeLeft && birdCenterX - birdRadius < pipeRight) {
                     // Check if bird is outside the gap (with radius consideration)
@@ -361,7 +406,7 @@ const getGameHTML = () => {
                 }
                 return false;
             }
-            
+
             drawBackground() {
                 // Sky gradient
                 const gradient = this.ctx.createLinearGradient(0, 0, 0, this.height);
@@ -371,14 +416,14 @@ const getGameHTML = () => {
                 this.ctx.fillStyle = gradient;
                 this.ctx.fillRect(0, 0, this.width, this.height);
             }
-            
+
             drawClouds() {
                 this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
                 this.clouds.forEach(cloud => {
                     this.drawCloud(cloud.x, cloud.y, cloud.size);
                 });
             }
-            
+
             drawCloud(x, y, size) {
                 this.ctx.beginPath();
                 this.ctx.arc(x, y, size * 0.5, 0, Math.PI * 2);
@@ -411,7 +456,7 @@ const getGameHTML = () => {
                     );
                 }
             }
-            
+
             drawPipes() {
                 const img = document.getElementById('brush-img');
                 if (!img) return;
@@ -437,42 +482,7 @@ const getGameHTML = () => {
                     );
                 });
             }
-            
-            drawPipe(x, y, width, height, isTop) {
-                // Pipe body gradient
-                const gradient = this.ctx.createLinearGradient(x, y, x + width, y);
-                gradient.addColorStop(0, '#2ecc71');
-                gradient.addColorStop(0.5, '#27ae60');
-                gradient.addColorStop(1, '#229954');
-                this.ctx.fillStyle = gradient;
-                this.ctx.fillRect(x, y, width, height);
-                
-                // Pipe border
-                this.ctx.strokeStyle = '#1e8449';
-                this.ctx.lineWidth = 3;
-                this.ctx.strokeRect(x, y, width, height);
-                
-                // Pipe cap
-                const capHeight = 30;
-                const capY = isTop ? y + height - capHeight : y;
-                
-                // Cap gradient
-                const capGradient = this.ctx.createLinearGradient(x, capY, x, capY + capHeight);
-                capGradient.addColorStop(0, '#229954');
-                capGradient.addColorStop(1, '#1e8449');
-                this.ctx.fillStyle = capGradient;
-                this.ctx.fillRect(x - 5, capY, width + 10, capHeight);
-                
-                // Cap border
-                this.ctx.strokeStyle = '#145a32';
-                this.ctx.lineWidth = 2;
-                this.ctx.strokeRect(x - 5, capY, width + 10, capHeight);
-                
-                // Cap highlight
-                this.ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-                this.ctx.fillRect(x - 3, capY + 2, width + 6, 8);
-            }
-            
+
             drawGround() {
                 const ctx = this.ctx;
                 const img = document.getElementById('road-img');
@@ -487,7 +497,15 @@ const getGameHTML = () => {
                 ctx.drawImage(img, 0, sy, img.width, ROAD_SRC_HEIGHT, this.groundOffset, y, img.width, ROAD_DST_HEIGHT);
                 ctx.drawImage(img, 0, sy, img.width, ROAD_SRC_HEIGHT, this.groundOffset + img.width, y, img.width, ROAD_DST_HEIGHT);
             }
-            
+
+            drawCars() {
+                this.cars.forEach(car => {
+                    const carImg = document.getElementById(car.imageId);
+                    if (!carImg) return;
+                    this.ctx.drawImage(carImg, car.x, car.y, car.width, car.height);
+                });
+            }
+
             drawBird() {
                 const birdImg = document.getElementById('bird-sprite');
                 if (!birdImg) return; // Если картинка не загружена, выходим
@@ -513,7 +531,7 @@ const getGameHTML = () => {
 
                 this.ctx.restore();
             }
-            
+
             drawParticles() {
                 this.particles.forEach(p => {
                     this.ctx.save();
@@ -525,7 +543,7 @@ const getGameHTML = () => {
                     this.ctx.restore();
                 });
             }
-            
+
             createScoreParticles(x, y) {
                 for (let i = 0; i < 10; i++) {
                     this.particles.push({
@@ -539,7 +557,7 @@ const getGameHTML = () => {
                     });
                 }
             }
-            
+
             createCrashParticles() {
                 const centerX = this.bird.x + this.bird.width / 2;
                 const centerY = this.bird.y + this.bird.height / 2;
@@ -555,16 +573,17 @@ const getGameHTML = () => {
                     });
                 }
             }
-            
+
             draw() {
                 // Draw all layers
                 this.drawBackground();
-                this.drawClouds();     
-                this.drawGround();    
-                this.drawPipes();     
-                this.drawParticles();  
-                this.drawBird(); 
-                
+                this.drawClouds();
+                this.drawGround();
+                this.drawCars();
+                this.drawPipes();
+                this.drawParticles();
+                this.drawBird();
+
                 // Draw instructions
                 if (!this.gameStarted && !this.gameOver) {
                     const pulse = Math.sin(this.frameCount * 0.1) * 0.3 + 0.7;
@@ -576,18 +595,16 @@ const getGameHTML = () => {
                     this.ctx.lineWidth = 4;
                     this.ctx.strokeText('Нажмите чтобы начать', this.width / 2, this.height / 2 - 30);
                     this.ctx.fillText('Нажмите чтобы начать', this.width / 2, this.height / 2 - 30);
-                    // this.ctx.strokeText('Tap to Fly', this.width / 2, this.height / 2 + 10);
-                    // this.ctx.fillText('Tap to Fly', this.width / 2, this.height / 2 + 10);
                     this.ctx.globalAlpha = 1;
                 }
             }
-            
+
             gameLoop() {
                 this.update();
                 this.draw();
                 this.animationId = requestAnimationFrame(() => this.gameLoop());
             }
-            
+
             addScore() {
                 this.score++;
                 const scoreDisplay = document.getElementById('score-display');
@@ -595,38 +612,40 @@ const getGameHTML = () => {
                     scoreDisplay.textContent = 'Счет: ' + this.score;
                 }
                 this.sendToReactNative({ type: 'SCORE_UPDATE', score: this.score });
-                
+
                 // Send special event when score reaches 10
                 if (this.score === 3) {
                     this.sendToReactNative({ type: 'SCORE_REACHED_10', score: this.score });
                 }
             }
-            
+
             endGame() {
                 if (this.gameOver) return;
                 this.gameOver = true;
-                
+                this.cars.forEach(car => {
+                    car.speed = car.originalSpeed;
+                });
                 const gameOverDiv = document.getElementById('game-over');
                 const finalScoreSpan = document.getElementById('final-score');
                 if (gameOverDiv && finalScoreSpan) {
                     finalScoreSpan.textContent = this.score;
                     gameOverDiv.classList.remove('hidden');
                 }
-                
+
                 this.sendToReactNative({ type: 'GAME_OVER', score: this.score });
-                
+
                 const restartBtn = document.getElementById('restart-btn');
                 if (restartBtn) {
                     restartBtn.onclick = () => this.restart();
                 }
             }
-            
+
             restart() {
                 const gameOverDiv = document.getElementById('game-over');
                 if (gameOverDiv) {
                     gameOverDiv.classList.add('hidden');
                 }
-                
+
                 this.score = 0;
                 this.gameOver = false;
                 this.gameStarted = false;
@@ -639,22 +658,22 @@ const getGameHTML = () => {
                 this.bird.wingAngle = 0;
                 this.groundOffset = 0;
                 this.frameCount = 0;
-                
+
                 const scoreDisplay = document.getElementById('score-display');
                 if (scoreDisplay) {
                     scoreDisplay.textContent = 'Счет: 0';
                 }
-                
+
                 this.sendToReactNative({ type: 'GAME_RESTART' });
             }
-            
+
             sendToReactNative(data) {
                 if (window.ReactNativeWebView) {
                     window.ReactNativeWebView.postMessage(JSON.stringify(data));
                 }
             }
         }
-        
+
         // Initialize game
         function initGame() {
             console.log('Initializing Flappy Bird game...');
@@ -666,7 +685,7 @@ const getGameHTML = () => {
                 console.error('Error initializing game:', error);
             }
         }
-        
+
         // Start game when DOM is ready
         if (document.readyState === 'complete' || document.readyState === 'interactive') {
             setTimeout(initGame, 100);
@@ -678,6 +697,7 @@ const getGameHTML = () => {
     </script>
 </body>
 </html>
+
   `;
 };
 
