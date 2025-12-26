@@ -177,7 +177,8 @@ const getGameHTML = () => {
                 this.gameOver = false;
                 this.gameStarted = false;
                 this.pipeGap = 200;
-                this.pipeWidth = 70;
+                this.brushWidth = 80;
+                this.pipeWidth = this.brushWidth;
                 this.pipeSpeed = 3;
                 this.pipeSpawnInterval = 2000;
                 this.lastPipeTime = 0;
@@ -187,7 +188,6 @@ const getGameHTML = () => {
                 this.frameCount = 0;
                 this.roadSpeed = this.pipeSpeed; // чтобы совпадала скорость
                 this.roadImg = null;
-                this.brushWidth = 90;
 
                 // Initialize clouds
                 for (let i = 0; i < 5; i++) {
@@ -457,7 +457,7 @@ const getGameHTML = () => {
                 }
             }
 
-            drawPipes() {
+             drawPipes() {
                 const img = document.getElementById('brush-img');
                 if (!img) return;
 
@@ -465,21 +465,11 @@ const getGameHTML = () => {
                     const gapTop = pipe.gapY - pipe.gapSize / 2;
                     const gapBottom = pipe.gapY + pipe.gapSize / 2;
 
-                    // 🔼 Верхняя труба
-                    this.drawBrushImage(
-                        img,
-                        pipe.x,
-                        gapTop,        // нижняя точка трубы
-                        true
-                    );
+                    // Верхняя труба (изображение щетки)
+                    this.drawBrushImage(img, pipe.x, gapTop, true);
 
-                    // 🔽 Нижняя труба
-                    this.drawBrushImage(
-                        img,
-                        pipe.x,
-                        gapBottom,     // верхняя точка трубы
-                        false
-                    );
+                    // Нижняя труба (изображение щетки)
+                    this.drawBrushImage(img, pipe.x, gapBottom, false);
                 });
             }
 
