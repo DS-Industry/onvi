@@ -40,7 +40,9 @@ export default function PortalLaunch({ isOpened, onSelect }: PortalLaunchProps) 
       }}
       style={styles.scrollView}
       nestedScrollEnabled={true}
-      scrollEnabled={isOpened}>
+      scrollEnabled={isOpened}
+      showsVerticalScrollIndicator={false}
+    >
       <View style={{ paddingBottom: verticalScale(100) }}>
         {orderDetails &&
           orderDetails.prices &&
@@ -115,8 +117,6 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     borderRadius: moderateScale(38),
-    paddingLeft: horizontalScale(22),
-    paddingRight: horizontalScale(22),
   },
   scrollView: {
     flex: 1,
