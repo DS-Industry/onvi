@@ -59,6 +59,27 @@ const getGameHTML = () => {
             border: 2px solid rgba(255, 255, 255, 0.3);
             backdrop-filter: blur(10px);
         }
+        #coins-display {
+            position: absolute;
+            top: 140px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 32px;
+            font-weight: bold;
+            color: #ffd700;
+            text-shadow:
+                2px 2px 0px rgba(0, 0, 0, 0.5),
+                0px 0px 8px rgba(255, 215, 0, 0.7);
+            z-index: 100;
+            pointer-events: none;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 165, 0, 0.2));
+            padding: 8px 20px;
+            border-radius: 12px;
+            white-space: nowrap;
+            border: 2px solid rgba(255, 215, 0, 0.4);
+            backdrop-filter: blur(10px);
+        }
         #game-over {
             position: absolute;
             top: 0;
@@ -92,7 +113,7 @@ const getGameHTML = () => {
         }
         .game-over-content p {
             font-size: 24px;
-            margin-bottom: 25px;
+            margin-bottom: 10px;
             color: rgba(255, 255, 255, 0.9);
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
         }
@@ -106,6 +127,17 @@ const getGameHTML = () => {
             background: rgba(255, 255, 255, 0.2);
             border-radius: 10px;
             margin: 10px 0;
+        }
+        #final-coins {
+            font-weight: bold;
+            color: #ffd700;
+            font-size: 28px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            margin: 5px 0 20px 0;
         }
         #restart-btn {
             padding: 18px 40px;
@@ -134,16 +166,19 @@ const getGameHTML = () => {
 <body>
     <div id="game-container"></div>
     <div id="score-display">Счет: 0</div>
+    <div id="coins-display">Монеты: 0</div>
     <div id="game-over" class="hidden">
         <div class="game-over-content">
             <h2>Игра окончена!</h2>
             <p>Итого: <span id="final-score">0</span></p>
+            <p>Монеты: <span id="final-coins">0</span></p>
             <button id="restart-btn">Переиграть</button>
         </div>
     </div>
     <img id="bird-sprite" src="${imagesBase64.bird}" style="display:none" />
     <img id="brush-img" src="${imagesBase64.brush}" style="display:none" />
     <img id="road-img"  src="${imagesBase64.road}"  style="display:none" />
+    <img id="coin-img" src="${imagesBase64.coin}" style="display:none" />
 
     <img id="redCar" src="${imagesBase64.redCar}" style="display:none" />
     <img id="yellowCar" src="${imagesBase64.yellowCar}" style="display:none" />
@@ -152,7 +187,6 @@ const getGameHTML = () => {
     <img id="blueCar" src="${imagesBase64.blueCar}" style="display:none" />
 
     <script>
-        // Beautiful Flappy Bird Game with enhanced graphics and animations
         class FlappyBirdGame {
             constructor() {
                 this.canvas = null;
@@ -171,23 +205,35 @@ const getGameHTML = () => {
                     wingSpeed: 0.3
                 };
                 this.pipes = [];
+                this.coins = [];
                 this.clouds = [];
                 this.particles = [];
                 this.score = 0;
+                this.coinsCount = 0;
                 this.gameOver = false;
                 this.gameStarted = false;
                 this.pipeGap = 200;
-                this.brushWidth = 80;
+                this.brushWidth = 90;
                 this.pipeWidth = this.brushWidth;
                 this.pipeSpeed = 3;
-                this.pipeSpawnInterval = 2000;
+                this.pipeSpawnInterval = 2000; // 2 секунды
                 this.lastPipeTime = 0;
                 this.animationId = null;
                 this.groundY = this.height - 80;
                 this.groundOffset = 0;
                 this.frameCount = 0;
-                this.roadSpeed = this.pipeSpeed; // чтобы совпадала скорость
+                this.roadSpeed = this.pipeSpeed;
                 this.roadImg = null;
+                
+                // Параметры для синусоиды монет
+                this.coinSize = 25;
+                this.coinSpacing = 35;
+                this.coinWaveAmplitude = 40;
+                this.coinWaveFrequency = 0.02;
+                this.coinPhase = 0;
+                this.coinRotationSpeed = 0.05;
+                this.coinFloatAmplitude = 3;
+                this.coinFloatSpeed = 0.05;
 
                 // Initialize clouds
                 for (let i = 0; i < 5; i++) {
@@ -214,7 +260,7 @@ const getGameHTML = () => {
                         x: setting.speed > 0
                             ? -100 - Math.random() * 200
                             : this.width + 100 + Math.random() * 200,
-                        y: this.groundY - 40 + setting.yOffset, // Используем yOffset из настроек
+                        y: this.groundY - 40 + setting.yOffset,
                         width: 60,
                         height: 30,
                         originalSpeed: setting.speed,
@@ -268,12 +314,12 @@ const getGameHTML = () => {
                 if (!this.gameStarted) {
                     this.gameStarted = true;
                     this.cars.forEach(car => {
-                        // Для машинок с положительной скоростью: уменьшаем скорость на скорость дороги
-                        // Для машинок с отрицательной скоростью: увеличиваем отрицательную скорость на скорость дороги
                         car.speed = car.originalSpeed - this.roadSpeed;
                     });
                     this.bird.velocity = 0;
-                    this.spawnPipe();
+                    
+                    // Создаем первые две трубы сразу
+                    this.spawnInitialPipes();
                     this.lastPipeTime = Date.now();
                 }
                 if (!this.gameOver) {
@@ -282,21 +328,192 @@ const getGameHTML = () => {
                 }
             }
 
-            spawnPipe() {
+            spawnInitialPipes() {
+                // Создаем первую трубу
+                const firstPipe = this.createPipe(this.width);
+                this.pipes.push(firstPipe);
+                
+                // Создаем вторую трубу на расстоянии
+                const distanceBetweenPipes = this.pipeSpeed * (this.pipeSpawnInterval / 1000 * 60);
+                const secondPipe = this.createPipe(this.width + distanceBetweenPipes);
+                this.pipes.push(secondPipe);
+                
+                // Создаем монеты для всего пути (от птицы до второй трубы)
+                this.createCoinsForInitialPath();
+            }
+            
+            createPipe(x) {
                 const minGap = this.pipeGap + 100;
                 const maxGap = this.height - this.pipeGap - 100;
                 const gapY = Math.random() * (maxGap - minGap) + minGap;
 
-                this.pipes.push({
-                    x: this.width,
+                return {
+                    x: x,
                     gapY: gapY,
                     gapSize: this.pipeGap,
-                    scored: false
-                });
+                    scored: false,
+                    coinsCreated: true
+                };
+            }
+            
+            createCoinsForInitialPath() {
+                if (this.pipes.length < 2) return;
+                
+                const firstPipe = this.pipes[0];
+                const secondPipe = this.pipes[1];
+                
+                // Начало пути - от птицы или немного впереди птицы
+                let startX = Math.max(this.bird.x + 150, firstPipe.x - 400);
+                const endX = secondPipe.x;
+                
+                // Не создаем монеты, если расстояние слишком маленькое
+                if (endX - startX <= 0) return;
+                
+                const distance = endX - startX;
+                const coinCount = Math.floor(distance / this.coinSpacing);
+                
+                // Создаем монеты между началом и второй трубой
+                for (let i = 0; i < coinCount; i++) {
+                    const x = startX + i * this.coinSpacing;
+                    const progress = i / (coinCount - 1 || 1);
+                    
+                    // Интерполируем высоту между птицей и второй трубой
+                    let targetY;
+                    if (i < coinCount / 2) {
+                        // Первая половина монет: интерполируем от птицы к первой трубе
+                        const firstHalfProgress = (i / (coinCount / 2)) * 2;
+                        targetY = this.bird.y + (firstPipe.gapY - this.bird.y) * Math.min(firstHalfProgress, 1);
+                    } else {
+                        // Вторая половина монет: интерполируем от первой трубы ко второй
+                        const secondHalfProgress = ((i - coinCount / 2) / (coinCount / 2)) * 2;
+                        targetY = firstPipe.gapY + (secondPipe.gapY - firstPipe.gapY) * Math.min(secondHalfProgress, 1);
+                    }
+                    
+                    // Синусоидальное смещение
+                    const sinOffset = this.coinWaveAmplitude * Math.sin(
+                        this.coinWaveFrequency * x + this.coinPhase
+                    );
+                    
+                    const y = targetY + sinOffset;
+                    
+                    // Проверяем границы
+                    if (y < 50 || y > this.height - 150) continue;
+                    
+                    // Проверяем, нет ли уже монеты в этой позиции
+                    const isOverlap = this.coins.some(coin => 
+                        Math.abs(coin.x - x) < this.coinSpacing / 2 && 
+                        Math.abs(coin.y - y) < this.coinSpacing / 2
+                    );
+                    
+                    if (isOverlap) continue;
+                    
+                    this.coins.push({
+                        x: x,
+                        y: y,
+                        originalY: y,
+                        width: this.coinSize,
+                        height: this.coinSize,
+                        collected: false,
+                        rotation: Math.random() * Math.PI * 2,
+                        rotationSpeed: 0.05 + Math.random() * 0.03,
+                        floatOffset: Math.random() * Math.PI * 2,
+                        amplitude: 2 + Math.random() * 3
+                    });
+                }
+            }
+
+            spawnPipe() {
+                // Создаем новую трубу
+                const minGap = this.pipeGap + 100;
+                const maxGap = this.height - this.pipeGap - 100;
+                const gapY = Math.random() * (maxGap - minGap) + minGap;
+
+                // Позиция новой трубы - после последней существующей
+                const lastPipe = this.pipes.length > 0 ? 
+                    this.pipes[this.pipes.length - 1] : 
+                    { x: this.width };
+                
+                // Дистанция между трубами
+                const distanceBetweenPipes = this.pipeSpeed * (this.pipeSpawnInterval / 1000 * 60);
+                
+                const pipe = {
+                    x: lastPipe.x + distanceBetweenPipes,
+                    gapY: gapY,
+                    gapSize: this.pipeGap,
+                    scored: false,
+                    coinsCreated: true
+                };
+                
+                this.pipes.push(pipe);
+                
+                // Создаем монеты между предыдущей и новой трубой
+                this.createCoinsBetweenPipes();
+                
+                return pipe;
+            }
+            
+            createCoinsBetweenPipes() {
+                if (this.pipes.length < 2) return;
+                
+                const prevPipe = this.pipes[this.pipes.length - 2];
+                const currentPipe = this.pipes[this.pipes.length - 1];
+                
+                // Начинаем от предыдущей трубы, заканчиваем на текущей
+                const startX = prevPipe.x + this.brushWidth;
+                const endX = currentPipe.x;
+                
+                // Не создаем монеты, если расстояние слишком маленькое
+                if (endX - startX <= 0) return;
+                
+                const distance = endX - startX;
+                const coinCount = Math.floor(distance / this.coinSpacing);
+                
+                // Создаем монеты между трубами
+                for (let i = 0; i < coinCount; i++) {
+                    const x = startX + i * this.coinSpacing;
+                    const progress = i / (coinCount - 1 || 1);
+                    
+                    // Интерполируем высоту между трубами
+                    const targetY = prevPipe.gapY + (currentPipe.gapY - prevPipe.gapY) * progress;
+                    
+                    // Синусоидальное смещение
+                    const sinOffset = this.coinWaveAmplitude * Math.sin(
+                        this.coinWaveFrequency * x + this.coinPhase
+                    );
+                    
+                    const y = targetY + sinOffset;
+                    
+                    // Проверяем границы
+                    if (y < 50 || y > this.height - 150) continue;
+                    
+                    // Проверяем, нет ли уже монеты в этой позиции
+                    const isOverlap = this.coins.some(coin => 
+                        Math.abs(coin.x - x) < this.coinSpacing / 2 && 
+                        Math.abs(coin.y - y) < this.coinSpacing / 2
+                    );
+                    
+                    if (isOverlap) continue;
+                    
+                    this.coins.push({
+                        x: x,
+                        y: y,
+                        originalY: y,
+                        width: this.coinSize,
+                        height: this.coinSize,
+                        collected: false,
+                        rotation: Math.random() * Math.PI * 2,
+                        rotationSpeed: 0.05 + Math.random() * 0.03,
+                        floatOffset: Math.random() * Math.PI * 2,
+                        amplitude: 2 + Math.random() * 3
+                    });
+                }
             }
 
             update() {
                 this.frameCount++;
+                
+                // Обновляем фазу синусоиды для анимации волны
+                this.coinPhase += 0.02;
 
                 // Update bird wing animation
                 if (this.gameStarted && !this.gameOver) {
@@ -334,12 +551,27 @@ const getGameHTML = () => {
                     const p = this.particles[i];
                     p.x += p.vx;
                     p.y += p.vy;
-                    p.vy += 0.1; // gravity
+                    p.vy += 0.1;
                     p.life--;
                     if (p.life <= 0) {
                         this.particles.splice(i, 1);
                     }
                 }
+                
+                // Update coins
+                this.coins.forEach(coin => {
+                    if (!coin.collected) {
+                        // Двигаем монетку вместе с миром
+                        coin.x -= this.pipeSpeed;
+                        
+                        // Обновляем вращение
+                        coin.rotation += coin.rotationSpeed;
+                        
+                        // Обновляем плавающую анимацию
+                        coin.currentY = coin.originalY + 
+                                      Math.sin(this.frameCount * this.coinFloatSpeed + coin.floatOffset) * coin.amplitude;
+                    }
+                });
 
                 if (!this.gameStarted || this.gameOver) return;
 
@@ -347,7 +579,7 @@ const getGameHTML = () => {
                 this.bird.velocity += this.bird.gravity;
                 this.bird.y += this.bird.velocity;
 
-                // Spawn pipes
+                // Spawn pipes каждые 2 секунды
                 const now = Date.now();
                 if (now - this.lastPipeTime > this.pipeSpawnInterval) {
                     this.spawnPipe();
@@ -378,6 +610,22 @@ const getGameHTML = () => {
                         this.pipes.splice(i, 1);
                     }
                 }
+                
+                // Проверяем столкновение с монетками
+                for (let i = this.coins.length - 1; i >= 0; i--) {
+                    const coin = this.coins[i];
+                    
+                    if (!coin.collected && this.checkCoinCollision(coin)) {
+                        coin.collected = true;
+                        this.collectCoin(coin);
+                        this.coins.splice(i, 1);
+                    }
+                    
+                    // Удаляем монеты, которые вышли за экран
+                    if (coin.x + coin.width < 0) {
+                        this.coins.splice(i, 1);
+                    }
+                }
 
                 // Check boundaries
                 if (this.bird.y < 0 || this.bird.y + this.bird.height > this.groundY) {
@@ -385,9 +633,52 @@ const getGameHTML = () => {
                     this.endGame();
                 }
             }
+            
+            checkCoinCollision(coin) {
+                const bird = this.bird;
+                const coinY = coin.currentY || coin.y;
+                
+                return bird.x < coin.x + coin.width &&
+                       bird.x + bird.width > coin.x &&
+                       bird.y < coinY + coin.height &&
+                       bird.y + bird.height > coinY;
+            }
+            
+            collectCoin(coin) {
+                this.coinsCount++;
+                
+                const coinsDisplay = document.getElementById('coins-display');
+                if (coinsDisplay) {
+                    coinsDisplay.textContent = 'Монеты: ' + this.coinsCount;
+                }
+                
+                this.createCoinParticles(coin.x + coin.width / 2, coin.y + coin.height / 2);
+                
+                this.sendToReactNative({ 
+                    type: 'COIN_COLLECTED', 
+                    coins: this.coinsCount 
+                });
+            }
+            
+            createCoinParticles(x, y) {
+                for (let i = 0; i < 15; i++) {
+                    const angle = (i / 15) * Math.PI * 2;
+                    const speed = 2 + Math.random() * 3;
+                    
+                    this.particles.push({
+                        x: x,
+                        y: y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        size: 2 + Math.random() * 3,
+                        color: ['#FFD700', '#FFEC8B', '#FFFACD'][Math.floor(Math.random() * 3)],
+                        life: 20 + Math.random() * 20,
+                        gravity: 0.05
+                    });
+                }
+            }
 
             checkCollision(pipe) {
-                // More precise collision detection with bird's circular shape
                 const birdCenterX = this.bird.x + this.bird.width / 2;
                 const birdCenterY = this.bird.y + this.bird.height / 2;
                 const birdRadius = Math.min(this.bird.width, this.bird.height) / 2;
@@ -397,9 +688,7 @@ const getGameHTML = () => {
                 const gapTop = pipe.gapY - pipe.gapSize / 2;
                 const gapBottom = pipe.gapY + pipe.gapSize / 2;
 
-                // Check if bird center is within pipe's x range
                 if (birdCenterX + birdRadius > pipeLeft && birdCenterX - birdRadius < pipeRight) {
-                    // Check if bird is outside the gap (with radius consideration)
                     if (birdCenterY - birdRadius < gapTop || birdCenterY + birdRadius > gapBottom) {
                         return true;
                     }
@@ -408,7 +697,6 @@ const getGameHTML = () => {
             }
 
             drawBackground() {
-                // Sky gradient
                 const gradient = this.ctx.createLinearGradient(0, 0, 0, this.height);
                 gradient.addColorStop(0, '#87CEEB');
                 gradient.addColorStop(0.7, '#70c5ce');
@@ -457,7 +745,7 @@ const getGameHTML = () => {
                 }
             }
 
-             drawPipes() {
+            drawPipes() {
                 const img = document.getElementById('brush-img');
                 if (!img) return;
 
@@ -465,11 +753,46 @@ const getGameHTML = () => {
                     const gapTop = pipe.gapY - pipe.gapSize / 2;
                     const gapBottom = pipe.gapY + pipe.gapSize / 2;
 
-                    // Верхняя труба (изображение щетки)
                     this.drawBrushImage(img, pipe.x, gapTop, true);
-
-                    // Нижняя труба (изображение щетки)
                     this.drawBrushImage(img, pipe.x, gapBottom, false);
+                });
+            }
+            
+            drawCoins() {
+                const coinImg = document.getElementById('coin-img');
+                if (!coinImg) return;
+
+                this.coins.forEach(coin => {
+                    if (!coin.collected) {
+                        this.ctx.save();
+                        
+                        const drawX = coin.x + coin.width / 2;
+                        const drawY = (coin.currentY || coin.y) + coin.height / 2;
+                        
+                        this.ctx.translate(drawX, drawY);
+                        this.ctx.rotate(coin.rotation);
+                        
+                        this.ctx.drawImage(
+                            coinImg,
+                            -coin.width / 2,
+                            -coin.height / 2,
+                            coin.width,
+                            coin.height
+                        );
+                        
+                        this.ctx.beginPath();
+                        this.ctx.arc(0, 0, coin.width / 2, 0, Math.PI * 2);
+                        const gradient = this.ctx.createRadialGradient(
+                            0, 0, 0,
+                            0, 0, coin.width / 2
+                        );
+                        gradient.addColorStop(0, 'rgba(255, 255, 255, 0.3)');
+                        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                        this.ctx.fillStyle = gradient;
+                        this.ctx.fill();
+                        
+                        this.ctx.restore();
+                    }
                 });
             }
 
@@ -483,7 +806,6 @@ const getGameHTML = () => {
                 const sy = img.height - ROAD_SRC_HEIGHT;
                 const y = this.height - ROAD_DST_HEIGHT;
 
-                // Рисуем дорогу дважды для плавности
                 ctx.drawImage(img, 0, sy, img.width, ROAD_SRC_HEIGHT, this.groundOffset, y, img.width, ROAD_DST_HEIGHT);
                 ctx.drawImage(img, 0, sy, img.width, ROAD_SRC_HEIGHT, this.groundOffset + img.width, y, img.width, ROAD_DST_HEIGHT);
             }
@@ -498,9 +820,8 @@ const getGameHTML = () => {
 
             drawBird() {
                 const birdImg = document.getElementById('bird-sprite');
-                if (!birdImg) return; // Если картинка не загружена, выходим
+                if (!birdImg) return;
 
-                // Поворачиваем птицу в зависимости от скорости падения
                 const birdAngle = Math.min(Math.max(this.bird.velocity * 2.5, -25), 70);
 
                 this.ctx.save();
@@ -510,13 +831,12 @@ const getGameHTML = () => {
                 );
                 this.ctx.rotate(birdAngle * Math.PI / 180);
 
-                // Рисуем картинку
                 this.ctx.drawImage(
                     birdImg,
-                    -this.bird.width / 2, // Центрируем по X
-                    -this.bird.height / 2, // Центрируем по Y
-                    this.bird.width, // Ширина
-                    this.bird.height  // Высота
+                    -this.bird.width / 2,
+                    -this.bird.height / 2,
+                    this.bird.width,
+                    this.bird.height
                 );
 
                 this.ctx.restore();
@@ -565,16 +885,15 @@ const getGameHTML = () => {
             }
 
             draw() {
-                // Draw all layers
                 this.drawBackground();
                 this.drawClouds();
                 this.drawGround();
                 this.drawCars();
                 this.drawPipes();
+                this.drawCoins();
                 this.drawParticles();
                 this.drawBird();
 
-                // Draw instructions
                 if (!this.gameStarted && !this.gameOver) {
                     const pulse = Math.sin(this.frameCount * 0.1) * 0.3 + 0.7;
                     this.ctx.globalAlpha = pulse;
@@ -603,7 +922,6 @@ const getGameHTML = () => {
                 }
                 this.sendToReactNative({ type: 'SCORE_UPDATE', score: this.score });
 
-                // Send special event when score reaches 10
                 if (this.score === 3) {
                     this.sendToReactNative({ type: 'SCORE_REACHED_10', score: this.score });
                 }
@@ -615,14 +933,22 @@ const getGameHTML = () => {
                 this.cars.forEach(car => {
                     car.speed = car.originalSpeed;
                 });
+                
                 const gameOverDiv = document.getElementById('game-over');
                 const finalScoreSpan = document.getElementById('final-score');
-                if (gameOverDiv && finalScoreSpan) {
+                const finalCoinsSpan = document.getElementById('final-coins');
+                
+                if (gameOverDiv && finalScoreSpan && finalCoinsSpan) {
                     finalScoreSpan.textContent = this.score;
+                    finalCoinsSpan.textContent = this.coinsCount;
                     gameOverDiv.classList.remove('hidden');
                 }
 
-                this.sendToReactNative({ type: 'GAME_OVER', score: this.score });
+                this.sendToReactNative({ 
+                    type: 'GAME_OVER', 
+                    score: this.score,
+                    coins: this.coinsCount 
+                });
 
                 const restartBtn = document.getElementById('restart-btn');
                 if (restartBtn) {
@@ -637,10 +963,12 @@ const getGameHTML = () => {
                 }
 
                 this.score = 0;
+                this.coinsCount = 0;
                 this.gameOver = false;
                 this.gameStarted = false;
                 this.lastPipeTime = 0;
                 this.pipes = [];
+                this.coins = [];
                 this.particles = [];
                 this.bird.x = 100;
                 this.bird.y = this.height / 2;
@@ -648,10 +976,15 @@ const getGameHTML = () => {
                 this.bird.wingAngle = 0;
                 this.groundOffset = 0;
                 this.frameCount = 0;
+                this.coinPhase = 0;
 
                 const scoreDisplay = document.getElementById('score-display');
+                const coinsDisplay = document.getElementById('coins-display');
                 if (scoreDisplay) {
                     scoreDisplay.textContent = 'Счет: 0';
+                }
+                if (coinsDisplay) {
+                    coinsDisplay.textContent = 'Монеты: 0';
                 }
 
                 this.sendToReactNative({ type: 'GAME_RESTART' });
@@ -664,7 +997,6 @@ const getGameHTML = () => {
             }
         }
 
-        // Initialize game
         function initGame() {
             console.log('Initializing Flappy Bird game...');
             try {
@@ -676,7 +1008,6 @@ const getGameHTML = () => {
             }
         }
 
-        // Start game when DOM is ready
         if (document.readyState === 'complete' || document.readyState === 'interactive') {
             setTimeout(initGame, 100);
         } else {
@@ -687,7 +1018,6 @@ const getGameHTML = () => {
     </script>
 </body>
 </html>
-
   `;
 };
 
@@ -828,4 +1158,3 @@ const styles = StyleSheet.create({
 });
 
 export { Game };
-
