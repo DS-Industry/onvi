@@ -82,7 +82,7 @@ android {
         applicationId "com.onvimobile"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 14
+        versionCode 15
         versionName "2.2"
         
         resValue 'string', 'build_config_package','com.onvimobile'
