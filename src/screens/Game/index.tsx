@@ -177,7 +177,7 @@ const getGameHTML = () => {
                 this.gameOver = false;
                 this.gameStarted = false;
                 this.pipeGap = 200;
-                this.brushWidth = 80;
+                this.brushWidth = 90;
                 this.pipeWidth = this.brushWidth;
                 this.pipeSpeed = 3;
                 this.pipeSpawnInterval = 2000;
