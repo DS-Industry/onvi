@@ -21,9 +21,9 @@ class MainActivity : ReactActivity() {
       RNBranchModule.initSession(intent.data, this)
   }
 
-  override fun onNewIntent(intent: Intent?) {
-      super.onNewIntent(intent)
-      setIntent(intent)
-      RNBranchModule.reInitSession(this)
+  override fun onNewIntent(intent: Intent) {
+    super.onNewIntent(intent)
+    setIntent(intent)
+    RNBranchModule.reInitSession(this)  
   }
 }
