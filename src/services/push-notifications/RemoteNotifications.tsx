@@ -4,6 +4,7 @@ import messaging, {
 } from '@react-native-firebase/messaging';
 import useStore from '../../state/store.ts';
 import {DdLogs} from '@datadog/mobile-react-native';
+import { Platform } from 'react-native';
 
 const RemoteNotifications = () => {
   const [isEnabled, setIsEnabled] = useState(false);
@@ -60,12 +61,19 @@ const RemoteNotifications = () => {
 
   useEffect(() => {
     async function setupNotifications() {
-      const granted = await checkNotificationPermissionStatus();
-      if (granted) {
-        setIsEnabled(true);
-        await getDeviceToken();
-      } else {
-        await requestUserPermission();
+      try {
+        const granted = await checkNotificationPermissionStatus();
+        if (granted) {
+          setIsEnabled(true);
+          if (Platform.OS === 'ios') {
+            await messaging().registerDeviceForRemoteMessages();
+          }
+          await getDeviceToken();
+        } else {
+          await requestUserPermission();
+        }
+      } catch (error) {
+        DdLogs.error('Ошибка setupNotifications', { error: error.message });
       }
     }
     setupNotifications();
