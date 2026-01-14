@@ -65,19 +65,19 @@ const Map = forwardRef<CameraReference, any>(({ userLocationRef }: any, ref) => 
     () =>
       posList && posList.length
         ? posList.map(businessItem => (
-          <Marker
-            key={`${businessItem.carwashes[0].id}-${businessItem.location.lat}-${businessItem.location.lon}`}
-            coordinate={[
-              businessItem.location.lon,
-              businessItem.location.lat,
-            ]}
-            locationRef={userLocationRef}
-            business={businessItem}
-            isSelected={
-              businessItem.carwashes[0].id === business?.carwashes[0].id
-            }
-          />
-        ))
+            <Marker
+              key={`${businessItem.carwashes[0].id}-${businessItem.location.lat}-${businessItem.location.lon}`}
+              coordinate={[
+                businessItem.location.lon,
+                businessItem.location.lat,
+              ]}
+              locationRef={userLocationRef}
+              business={businessItem}
+              isSelected={
+                businessItem.carwashes[0].id === business?.carwashes[0].id
+              }
+            />
+          ))
         : [],
     [posList, business],
   );
@@ -117,7 +117,7 @@ const Map = forwardRef<CameraReference, any>(({ userLocationRef }: any, ref) => 
           location.longitude,
           location.latitude,
         ],
-        zoomLevel: 14,
+        zoomLevel: 16,
         pitch: 1,
         animationMode: 'flyTo',
         animationDuration: 2000,
@@ -146,6 +146,22 @@ const Map = forwardRef<CameraReference, any>(({ userLocationRef }: any, ref) => 
         }
 
         setLocation({ latitude: lat, longitude: lon });
+
+        if (cameraRef.current) {
+          cameraRef.current.setCamera({
+            centerCoordinate: [lon, lat],
+            zoomLevel: 16,
+            pitch: 1,
+            animationMode: 'flyTo',
+            animationDuration: 1000,
+            padding: {
+              paddingLeft: 0,
+              paddingRight: 0,
+              paddingTop: 0,
+              paddingBottom: 300,
+            },
+          });
+        }
       }, 1000),
     [setLocation, locationFound],
   );
