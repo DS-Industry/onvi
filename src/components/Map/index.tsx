@@ -5,17 +5,15 @@ import React, {
   useImperativeHandle,
   forwardRef,
   useCallback,
-  useRef,
 } from 'react';
-import {View, Dimensions, Platform, PermissionsAndroid, Image} from 'react-native';
-import MapboxGL, {UserLocation} from '@rnmapbox/maps';
+import { View, Dimensions, Platform, PermissionsAndroid, Image } from 'react-native';
+import MapboxGL, { UserLocation } from '@rnmapbox/maps';
 import Marker from './Marker';
 import useStore from '../../state/store.ts';
 import useSWR from 'swr';
-import {getPOSList} from '@services/api/pos';
-import {throttle} from 'lodash';
+import { getPOSList } from '@services/api/pos';
+import { throttle } from 'lodash';
 import { CameraRef } from 'node_modules/@rnmapbox/maps/lib/typescript/src/components/Camera';
-import { CarWash, Location } from '@app-types/api/app/types.ts';
 import { dp } from '@utils/dp.ts';
 
 export type CameraReference = {
@@ -32,18 +30,19 @@ const DEFAULT_LOCATION = {
   latitude: 55.751244,
 };
 
+let globalShouldAutoSetCamera = true;
 
-const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
+const Map = forwardRef<CameraReference, any>(({ userLocationRef }: any, ref) => {
   const {
-    posList, 
-    setPosList, 
-    location, 
-    setLocation, 
-    business, 
-    setOriginalPosList, 
+    posList,
+    setPosList,
+    location,
+    setLocation,
+    business,
+    setOriginalPosList,
   } = useStore.getState();
-  
-  const {data, error} = useSWR('getPOSList', () => getPOSList({}), {
+
+  const { data, error } = useSWR('getPOSList', () => getPOSList({}), {
     revalidateOnFocus: false,
     shouldRetryOnError: true,
     errorRetryCount: 3,
@@ -53,8 +52,7 @@ const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
 
   const cameraRef = React.useRef<CameraRef>(null);
   const [hasLocationPermission, setHasLocationPermission] = useState(false);
-  
-  const shouldAutoSetCameraRef = useRef(true);
+
 
   useEffect(() => {
     if (data && data.businessesLocations) {
@@ -67,19 +65,19 @@ const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
     () =>
       posList && posList.length
         ? posList.map(businessItem => (
-            <Marker
-              key={`${businessItem.carwashes[0].id}-${businessItem.location.lat}-${businessItem.location.lon}`}
-              coordinate={[
-                businessItem.location.lon,
-                businessItem.location.lat,
-              ]}
-              locationRef={userLocationRef}
-              business={businessItem}
-              isSelected={
-                businessItem.carwashes[0].id === business?.carwashes[0].id
-              }
-            />
-          ))
+          <Marker
+            key={`${businessItem.carwashes[0].id}-${businessItem.location.lat}-${businessItem.location.lon}`}
+            coordinate={[
+              businessItem.location.lon,
+              businessItem.location.lat,
+            ]}
+            locationRef={userLocationRef}
+            business={businessItem}
+            isSelected={
+              businessItem.carwashes[0].id === business?.carwashes[0].id
+            }
+          />
+        ))
         : [],
     [posList, business],
   );
@@ -91,14 +89,12 @@ const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
           const granted = await PermissionsAndroid.request(
             PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
           );
-          if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-            setHasLocationPermission(true);
-          }
+          const hasPermission = granted === PermissionsAndroid.RESULTS.GRANTED;
+          setHasLocationPermission(hasPermission);
         } else {
           setHasLocationPermission(true);
         }
       } catch (err) {
-        console.error("Location permission error:", err);
       }
     };
 
@@ -106,14 +102,20 @@ const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
   }, []);
 
   useEffect(() => {
-    if (shouldAutoSetCameraRef.current && hasLocationPermission && locationFound && location) {
-      
-      shouldAutoSetCameraRef.current = false;
-      
+    const hasValidLocation = location &&
+      location.latitude !== undefined &&
+      location.longitude !== undefined &&
+      !isNaN(location.latitude) &&
+      !isNaN(location.longitude);
+
+    if (globalShouldAutoSetCamera && hasLocationPermission && locationFound && hasValidLocation) {
+
+      globalShouldAutoSetCamera = false;
+
       cameraRef.current?.setCamera({
         centerCoordinate: [
-          location?.longitude ?? DEFAULT_LOCATION.longitude,
-          location?.latitude ?? DEFAULT_LOCATION.latitude,
+          location.longitude,
+          location.latitude,
         ],
         zoomLevel: 14,
         pitch: 1,
@@ -126,20 +128,26 @@ const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
           paddingBottom: 300,
         },
       });
-      
+
     }
   }, [hasLocationPermission, locationFound, location]);
 
   const onUserLocationUpdateThrottled = useMemo(
     () =>
-      throttle(userLocation => {
+      throttle((userLocation) => {
+        const { latitude: lat, longitude: lon } = userLocation.coords;
+
+        if (lat === undefined || lon === undefined) {
+          return;
+        }
+
         if (!locationFound) {
           setLocationFound(true);
         }
-        const {latitude: lat, longitude: lon} = userLocation.coords;        
-        setLocation({latitude: lat, longitude: lon});
+
+        setLocation({ latitude: lat, longitude: lon });
       }, 1000),
-    [setLocation, locationFound], 
+    [setLocation, locationFound],
   );
 
   const setCameraPosition = useCallback((val?: {
@@ -148,24 +156,24 @@ const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
     zoomLevel?: number;
     animationDuration?: number;
   }) => {
-    shouldAutoSetCameraRef.current = false;
-    
+    globalShouldAutoSetCamera = false;
+
     requestAnimationFrame(() => {
       const currentLocation = useStore.getState().location;
-      
-      const targetLongitude = val?.longitude !== undefined 
-        ? val.longitude 
+
+      const targetLongitude = val?.longitude !== undefined
+        ? val.longitude
         : (currentLocation?.longitude ?? DEFAULT_LOCATION.longitude);
-      
+
       const targetLatitude = val?.latitude !== undefined
         ? val.latitude
         : (currentLocation?.latitude ?? DEFAULT_LOCATION.latitude);
+        
 
-      
       if (!cameraRef.current) {
         return;
       }
-      
+
       cameraRef.current.setCamera({
         centerCoordinate: [targetLongitude, targetLatitude],
         zoomLevel: val?.zoomLevel ?? 16,
@@ -194,7 +202,7 @@ const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
         position: 'absolute',
       }}>
       <MapboxGL.MapView
-        style={{flex: 1}}
+        style={{ flex: 1 }}
         zoomEnabled={true}
         scaleBarEnabled={false}
         styleURL={'mapbox://styles/mapbox/light-v11'}
@@ -208,8 +216,8 @@ const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
           animationDuration={4000}
           followUserLocation={false}
           centerCoordinate={[
-            DEFAULT_LOCATION.longitude,
-            DEFAULT_LOCATION.latitude,
+            location?.longitude ?? DEFAULT_LOCATION.longitude,
+            location?.latitude ?? DEFAULT_LOCATION.latitude,
           ]}
         />
         <UserLocation
@@ -238,7 +246,7 @@ const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
             },
           }),
         }}
-        >
+      >
         <Image
           source={require('../../assets/images/garland.webp')}
           style={{
@@ -248,7 +256,7 @@ const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
           }}
         />
       </View>
-      
+
       {business && (
         <View
           style={{
@@ -266,4 +274,4 @@ const Map = forwardRef<CameraReference, any>(({userLocationRef}: any, ref) => {
   );
 });
 
-export {Map};
+export { Map };
