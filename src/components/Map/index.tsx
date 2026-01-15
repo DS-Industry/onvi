@@ -54,38 +54,30 @@ const Map = forwardRef<CameraReference, any>(({ userLocationRef }: any, ref) => 
   // Инициализация начальной позиции камеры
   const [initialCameraPosition, setInitialCameraPosition] = useState<[number, number]>(() => {
     const savedLocation = useStore.getState().location;
-    
-    // Полная проверка валидности сохраненной локации
-    const isValidLocation = savedLocation && 
-      savedLocation.latitude !== undefined && 
-      savedLocation.longitude !== undefined &&
-      savedLocation.latitude !== null && 
-      savedLocation.longitude !== null &&
-      typeof savedLocation.latitude === 'number' && 
-      typeof savedLocation.longitude === 'number' &&
-      !isNaN(savedLocation.latitude) && 
-      !isNaN(savedLocation.longitude) &&
-      Math.abs(savedLocation.latitude) <= 90 &&
-      Math.abs(savedLocation.longitude) <= 180;
-    
-    if (isValidLocation) {
-      return [savedLocation.longitude, savedLocation.latitude];
-    } else {
-      return [DEFAULT_LOCATION.longitude, DEFAULT_LOCATION.latitude];
+
+    const isLatitudeValid = Number.isFinite(savedLocation?.latitude);
+    const isLongitudeValid = Number.isFinite(savedLocation?.longitude);
+
+    if (isLatitudeValid && isLongitudeValid && savedLocation) {
+      const isValidRange = Math.abs(savedLocation.latitude) <= 90 &&
+        Math.abs(savedLocation.longitude) <= 180;
+
+      if (isValidRange) {
+        return [savedLocation.longitude, savedLocation.latitude];
+      }
     }
+
+    return [DEFAULT_LOCATION.longitude, DEFAULT_LOCATION.latitude];
   });
 
   const shouldAutoSetCameraRef = useRef(true);
 
-  // Защита от невалидных координатов
   useEffect(() => {
-    if (!initialCameraPosition || 
-        !Array.isArray(initialCameraPosition) || 
-        initialCameraPosition.length !== 2 ||
-        typeof initialCameraPosition[0] !== 'number' ||
-        typeof initialCameraPosition[1] !== 'number' ||
-        isNaN(initialCameraPosition[0]) ||
-        isNaN(initialCameraPosition[1])) {
+    if (!initialCameraPosition ||
+      !Array.isArray(initialCameraPosition) ||
+      initialCameraPosition.length !== 2 ||
+      !Number.isFinite(initialCameraPosition[0]) ||
+      !Number.isFinite(initialCameraPosition[1])) {
       setInitialCameraPosition([DEFAULT_LOCATION.longitude, DEFAULT_LOCATION.latitude]);
     }
   }, []);
@@ -140,16 +132,12 @@ const Map = forwardRef<CameraReference, any>(({ userLocationRef }: any, ref) => 
 
   useEffect(() => {
     // Проверяем валидность live-локации
-    const isValidLiveLocation = location && 
-      location.latitude !== undefined && 
-      location.longitude !== undefined &&
-      typeof location.latitude === 'number' && 
-      typeof location.longitude === 'number' &&
-      !isNaN(location.latitude) && 
-      !isNaN(location.longitude);
+    const isValidLiveLocation = location
+      && Number.isFinite(location?.latitude)
+      && Number.isFinite(location?.longitude);
 
     if (shouldAutoSetCameraRef.current && hasLocationPermission && locationFound && isValidLiveLocation) {
-      
+
       shouldAutoSetCameraRef.current = false;
 
       cameraRef.current?.setCamera({
@@ -168,7 +156,6 @@ const Map = forwardRef<CameraReference, any>(({ userLocationRef }: any, ref) => 
           paddingBottom: 300,
         },
       });
-      
     }
   }, [hasLocationPermission, locationFound, location]);
 
@@ -236,13 +223,11 @@ const Map = forwardRef<CameraReference, any>(({ userLocationRef }: any, ref) => 
 
   // Определяем конечные координаты для камеры
   const getSafeCameraCoordinates = (): [number, number] => {
-    if (!initialCameraPosition || 
-        !Array.isArray(initialCameraPosition) || 
-        initialCameraPosition.length !== 2 ||
-        typeof initialCameraPosition[0] !== 'number' ||
-        typeof initialCameraPosition[1] !== 'number' ||
-        isNaN(initialCameraPosition[0]) ||
-        isNaN(initialCameraPosition[1])) {
+    if (!initialCameraPosition ||
+      !Array.isArray(initialCameraPosition) ||
+      initialCameraPosition.length !== 2 ||
+      !Number.isFinite(initialCameraPosition[0]) ||
+      !Number.isFinite(initialCameraPosition[1])) {
       return [DEFAULT_LOCATION.longitude, DEFAULT_LOCATION.latitude];
     }
     return initialCameraPosition;
@@ -332,5 +317,7 @@ const Map = forwardRef<CameraReference, any>(({ userLocationRef }: any, ref) => 
     </View>
   );
 });
+
+Map.displayName = 'Map';
 
 export { Map };
