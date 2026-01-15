@@ -268,8 +268,8 @@ const Map = forwardRef<CameraReference, any>(({ userLocationRef }: any, ref) => 
           ref={cameraRef}
           zoomLevel={12}
           pitch={1}
-          animationMode="flyTo"
-          animationDuration={2000}
+          animationMode="none"
+          animationDuration={0}
           followUserLocation={false}
           centerCoordinate={cameraCoordinates}
           padding={{
