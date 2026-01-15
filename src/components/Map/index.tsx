@@ -153,7 +153,7 @@ const Map = forwardRef<CameraReference, any>(({ userLocationRef }: any, ref) => 
             zoomLevel: 16,
             pitch: 1,
             animationMode: 'flyTo',
-            animationDuration: 1000,
+            animationDuration: 2000,
             padding: {
               paddingLeft: 0,
               paddingRight: 0,
@@ -195,7 +195,7 @@ const Map = forwardRef<CameraReference, any>(({ userLocationRef }: any, ref) => 
         zoomLevel: val?.zoomLevel ?? 16,
         pitch: 1,
         animationMode: 'flyTo',
-        animationDuration: val?.animationDuration ?? 1000,
+        animationDuration: val?.animationDuration ?? 2000,
         padding: {
           paddingLeft: 0,
           paddingRight: 0,
@@ -229,7 +229,7 @@ const Map = forwardRef<CameraReference, any>(({ userLocationRef }: any, ref) => 
           zoomLevel={12}
           pitch={1}
           animationMode="flyTo"
-          animationDuration={4000}
+          animationDuration={2000}
           followUserLocation={false}
           centerCoordinate={[
             location?.longitude ?? DEFAULT_LOCATION.longitude,
