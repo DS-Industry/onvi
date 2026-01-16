@@ -56,6 +56,7 @@ const useStore = create<StoreState>()(
           fcmToken: state.fcmToken,
           refreshRetryCounter: state.refreshRetryCounter,
           isAuthenticated: state.isAuthenticated,
+          location: state.location,
         }),
       },
     ),
