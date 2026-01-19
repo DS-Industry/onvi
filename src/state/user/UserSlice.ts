@@ -13,7 +13,7 @@ import {
 } from '@services/validation/index.validator.ts';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import i18n from '../../locales';
-import {deleteAccount, getMe, getTariff} from '@services/api/user';
+import {deleteAccount, getClientMe, getTariff} from '@services/api/user';
 import {login, refresh, register, sendOtp} from '@services/api/auth';
 import {DdLogs} from '@datadog/mobile-react-native';
 
@@ -84,7 +84,11 @@ const createUserSlice: StoreSlice<UserSlice> = (set, get) => ({
   setExpiredDate: expiredDate => set({expiredDate}),
   setLoading: loading => set({loading}),
   setFreeVacuum: freeVacuum => set({freeVacuum}),
-  setFcmToken: fcmToken => set({fcmToken}),
+  setFcmToken: fcmToken => {
+    console.log("fcmToken", fcmToken);
+    
+    set({fcmToken})
+  },
   mutateRefreshToken: async () => {
     try {
       const refreshRetriesLeft = get().refreshRetryCounter;
@@ -124,6 +128,8 @@ const createUserSlice: StoreSlice<UserSlice> = (set, get) => ({
       const response = await refresh({
         refreshToken: existingData.refreshToken,
       });
+
+      console.log("mutateRefreshToken:", response);
 
       if (response) {
         await LocalStorage.set(
@@ -178,13 +184,14 @@ const createUserSlice: StoreSlice<UserSlice> = (set, get) => ({
     try {
       const formattedPhone = phone.replace(/[ \(\)-]+/g, '');
       const response = await login({phone: formattedPhone, otp});
+      console.log(response.tokens);
       if (response.type === 'register-required') {
         return response;
       }
-      if (response.type === 'login-success') {
+      if (response.tokens) {
         DdLogs.info('Login success', {phone});
         const {tokens} = response;
-        if (!tokens) {
+        if (!tokens) {          
           return null;
         }
 
@@ -233,12 +240,7 @@ const createUserSlice: StoreSlice<UserSlice> = (set, get) => ({
     }
   },
 
-  register: async (
-    otp,
-    phone,
-    isTermsAccepted = true,
-    isPromoTermsAccepted = true,
-  ) => {
+  register: async (otp, phone, isTermsAccepted = true, isPromoTermsAccepted = true) => {
     try {
       const formattedPhone = phone.replace(/[ \(\)-]+/g, '');
       const response = await register({
@@ -247,8 +249,9 @@ const createUserSlice: StoreSlice<UserSlice> = (set, get) => ({
         isTermsAccepted,
         isPromoTermsAccepted,
       });
+      console.log("Register response:", response); 
 
-      if (response.type === 'register-success') {
+      if (response.tokens) {
         DdLogs.info('Register success ', {phone});
 
         const {tokens} = response;
@@ -288,7 +291,7 @@ const createUserSlice: StoreSlice<UserSlice> = (set, get) => ({
       });
       return response;
     } catch (error) {
-      DdLogs.error('Registration error');
+      DdLogs.error('Registration error', {error});
       Toast.show({
         type: 'customErrorToast',
         text1: i18n.t('app.authErrors.registrationFailed'),
@@ -364,16 +367,21 @@ const createUserSlice: StoreSlice<UserSlice> = (set, get) => ({
             loading: false,
           });
 
-          const data = await getMe();
+          const client = await getClientMe();
+          console.log(client);
+          
           const tariff = await getTariff();
-
+          console.log(tariff);
+          
           set({
             user: {
-              ...data,
+              ...client,
               tariff: tariff.cashBack,
             },
             refreshRetryCounter: MAX_REFRESH_RETRIES,
           });
+          console.log("установили пользоателя");
+          
         } else if (
           formatted &&
           hasAccessTokenCredentials(existingData.refreshToken)

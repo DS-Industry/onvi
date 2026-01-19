@@ -1,10 +1,9 @@
 import axios, {AxiosError} from 'axios';
-const PREFIX = '/api/v2/';
-
-import { API_URL, STRAPI_URL } from '@env';
+import {API_URL, NEW_API_URL, STRAPI_URL} from '@env';
 import {setupAuthInterceptors} from './interceptors';
-
 import {DdLogs} from '@datadog/mobile-react-native';
+
+const PREFIX = '/api/v2/';
 
 function logAxiosErrorToDatadog(error: AxiosError, instanceName: string) {
   const logData = {
@@ -19,7 +18,6 @@ function logAxiosErrorToDatadog(error: AxiosError, instanceName: string) {
   return Promise.reject(error);
 }
 
-// Create API instances
 const userApiInstance = axios.create({
   baseURL: API_URL + PREFIX,
   withCredentials: true,
@@ -30,10 +28,17 @@ const userApiInstance = axios.create({
   },
 });
 
-// Setup auth interceptors for handling token expiry
-setupAuthInterceptors(userApiInstance);
+const newUserApiInstance = axios.create({
+  baseURL: NEW_API_URL,
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+    'Access-Control-Allow-Origin': '*',
+    'X-API-Version': 'new-auth-v1',
+  },
+});
 
-// Content API instance (without auth interceptors)
 const contentApiInstance = axios.create({
   baseURL: STRAPI_URL,
   headers: {
@@ -41,9 +46,12 @@ const contentApiInstance = axios.create({
   },
 });
 
+setupAuthInterceptors(userApiInstance);
+setupAuthInterceptors(newUserApiInstance);
+
 contentApiInstance.interceptors.response.use(
   response => response,
   error => logAxiosErrorToDatadog(error, 'contentApiInstance'),
 );
 
-export {userApiInstance, contentApiInstance};
+export {userApiInstance, contentApiInstance, newUserApiInstance};
