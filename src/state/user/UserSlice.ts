@@ -367,8 +367,9 @@ const createUserSlice: StoreSlice<UserSlice> = (set, get) => ({
             loading: false,
           });
 
-          const client = await getClientMe();
-          console.log(client);
+          const clientData = await getClientMe();
+          const client = clientData.client.props
+          const meta = clientData.meta.props
           
           const tariff = await getTariff();
           console.log(tariff);
@@ -376,11 +377,12 @@ const createUserSlice: StoreSlice<UserSlice> = (set, get) => ({
           set({
             user: {
               ...client,
+              meta,
               tariff: tariff.cashBack,
             },
             refreshRetryCounter: MAX_REFRESH_RETRIES,
           });
-          console.log("установили пользоателя");
+          console.log("установили пользователя", get().user);
           
         } else if (
           formatted &&

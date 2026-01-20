@@ -168,13 +168,10 @@ function App(): React.JSX.Element {
   useEffect(() => {
     loadUser();
     const syncMetaData = async () => {
-      console.log(user?.id);
       
       if (isConnected && user?.id) {
         try {
           const localMetaDataPartial: DeviceMeta = await getLocalMetaData();
-          console.log("syncMetaData");
-          console.log(!user?.meta);
           
           if (!user?.meta) {
             try {
@@ -188,9 +185,7 @@ function App(): React.JSX.Element {
                 status: error.response?.status,
                 message: error.response?.data?.message || error.message,
                 code: error.response?.data?.code
-              });
-              
-              throw error;
+              });              
             }
             
           } else if (
@@ -199,20 +194,19 @@ function App(): React.JSX.Element {
                 ...localMetaDataPartial,
                 appToken: fcmToken ?? '',
                 clientId: user.id,
-                metaId: user.meta.metaId,
+                id: user.meta.id,
               },
               user.meta,
             )
-          ) {
+          ) {            
             await updateUserMeta({
               ...localMetaDataPartial,
               appToken: fcmToken ?? '',
               clientId: user.id,
-              metaId: user.meta.metaId,
+              id: user.meta.id,
             });
           }
         } catch (error) {
-          console.error('Error syncing metadata:', error);
         }
       }
     };

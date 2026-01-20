@@ -1,3 +1,5 @@
+import { IUser, Meta } from "@app-types/models/User";
+
 export interface IUserApiResponse<T> {
   data: T;
   path: string;
@@ -5,10 +7,11 @@ export interface IUserApiResponse<T> {
   method: string;
 }
 
-interface GetMeClient<T> {
-  props: T
-}
-
-export interface IUserGetMeResponse<T> {
-  client: GetMeClient<T>;
+export interface IUserGetMeResponse {
+  client: {
+    props: IUser;
+  };
+  meta: {
+    props: Meta;
+  };
 }

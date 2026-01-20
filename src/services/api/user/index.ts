@@ -21,6 +21,7 @@ enum NEW_ACCOUNT_ENDPOINTS {
   GET_TARIFF_URL = '/client/card/tariff',
   UPDATE_ACCOUNT_URL = '/client/client/account/update',
   ACCOUNT_URL = '/client/client',
+  UPDATE_ACCOUNT_META = '/client/client/meta/update',
 }
 
 enum ACCOUNT {
@@ -29,17 +30,16 @@ enum ACCOUNT {
   GET_PROMOTION_HISTORY_URL = '/account/promotion',
   GET_ACTIVE_PROMOTIONS = 'account/activePromotion',
   UPDATE_NOTIFICATION_URL = '/account/notifications',
-  UPDATE_ACCOUNT_META = '/account/meta/update',
   FAVORITES = '/account/favorites',
 }
 
-export async function getClientMe(): Promise<IUser> {
-  const response = await newUserApiInstance.get<IUserGetMeResponse<IUser>>(
+export async function getClientMe(): Promise<IUserGetMeResponse> {
+  const response = await newUserApiInstance.get<IUserGetMeResponse>(
     NEW_ACCOUNT_ENDPOINTS.GET_CLIENT_ME
   );
-  console.log("getClientMe:", response);
+  console.log("getClientMe:", response.data);
 
-  return response.data.client.props;
+  return response.data;
 }
 
 export async function getTariff(): Promise<IGetTariffResponse> {
@@ -147,12 +147,25 @@ export async function updateUserMeta(data: Meta): Promise<any> {
   const body: IUpdateUserMetaRequest = {
     ...data,
   };
-  const response = await userApiInstance.post(
-    ACCOUNT.UPDATE_ACCOUNT_META,
-    body,
-  );
+  try {
+    console.log("updateUserMeta body", body);
 
-  return response;
+    const response = await newUserApiInstance.post(
+      NEW_ACCOUNT_ENDPOINTS.UPDATE_ACCOUNT_META,
+      body,
+    );
+
+    console.log("updateUserMeta", response);
+
+    return response;
+  } catch (error) {
+    console.error("updateUserMeta failed:", {
+      status: error.response?.status,
+      message: error.response?.data?.message || error.message,
+      code: error.response?.data?.code,
+    });
+    throw error;
+  }
 }
 
 export async function deleteAccount(): Promise<number> {
@@ -160,7 +173,7 @@ export async function deleteAccount(): Promise<number> {
     const response = await newUserApiInstance.delete(NEW_ACCOUNT_ENDPOINTS.ACCOUNT_URL);
     console.log("deleteAccount:", response);
     return response.status;
-    
+
   } catch (error) {
     console.error("deleteAccount failed:", {
       status: error.response?.status,
