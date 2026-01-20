@@ -5,18 +5,14 @@ require Pod::Executable.execute_command('node', ['-p',
     {paths: [process.argv[1]]},
   )', __dir__]).strip
 
-$RNMapboxMapsImpl = 'mapbox'
 source 'https://github.com/CocoaPods/Specs.git'
 source 'https://git.yoomoney.ru/scm/sdk/cocoa-pod-specs.git'
 
 platform :ios, 18.0
 prepare_react_native_project!
 
-linkage = ENV['USE_FRAMEWORKS']
-if linkage != nil
-  Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
-  use_frameworks! :linkage => linkage.to_sym
-end
+$RNFirebaseAsStaticFramework = true
+$RNMapboxMapsImpl = 'mapbox'
 
 project 'OnviMobile',
   'Staging Debug' => :debug,
@@ -24,7 +20,9 @@ project 'OnviMobile',
 
 target 'OnviMobile' do
   config = use_native_modules!
-
+  
+  use_frameworks! :linkage => :static
+  
   pre_install do |installer|
     $RNMapboxMaps.pre_install(installer)
   end
@@ -34,8 +32,6 @@ target 'OnviMobile' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
   
-  pod 'GoogleUtilities', :modular_headers => true
-  pod 'FirebaseCore', :modular_headers => true
   pod 'lottie-ios', :modular_headers => false
 
   pod 'YooKassaPayments',

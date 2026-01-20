@@ -1,0 +1,67 @@
+{
+  "project_info": {
+    "project_number": "971540313031",
+    "project_id": "onvione",
+    "storage_bucket": "onvione.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:971540313031:android:3692a5dca7ade2bff11fe2",
+        "android_client_info": {
+          "package_name": "com.onvimobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAbJQpjbKe2eOn1rCDN-fgN_KfbuiZrNYE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:971540313031:android:4aad59580800bfc3f11fe2",
+        "android_client_info": {
+          "package_name": "com.onvimobile.development"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAbJQpjbKe2eOn1rCDN-fgN_KfbuiZrNYE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:971540313031:android:b46be2296805654ef11fe2",
+        "android_client_info": {
+          "package_name": "com.onvimobile.staging"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAbJQpjbKe2eOn1rCDN-fgN_KfbuiZrNYE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
