@@ -26,7 +26,7 @@ export async function sendOtp(
 
     return response.data.data;
   } catch (error) {
-    console.error("Refresh failed:", {
+    console.error("sendOtp failed:", {
       status: error.response?.status,
       message: error.response?.data?.message || error.message,
       code: error.response?.data?.code,

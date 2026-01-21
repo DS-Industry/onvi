@@ -7,9 +7,16 @@ export interface IUserApiResponse<T> {
   method: string;
 }
 
+export interface IUserExtended extends IUser {
+  cardId: number;
+  cardNumber: string; 
+  cardUnqNumber: string; 
+  cardBalance: number;
+}
+
 export interface IUserGetMeResponse {
   client: {
-    props: IUser;
+    props: IUserExtended;
   };
   meta: {
     props: Meta;

@@ -342,8 +342,8 @@ const Settings = () => {
               }}>
               <View style={styles.balance}>
                 <Text style={styles.balanceText}>
-                  {user && user.cards && user.cards.balance
-                    ? user.cards.balance
+                  {user && user.cards && user.cards.cardBalance
+                    ? user.cards.cardBalance
                     : 0}
                 </Text>
                 <Image

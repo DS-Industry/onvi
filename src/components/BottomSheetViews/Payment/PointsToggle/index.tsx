@@ -50,7 +50,7 @@ const PointsToggle: React.FC<PointsToggleProps> = ({
     }
   }, [order, discount]);
 
-  if (!user || !user.cards || user.cards.balance == null) {
+  if (!user || !user.cards || user.cards.cardBalance == null) {
     return (
       <View
         style={{

@@ -1,6 +1,5 @@
 import { IUser, Meta } from '../../../types/models/User.ts';
 import { IUserApiResponse, IUserGetMeResponse } from '../../../types/api/common/IUserApiResponse.ts';
-import { IGetTariffResponse } from '../../../types/api/user/res/IGetTariffResponse.ts';
 import { IGetAccountHistoryRequestParams } from '../../../types/api/user/req/IGetAccountHistoryRequestParams.ts';
 import { IGetHistoryResponse } from '../../../types/api/user/res/IGetHistoryResponse.ts';
 import { IGetPromoHistoryResponse } from '../../../types/api/user/res/IGetPromoHistoryResponse.ts';
@@ -13,6 +12,7 @@ import { IPersonalPromotion } from '../../../types/models/PersonalPromotion.ts';
 import { IGetFreeVacuum } from 'src/types/api/user/res/IGetFreeVacuum.ts';
 import { IgetActiveClientPromotionsParams } from 'src/types/api/promotion/req/IApplyPromotionRequest.ts';
 import { IPostAccountFavorites } from '@app-types/api/user/req/IPostAccountFavorites.ts';
+import { ITariffResponse } from '@app-types/api/user/res/IGetTariffResponse.ts';
 
 enum NEW_ACCOUNT_ENDPOINTS {
   GET_CLIENT_ME = '/client/client/me',
@@ -22,11 +22,11 @@ enum NEW_ACCOUNT_ENDPOINTS {
   UPDATE_ACCOUNT_URL = '/client/client/account/update',
   ACCOUNT_URL = '/client/client',
   UPDATE_ACCOUNT_META = '/client/client/meta/update',
+  GET_ORDER_HISTORY_URL = '/client/card/orders',
 }
 
 enum ACCOUNT {
   GET_MET_URL = '/account/me',
-  GET_ORDER_HISTORY_URL = '/account/orders',
   GET_PROMOTION_HISTORY_URL = '/account/promotion',
   GET_ACTIVE_PROMOTIONS = 'account/activePromotion',
   UPDATE_NOTIFICATION_URL = '/account/notifications',
@@ -42,9 +42,9 @@ export async function getClientMe(): Promise<IUserGetMeResponse> {
   return response.data;
 }
 
-export async function getTariff(): Promise<IGetTariffResponse> {
+export async function getTariff(): Promise<ITariffResponse> {
   try {
-    const response = await newUserApiInstance.get<IGetTariffResponse>(NEW_ACCOUNT_ENDPOINTS.GET_TARIFF_URL);
+    const response = await newUserApiInstance.get<ITariffResponse>(NEW_ACCOUNT_ENDPOINTS.GET_TARIFF_URL);
     console.log("getTariff:", response);
 
     return response.data;
@@ -60,12 +60,25 @@ export async function getTariff(): Promise<IGetTariffResponse> {
 
 export async function getOrderHistory(
   params: IGetAccountHistoryRequestParams,
-): Promise<IGetHistoryResponse[]> {
-  const response = await userApiInstance.get<
-    IUserApiResponse<IGetHistoryResponse[]>
-  >(ACCOUNT.GET_ORDER_HISTORY_URL, { params });
+): Promise<IGetHistoryResponse> {
+  try {
+    console.log("getOrderHistory params", params);
 
-  return response.data.data;
+    const response = await newUserApiInstance.get<IGetHistoryResponse>(
+      NEW_ACCOUNT_ENDPOINTS.GET_ORDER_HISTORY_URL,
+      { params }
+    );
+    console.log("getOrderHistory: ", response.data);
+
+    return response.data;
+  } catch (error) {
+    console.error("getOrderHistory failed:", {
+      status: error.response?.status,
+      message: error.response?.data?.message || error.message,
+      code: error.response?.data?.code,
+    });
+    throw error;
+  }
 }
 
 export async function getCampaignHistory(): Promise<
@@ -194,7 +207,7 @@ export async function getFreeVacuum(): Promise<IGetFreeVacuum> {
 
     return response.data.data;
   } catch (error) {
-    console.error("Refresh failed:", {
+    console.error("getFreeVacuum failed:", {
       status: error.response?.status,
       message: error.response?.data?.message || error.message,
       code: error.response?.data?.code,

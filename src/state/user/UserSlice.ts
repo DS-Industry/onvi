@@ -236,6 +236,13 @@ const createUserSlice: StoreSlice<UserSlice> = (set, get) => ({
         text1: i18n.t('app.authErrors.loginFailed'),
         props: {errorCode: 400},
       });
+      
+      console.error("login failed:", {
+        status: error.response?.status,
+        message: error.response?.data?.message || error.message,
+        code: error.response?.data?.code,
+        ulr: error.response
+      });
       return null;
     }
   },
@@ -353,7 +360,8 @@ const createUserSlice: StoreSlice<UserSlice> = (set, get) => ({
       if (existingSession) {
         existingData = JSON.parse(existingSession);
       }
-
+      console.log(userSession);
+      
       if (userSession) {
         const formatted: Record<string, any> = JSON.parse(userSession);
         if (
@@ -368,17 +376,26 @@ const createUserSlice: StoreSlice<UserSlice> = (set, get) => ({
           });
 
           const clientData = await getClientMe();
-          const client = clientData.client.props
+          console.log(clientData);
+          
+          const {cardId, cardNumber, cardUnqNumber, cardBalance, ...client} = clientData.client.props
           const meta = clientData.meta.props
           
           const tariff = await getTariff();
           console.log(tariff);
+
+          let cashBack = 0;
+          if (tariff.tier && tariff.tier.benefits) {
+            const cashBackBenefit = tariff.tier.benefits.find(benefit => benefit.benefitType === BenefitType.CASHBACK);
+            cashBack = cashBackBenefit ? cashBackBenefit.bonus : 0;
+          }
           
           set({
             user: {
               ...client,
               meta,
-              tariff: tariff.cashBack,
+              cards: {cardId, cardNumber, cardUnqNumber, cardBalance},
+              tariff: cashBack,
             },
             refreshRetryCounter: MAX_REFRESH_RETRIES,
           });
@@ -395,13 +412,16 @@ const createUserSlice: StoreSlice<UserSlice> = (set, get) => ({
       } else {
         set({loading: false});
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+      
+    }
   },
 
   deleteUser: async () => {
     try {
       const status = await deleteAccount();
-      if (status == 200) {
+      if (status == 204) {
         await LocalStorage.delete('user_session');
 
         await EncryptedStorage.setItem(

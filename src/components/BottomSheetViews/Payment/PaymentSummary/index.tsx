@@ -18,7 +18,8 @@ interface PaymentSummaryProps {
 const PaymentSummary: React.FC<PaymentSummaryProps> = memo(
   ({ order, user, selectedPos, finalOrderCost }) => {
     const { t } = useTranslation();
-
+    console.log(user);
+    
     return (
       <View style={styles.container}>
         {/* <View style={styles.row}>
