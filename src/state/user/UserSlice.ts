@@ -16,6 +16,7 @@ import i18n from '../../locales';
 import {deleteAccount, getClientMe, getTariff} from '@services/api/user';
 import {login, refresh, register, sendOtp} from '@services/api/auth';
 import {DdLogs} from '@datadog/mobile-react-native';
+import { BenefitType } from '@app-types/api/user/res/IGetTariffResponse.ts';
 
 const MAX_REFRESH_RETRIES = 3;
 
@@ -386,7 +387,7 @@ const createUserSlice: StoreSlice<UserSlice> = (set, get) => ({
 
           let cashBack = 0;
           if (tariff.tier && tariff.tier.benefits) {
-            const cashBackBenefit = tariff.tier.benefits.find(benefit => benefit.benefitType === BenefitType.CASHBACK);
+            const cashBackBenefit = tariff.tier.benefits.find(benefit => benefit?.benefitType === BenefitType.CASHBACK);
             cashBack = cashBackBenefit ? cashBackBenefit.bonus : 0;
           }
           

@@ -15,7 +15,6 @@ import useSWRMutation from 'swr/mutation';
 import {apply} from '@services/api/promotion';
 import {IApplyPromotionRequest} from '../../types/api/promotion/req/IApplyPromotionRequest.ts';
 import Toast from 'react-native-toast-message';
-
 import {
   DrawerParamList,
   GeneralDrawerNavigationProp,
@@ -27,6 +26,7 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import ScreenHeader from '@components/ScreenHeader/index.tsx';
 import useStore from '../../state/store';
 import {useTranslation} from 'react-i18next';
+import {AvailablePromocodeResponse} from '@app-types/models/Promotion';
 
 type PromoInputRouteProp = RouteProp<DrawerParamList, 'Ввод Промокода'>;
 
@@ -39,6 +39,8 @@ const PromosInput = () => {
   const route = useRoute<PromoInputRouteProp>();
   const {promocode, type} = route.params;
   const {setUserBalance} = useStore.getState();
+  console.log(type);
+  
 
   const {trigger, isMutating} = useSWRMutation(
     'applyUserPromo',
@@ -46,7 +48,7 @@ const PromosInput = () => {
     {
       onError: err => {
         let message = t('app.errors.genericError');
-        setCode(''); // Clear the code input
+        setCode('');
 
         if (err.response && err.response.data) {
           const errorCode = parseInt(err.response.data.code);
@@ -88,6 +90,7 @@ const PromosInput = () => {
   useEffect(() => {
     setPromocode(promocode.code);
   }, []);
+
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: '#fff'}}>
       <ScrollView contentContainerStyle={{flexGrow: 1}}>
@@ -98,26 +101,24 @@ const PromosInput = () => {
             btnCallback={() => navigation.navigate('Промокоды')}
           />
           <View style={styles.content}>
-            {type == 'personal' &&
-            'discount' in promocode &&
-            'discountType' in promocode ? (
+            {type === 'personal' && promocode.discountValue !== undefined ? (
               <PersonalPromoBanner
                 title={t('app.promos.promocodeForVariables', {
-                  discount: promocode.discount,
+                  discount: promocode.discountValue,
                   unit:
-                    promocode.discountType == 2
+                    promocode.discountType === 'percentage'
                       ? '%'
                       : t('common.labels.ballov'),
                 })}
-                date={new Date(promocode.expiryDate)}
+                date={promocode.validUntil ? new Date(promocode.validUntil) : new Date()}
                 disable={true}
               />
             ) : (
               <View
                 style={{width: '100%', height: '60%', borderRadius: dp(25)}}>
-                {promocode.image && (
+                {promocode.mobileDisplay?.imageLink && (
                   <Image
-                    source={{uri: promocode.image}}
+                    source={{uri: promocode.mobileDisplay.imageLink}}
                     style={{
                       width: '100%',
                       height: '100%',
@@ -155,10 +156,8 @@ const PromosInput = () => {
             <Text style={styles.title}>{t('common.labels.description')}</Text>
             <Text style={styles.text}>
               {type === 'personal'
-                ? promocode.image
-                : 'description' in promocode
-                ? promocode.description
-                : ''}
+                ? promocode.mobileDisplay?.description || ''
+                : promocode.campaign?.description || ''}
             </Text>
           </View>
           {type == 'global' && (
@@ -199,6 +198,7 @@ const styles = StyleSheet.create({
   promoCodeSection: {
     flexDirection: 'column',
     width: '100%',
+    marginTop: dp(20),
   },
   title: {
     fontSize: dp(14),
@@ -215,6 +215,7 @@ const styles = StyleSheet.create({
   text: {
     fontSize: dp(14),
     letterSpacing: 1.5,
+    alignSelf: 'flex-start',
   },
 });
 
