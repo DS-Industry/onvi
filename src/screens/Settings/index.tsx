@@ -24,7 +24,7 @@ import {LogOut} from 'react-native-feather';
 import {useNavigation} from '@react-navigation/native';
 import Switch from '@styled/buttons/CustomSwitch';
 import {AvatarEnum} from '../../types/AvatarEnum.ts';
-import {update, updateAllowNotificationSending} from '@services/api/user';
+import {accountUpdate} from '@services/api/user';
 import {IUpdateAccountRequest} from '../../types/api/user/req/IUpdateAccountRequest.ts';
 import useSWRMutation from 'swr/mutation';
 import Toast from 'react-native-toast-message';
@@ -75,7 +75,7 @@ const Settings = () => {
 
   const {trigger, isMutating} = useSWRMutation(
     'updateUserData',
-    (key, {arg}: {arg: IUpdateAccountRequest}) => update(arg),
+    (key, {arg}: {arg: IUpdateAccountRequest}) => accountUpdate(arg),
     {
       onError: () => {
         Toast.show({
@@ -95,7 +95,7 @@ const Settings = () => {
 
   const {trigger: notificationTrigger, isMutating: isNotifcationMutating} =
     useSWRMutation('updateNotificationStatys', (key, {arg}: {arg: boolean}) =>
-      updateAllowNotificationSending(arg),
+      accountUpdate({is_notifications_enabled: arg}),
     );
 
   useEffect(() => {

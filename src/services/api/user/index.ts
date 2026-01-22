@@ -13,6 +13,7 @@ import { IGetFreeVacuum } from 'src/types/api/user/res/IGetFreeVacuum.ts';
 import { IgetActiveClientPromotionsParams } from 'src/types/api/promotion/req/IApplyPromotionRequest.ts';
 import { IPostAccountFavorites } from '@app-types/api/user/req/IPostAccountFavorites.ts';
 import { ITariffResponse } from '@app-types/api/user/res/IGetTariffResponse.ts';
+import { IFavoritesResponse } from '@app-types/api/user/res/IFavoritesResponse.ts';
 
 enum NEW_ACCOUNT_ENDPOINTS {
   GET_CLIENT_ME = '/client/client/me',
@@ -23,6 +24,7 @@ enum NEW_ACCOUNT_ENDPOINTS {
   ACCOUNT_URL = '/client/client',
   UPDATE_ACCOUNT_META = '/client/client/meta/update',
   GET_ORDER_HISTORY_URL = '/client/card/orders',
+  FAVORITES = '/client/client/favorites',
 }
 
 enum ACCOUNT {
@@ -30,7 +32,6 @@ enum ACCOUNT {
   GET_PROMOTION_HISTORY_URL = '/account/promotion',
   GET_ACTIVE_PROMOTIONS = 'account/activePromotion',
   UPDATE_NOTIFICATION_URL = '/account/notifications',
-  FAVORITES = '/account/favorites',
 }
 
 export async function getClientMe(): Promise<IUserGetMeResponse> {
@@ -90,7 +91,7 @@ export async function getCampaignHistory(): Promise<
   return response.data.data;
 }
 
-export async function update(body: IUpdateAccountRequest): Promise<number> {
+export async function accountUpdate(body: IUpdateAccountRequest): Promise<number> {
   try {
     const response = await newUserApiInstance.patch<
       IUserApiResponse<IUpdateAccountResponse>
@@ -106,12 +107,6 @@ export async function update(body: IUpdateAccountRequest): Promise<number> {
     });
     throw error;
   }
-}
-
-export async function updateAllowNotificationSending(
-  notification: boolean,
-): Promise<void> {
-  await userApiInstance.patch(ACCOUNT.UPDATE_NOTIFICATION_URL, { notification });
 }
 
 export async function getActiveClientPromotions(
@@ -218,28 +213,44 @@ export async function getFreeVacuum(): Promise<IGetFreeVacuum> {
 }
 
 export async function getFavorites(): Promise<number[]> {
-  const response = await userApiInstance.get<IUserApiResponse<number[]>>(
-    ACCOUNT.FAVORITES,
-  );
-  return response.data.data;
+  try {
+    const response = await newUserApiInstance.get<number[]>(
+      NEW_ACCOUNT_ENDPOINTS.FAVORITES,
+    );
+    console.log("getFavorites:", response);
+
+    return response.data;
+  } catch (error) {
+    console.error("getFavorites failed:", {
+      status: error.response?.status,
+      message: error.response?.data?.message || error.message,
+      code: error.response?.data?.code,
+      ulr: error.response
+    });
+    throw error;
+  }
 }
 
 export async function postFavorites(
   body: IPostAccountFavorites,
 ): Promise<number[]> {
-  const response = await userApiInstance.post<IUserApiResponse<number[]>>(
-    ACCOUNT.FAVORITES,
+  const response = await newUserApiInstance.post<number[]>(
+    NEW_ACCOUNT_ENDPOINTS.FAVORITES,
     body,
   );
-  return response.data.data;
+  console.log("postFavorites:", response);
+
+  return response.data;
 }
 
 export async function removeFavorites(
   body: IPostAccountFavorites,
 ): Promise<number[]> {
-  const response = await userApiInstance.delete<IUserApiResponse<number[]>>(
-    ACCOUNT.FAVORITES,
+  const response = await newUserApiInstance.delete<number[]>(
+    NEW_ACCOUNT_ENDPOINTS.FAVORITES,
     { data: body },
   );
-  return response.data.data;
+  console.log("removeFavorites:", response);
+
+  return response.data;
 }

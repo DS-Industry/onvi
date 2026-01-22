@@ -35,7 +35,7 @@ const createCarwashSlice: StoreSlice<CarwashSlice> = (set, get) => ({
       set({favoritesCarwashes: newFavorites});
 
       await LocalStorage.set('favorites', JSON.stringify(newFavorites));
-      await postFavorites({carwashId: id});
+      await postFavorites({carWashId: id});
     } catch (error) {
       const currentFavorites = get().favoritesCarwashes.filter(
         favId => favId !== id,
@@ -54,7 +54,7 @@ const createCarwashSlice: StoreSlice<CarwashSlice> = (set, get) => ({
       set({favoritesCarwashes: newFavorites});
 
       await LocalStorage.set('favorites', JSON.stringify(newFavorites));
-      await removeFavorites({carwashId: id});
+      await removeFavorites({carWashId: id});
     } catch (error) {
       const currentFavorites = [...get().favoritesCarwashes, id];
       set({favoritesCarwashes: currentFavorites});
