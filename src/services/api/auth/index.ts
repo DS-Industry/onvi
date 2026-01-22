@@ -65,10 +65,6 @@ export async function register(
 export async function refresh(
   body: IRefreshRequest,
 ): Promise<IRefreshResponse> {
-  console.log("refresh body:", body);
-  const response = await newUserApiInstance.post<
-    IUserApiResponse<IRefreshResponse>
-  >(AUTH_ENDPOINTS.REFRESH_URL, body);
-  console.log("refresh:", response);
-  return response.data.data;
+  const response = await newUserApiInstance.post<IRefreshResponse>(AUTH_ENDPOINTS.REFRESH_URL, body);
+  return response.data;
 }
