@@ -44,7 +44,6 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
     promoCodeId,
     setPromocode,
     applyPromoCode,
-    debouncedApplyPromoCode,
   } = usePromoCode(order?.posId || 0);
 
   const { usedPoints, toggled, applyPoints, togglePoints } = useBonusPoints(

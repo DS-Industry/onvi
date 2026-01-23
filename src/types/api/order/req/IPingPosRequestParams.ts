@@ -1,5 +1,6 @@
 export interface IPingPosRequestParams {
   carWashId: number;
-  bayNumber: number;
+  carWashDeviceId: number;
+  bayNumber?: number;
   bayType?: string | null;
 }

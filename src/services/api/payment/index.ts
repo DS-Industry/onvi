@@ -1,26 +1,45 @@
-import {ICreatePaymentRequest} from '../../../types/api/payment/req/ICreatePaymentRequest.ts';
-import {IUserApiResponse} from '../../../types/api/common/IUserApiResponse.ts';
-import {userApiInstance} from '@services/api/axiosConfig.ts';
+import { ICreatePaymentRequest } from '../../../types/api/payment/req/ICreatePaymentRequest.ts';
+import { IUserApiResponse } from '../../../types/api/common/IUserApiResponse.ts';
+import { newUserApiInstance, userApiInstance } from '@services/api/axiosConfig.ts';
+import { ICalculateDiscountRequest } from '@app-types/api/payment/req/ICalculateDiscountRequest.ts';
+import { ICalculateDiscountResponse } from '@app-types/api/payment/res/ICalculateDiscountResponse.ts';
 
-enum PAYMENT {
-  CREATE_PAYMENT_URL = '/payment',
-  GET_CREDENTIAL = '/payment/credentials',
-}
-
-export async function createPayment(body: ICreatePaymentRequest): Promise<any> {
-  const response = await userApiInstance.post<IUserApiResponse<any>>(
-    PAYMENT.CREATE_PAYMENT_URL,
-    body,
-  );
-
-  return response.data.data;
+enum NEW_PAYMENT {
+  CREDENTIALS = '/client/order/credentials',
+  CALCULATE_DISCOUNT = '/calculate-discount',
 }
 
 export async function getCredentials(): Promise<{
-  apiKey: string;
-  storeId: string;
+  clientApplicationKey: string;
+  shopId: string;
 }> {
-  const response = await userApiInstance.get(PAYMENT.GET_CREDENTIAL);
+  try {
+    const response = await newUserApiInstance.get(NEW_PAYMENT.CREDENTIALS);
+    console.log("getCredentials: ", response);
 
-  return response.data.data;
+    return response.data;
+  } catch (error) {
+    console.error("getCredentials failed:", {
+      status: error.response?.status,
+      message: error.response?.data?.message || error.message,
+      code: error.response?.data?.code,
+    });
+    throw error;
+  }
+}
+
+export async function calculateDiscount(body: ICalculateDiscountRequest): Promise<ICalculateDiscountResponse> {
+  try {
+    const response = await newUserApiInstance.post<ICalculateDiscountResponse>(NEW_PAYMENT.CALCULATE_DISCOUNT, body);
+    console.log("calculateDiscount: ", response);
+
+    return response.data;
+  } catch (error) {
+    console.error("calculateDiscount failed:", {
+      status: error.response?.status,
+      message: error.response?.data?.message || error.message,
+      code: error.response?.data?.code,
+    });
+    throw error;
+  }
 }

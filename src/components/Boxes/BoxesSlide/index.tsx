@@ -9,6 +9,7 @@ import useStore from '../../../state/store';
 const width = Dimensions.get('window').width;
 
 interface BoxItem {
+  id: string;
   number: number;
 }
 
@@ -25,10 +26,12 @@ const BoxesSlide = ({boxes = [], navigation, params}: BoxesSlideProps) => {
   const contentPadding = (width - horizontalScale(92) * boxes.length) / 2;
 
   const handleBoxPress = useCallback(
-    (boxNumber: number) => {
+    (box: BoxItem) => {
+      console.log(box);
       setOrderDetails({
         ...orderDetails,
-        bayNumber: boxNumber,
+        carWashDeviceId: box.id,
+        bayNumber: box.number,
       });
 
       bottomSheetRef?.current?.snapToPosition(
@@ -51,7 +54,7 @@ const BoxesSlide = ({boxes = [], navigation, params}: BoxesSlideProps) => {
     ({item}: {item: BoxItem}) => (
       <Box
         label={item?.number?.toString()}
-        onClick={() => handleBoxPress(item.number)}
+        onClick={() => handleBoxPress(item)}
         active={orderDetails.bayNumber === item.number}
       />
     ),

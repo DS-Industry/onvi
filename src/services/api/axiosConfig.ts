@@ -4,6 +4,7 @@ import {setupAuthInterceptors} from './interceptors';
 import {DdLogs} from '@datadog/mobile-react-native';
 
 const PREFIX = '/api/v2/';
+const NEW_URL = 'https://791bccf893dd.ngrok-free.app';
 
 function logAxiosErrorToDatadog(error: AxiosError, instanceName: string) {
   const logData = {
@@ -29,7 +30,7 @@ const userApiInstance = axios.create({
 });
 
 const newUserApiInstance = axios.create({
-  baseURL: NEW_API_URL,
+  baseURL: NEW_URL,
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
