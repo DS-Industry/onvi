@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 import { IUser } from '../../../../types/models/User.ts';
 import { OrderDetailsType } from '../../../../state/order/OrderSlice.ts';
 import { CarWash } from '../../../../types/api/app/types.ts';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, ActivityIndicator } from 'react-native';
 import Skeleton from 'react-native-reanimated-skeleton'; 
 import { Info } from 'react-native-feather';
 import { dp } from '@utils/dp.ts';
@@ -13,24 +13,16 @@ interface PaymentSummaryProps {
   user: IUser | null;
   selectedPos: CarWash | null;
   finalOrderCost: number;
+  cashbackAmount?: number;
+  isCashbackLoading?: boolean; // Новый пропс для состояния загрузки
 }
 
 const PaymentSummary: React.FC<PaymentSummaryProps> = memo(
-  ({ order, user, selectedPos, finalOrderCost }) => {
+  ({ order, user, selectedPos, finalOrderCost, cashbackAmount, isCashbackLoading = false }) => {
     const { t } = useTranslation();
-    console.log(user);
     
     return (
       <View style={styles.container}>
-        {/* <View style={styles.row}>
-          {order.name ? (
-            <Text style={styles.itemName}>{order.name}</Text>
-          ) : (
-            <Text />
-          )}
-          <Text style={styles.itemPrice}>{order.sum ? order.sum : 0} ₽</Text>
-        </View> */}
-
         <View style={styles.row}>
           {selectedPos?.IsLoyaltyMember ? (
             <>
@@ -58,12 +50,20 @@ const PaymentSummary: React.FC<PaymentSummaryProps> = memo(
                   </Skeleton>
                 </View>
               ) : (
-                <Text style={styles.itemPrice}>
-                  {(finalOrderCost * user.tariff) / 100 < 1
-                    ? 0
-                    : Math.ceil((finalOrderCost * user.tariff) / 100)}{' '}
-                  ₽
-                </Text>
+                <View style={styles.cashbackContainer}>
+                  {isCashbackLoading ? (
+                    <ActivityIndicator size="small" color="#0B68E1" />
+                  ) : (
+                    <Text style={styles.itemPrice}>
+                      {cashbackAmount !== undefined 
+                        ? `${cashbackAmount} ₽`
+                        : `${(finalOrderCost * user.tariff) / 100 < 1
+                            ? 0
+                            : Math.ceil((finalOrderCost * user.tariff) / 100)} ₽`
+                      }
+                    </Text>
+                  )}
+                </View>
               )}
             </>
           ) : (
@@ -115,6 +115,10 @@ const styles = StyleSheet.create({
     fontSize: dp(10),
     color: 'rgba(0, 0, 0, 1)',
     marginLeft: dp(4),
+  },
+  cashbackContainer: {
+    minHeight: dp(20),
+    justifyContent: 'center',
   },
 });
 
