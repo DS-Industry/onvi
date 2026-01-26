@@ -6,7 +6,7 @@ import { ICalculateDiscountResponse } from '@app-types/api/payment/res/ICalculat
 
 enum NEW_PAYMENT {
   CREDENTIALS = '/client/order/credentials',
-  CALCULATE_DISCOUNT = '/calculate-discount',
+  CALCULATE_DISCOUNT = '/client/order/calculate-discount',
 }
 
 export async function getCredentials(): Promise<{
@@ -31,7 +31,7 @@ export async function getCredentials(): Promise<{
 export async function calculateDiscount(body: ICalculateDiscountRequest): Promise<ICalculateDiscountResponse> {
   try {
     const response = await newUserApiInstance.post<ICalculateDiscountResponse>(NEW_PAYMENT.CALCULATE_DISCOUNT, body);
-    console.log("calculateDiscount: ", response);
+    console.log("calculateDiscount: ", response.data);
 
     return response.data;
   } catch (error) {

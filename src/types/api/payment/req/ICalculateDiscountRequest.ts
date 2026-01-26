@@ -4,7 +4,7 @@ export interface ICalculateDiscountRequest {
   sum: number;
   sumBonus?: number;
   rewardPointsUsed?: number;
-  promoCode?: number;
+  promoCodeId?: number;
   carWashId: number;
   carWashDeviceId: number;
   bayType?: BayTypeEnum;

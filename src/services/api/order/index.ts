@@ -18,10 +18,10 @@ enum NEW_ORDER {
   PING_POS_URL = '/client/order/ping',
   GET_ORDER_BY_ORDER_ID = '/client/order',
   UPDATE_ORDER_STATUS = '/client/order/status',
+  VALIDATE_PROMOCODE_URL = '/client/order/validate-promocode',
 }
 
 enum ORDER {
-  VALIDATE_PROMOCODE_URL = '/order/promo/validate',
   PING_POS_URL = '/order/ping',
   LATEST = '/order/latest',
 }
@@ -67,10 +67,19 @@ export async function orderRegister(
 export async function validatePromoCode(
   body: IValidatePromoCodeRequest,
 ): Promise<IValidatePromoCodeResponse> {
-  const response = await userApiInstance.post<
-    IUserApiResponse<IValidatePromoCodeResponse>
-  >(ORDER.VALIDATE_PROMOCODE_URL, body);
-  return response.data.data;
+  try {
+    const response = await newUserApiInstance.post<IValidatePromoCodeResponse>(NEW_ORDER.VALIDATE_PROMOCODE_URL, body);
+    console.log("validatePromoCode:", response.data);
+
+    return response.data;
+  } catch (error) {
+    console.error("orderRegister failed:", {
+      status: error.response?.status,
+      message: error.response?.data?.message || error.message,
+      code: error.response?.data?.code,
+    });
+    throw error;
+  }
 }
 
 export async function pingPos(
@@ -81,7 +90,7 @@ export async function pingPos(
       NEW_ORDER.PING_POS_URL + `?carWashId=${params.carWashId}&carWashDeviceId=${params.carWashDeviceId}`
     );
     console.log("pingPos: ", response);
-    
+
     return response.data;
   } catch (error) {
     console.error("pingPos failed:", {
