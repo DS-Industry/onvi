@@ -4,10 +4,7 @@ import {useCallback, useRef, useState} from 'react';
 import {getCredentials} from '@services/api/payment';
 import {confirmPayment, tokenize} from '../native';
 import {
-  calculateActualPointsUsed,
-  calculateFinalAmount,
   createPaymentConfig,
-  calculateActualDiscount,
 } from '@utils/paymentHelpers.ts';
 import {
   orderCreate,
@@ -46,6 +43,7 @@ export const usePaymentProcess = (
   usedPoints: number,
   promoCodeId?: number,
   loadUser?: () => Promise<void>,
+  finalAmount?: number, 
   initialPaymentMethod: PaymentMethodType = 'BANK_CARD',
 ) => {
   const [loading, setLoading] = useState(false);
@@ -171,7 +169,7 @@ export const usePaymentProcess = (
       return;
     }
 
-    if (!order.posId || !order.carWashDeviceId || order.sum === undefined) {
+    if (!order?.posId || !order?.carWashDeviceId || order?.sum === undefined) {
       setError(i18n.t('app.paymentErrors.somethingWentWrong'));
       return;
     }
@@ -180,6 +178,10 @@ export const usePaymentProcess = (
       setError(i18n.t('app.paymentErrors.choosePaymentMethod'));
       return;
     }
+
+    // Используем finalAmount из API, если передан, иначе order.sum (fallback)
+    const paymentAmount = finalAmount !== undefined ? finalAmount : order.sum;
+    console.log('Using paymentAmount:', paymentAmount);
 
     //Order creation process
 
@@ -191,20 +193,6 @@ export const usePaymentProcess = (
 
       const apiKey: string = paymentConfig.clientApplicationKey.toString();
       const storeId: string = paymentConfig.shopId.toString();
-
-      const actualDiscount = calculateActualDiscount(discount, order.sum);
-
-      const pointsSum = calculateActualPointsUsed(
-        order.sum,
-        actualDiscount,
-        usedPoints,
-      );
-
-      const realSum = calculateFinalAmount(
-        order.sum,
-        actualDiscount,
-        pointsSum,
-      );
 
       // Check bay status
       const bayStatus = await pingPos({
@@ -235,37 +223,34 @@ export const usePaymentProcess = (
         default:
           break;
       }
-
+      
       // Create payment config
       const paymentConfigParams = createPaymentConfig(
         apiKey,
         storeId,
         order,
-        realSum,
+        paymentAmount,
         user,
         paymentMethodTypes,
       );
 
       // Create order request
       const createOrderRequest: ICreateOrderRequest = {
-        sumBonus: realSum,
-        sum: order.sum,
-        rewardPointsUsed: pointsSum,
+        sumBonus: paymentAmount, // финальная сумма из API
+        sum: order.sum, // оригинальная сумма
+        rewardPointsUsed: usedPoints || 0, // использованные баллы
         carWashId: Number(order.posId),
         bayType: order.bayType,
         carWashDeviceId: Number(order.carWashDeviceId),
       };
 
       // Add promo code if available
-      if (promoCodeId && discount && discount?.discount > 0) {
-        createOrderRequest.sumBonus = realSum;
+      if (promoCodeId) {
         createOrderRequest.promoCodeId = promoCodeId;
       }
 
       // Create order
-      const orderResult = await orderCreate(
-        createOrderRequest,
-      );
+      const orderResult = await orderCreate(createOrderRequest);
       currentOrderRef.current = orderResult.orderId;
       AppMetrica.reportEvent('Create Order Success', createOrderRequest);
 
@@ -317,7 +302,7 @@ export const usePaymentProcess = (
       });
 
       AppMetrica.reportAdRevenue({
-        price: realSum ?? 0,
+        price: paymentAmount ?? 0,
         currency: 'RUB',
       });
 
@@ -382,7 +367,7 @@ export const usePaymentProcess = (
     } catch (error: any) {
       errorHandler(error);
     }
-  }, [user, order, discount, usedPoints, promoCodeId, loadUser, paymentMethod]);
+  }, [user, order, discount, usedPoints, promoCodeId, loadUser, paymentMethod, finalAmount]);
 
   const handlePaymentMethodType = useCallback((value: PaymentMethodType) => {
     setPaymentMethod(value);
@@ -396,7 +381,7 @@ export const usePaymentProcess = (
   }, []);
 
   const processFreePayment = async () => {
-    if (!order.posId || !order.carWashDeviceId || order.sum === undefined || !user) {
+    if (!order?.posId || !order?.carWashDeviceId || order?.sum === undefined || !user) {
       setError(i18n.t('app.paymentErrors.somethingWentWrong'));
       return;
     }

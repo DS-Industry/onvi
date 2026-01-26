@@ -61,6 +61,7 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
     usedPoints,
     promoCodeId,
     loadUser,
+    finalOrderCost, 
   );
 
   // Функция для вызова calculate-discount
@@ -75,11 +76,11 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
       rewardPointsUsed: toggled ? usedPoints : undefined,
       promoCodeId: promoCodeId || undefined,
     };
-    
+        
     try {
       const result = await calculate(requestData);
       if (result) {
-        setFinalOrderCost(result.sumReal);
+        setFinalOrderCost(prev => result.sumReal);
         setCashbackAmount(result.sumCashback);
       }
     } catch (error) {
@@ -125,6 +126,7 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
       loadUser,
       freeOn,
       paymentMethod,
+      finalOrderCost,
     });
   };
 
