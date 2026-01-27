@@ -7,7 +7,6 @@ import { AvailablePromocodeResponse, IGetPromotionsParams, IPromotionsResponse }
 
 enum PROMOTION {
   APPLY_URL = '/promotion/apply',
-  GET_GLOBAL_PROMOTIONS = '/promotion',
   GET_PROMOTIONS = '/client/order/promocodes',
 }
 export async function apply(

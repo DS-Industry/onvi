@@ -28,10 +28,8 @@ enum NEW_ACCOUNT_ENDPOINTS {
 }
 
 enum ACCOUNT {
-  GET_MET_URL = '/account/me',
   GET_PROMOTION_HISTORY_URL = '/account/promotion',
   GET_ACTIVE_PROMOTIONS = 'account/activePromotion',
-  UPDATE_NOTIFICATION_URL = '/account/notifications',
 }
 
 export async function getClientMe(): Promise<IUserGetMeResponse> {

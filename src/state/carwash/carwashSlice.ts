@@ -92,9 +92,11 @@ const createCarwashSlice: StoreSlice<CarwashSlice> = (set, get) => ({
   loadLatestCarwashes: async () => {
     set({latestCarwashesIsLoading: true});
     try {
-      const serverLatest = await getLatestCarwash({size: 3, page: 1});
+      const serverLatest = await getLatestCarwash({limit: 3});
+      
+      const latestCarwashesIds = serverLatest.map(item => item.carWashId);
 
-      set({latestCarwashes: serverLatest});
+      set({latestCarwashes: latestCarwashesIds});
 
       await get().loadPinnedCarwashes();
       await LocalStorage.set('latest', JSON.stringify(serverLatest));

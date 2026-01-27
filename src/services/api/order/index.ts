@@ -11,6 +11,7 @@ import { IRegisterOrderResponse } from 'src/types/api/order/res/IRegisterOrderRe
 import { IGetOrderResponse } from 'src/types/api/order/res/IGetOrderByResponse.ts';
 import { OrderStatusCode } from '@app-types/api/order/status/OrderStatusCode.ts';
 import { IGetLatestCarwashRequestParams } from '@app-types/api/order/req/IGetLatestCarwashRequestParams.ts';
+import { ICarWashTransaction, IGetLatestCarwashResponse } from '@app-types/api/order/res/IGetLatestCarwashResponse.ts';
 
 enum NEW_ORDER {
   CREATE_ORDER = '/client/order/create',
@@ -19,11 +20,7 @@ enum NEW_ORDER {
   GET_ORDER_BY_ORDER_ID = '/client/order',
   UPDATE_ORDER_STATUS = '/client/order/status',
   VALIDATE_PROMOCODE_URL = '/client/order/validate-promocode',
-}
-
-enum ORDER {
-  PING_POS_URL = '/order/ping',
-  LATEST = '/order/latest',
+  LATEST = '/client/order/latest',
 }
 
 export async function orderCreate(
@@ -146,9 +143,9 @@ export async function updateOrderStatus(
 
 export async function getLatestCarwash(
   params: IGetLatestCarwashRequestParams,
-): Promise<number[]> {
-  const response = await userApiInstance.get<IUserApiResponse<number[]>>(
-    ORDER.LATEST,
+): Promise<ICarWashTransaction[]> {
+  const response = await newUserApiInstance.get<IGetLatestCarwashResponse>(
+    NEW_ORDER.LATEST,
     { params },
   );
   return response.data.data;
