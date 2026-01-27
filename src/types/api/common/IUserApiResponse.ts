@@ -19,6 +19,6 @@ export interface IUserGetMeResponse {
     props: IUserExtended;
   };
   meta: {
-    props: Meta;
+    props: Meta | null;
   };
 }

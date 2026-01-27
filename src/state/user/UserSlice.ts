@@ -356,12 +356,11 @@ const createUserSlice: StoreSlice<UserSlice> = (set, get) => ({
     try {
       const userSession = await LocalStorage.getString('user_session');
       const existingSession = await EncryptedStorage.getItem('user_session');
-
+  
       let existingData: Record<string, any> = {};
       if (existingSession) {
         existingData = JSON.parse(existingSession);
       }
-      console.log(userSession);
       
       if (userSession) {
         const formatted: Record<string, any> = JSON.parse(userSession);
@@ -375,32 +374,37 @@ const createUserSlice: StoreSlice<UserSlice> = (set, get) => ({
             isAuthenticated: true,
             loading: false,
           });
-
+  
           const clientData = await getClientMe();
-          console.log(clientData);
           
-          const {cardId, cardNumber, cardUnqNumber, cardBalance, ...client} = clientData.client.props
-          const meta = clientData.meta.props
+          const {cardId, cardNumber, cardUnqNumber, cardBalance, ...client} = clientData.client.props;
+          
+          const metaProps = clientData.meta?.props || null;
           
           const tariff = await getTariff();
-          console.log(tariff);
-
+  
           let cashBack = 0;
           if (tariff.tier && tariff.tier.benefits) {
-            const cashBackBenefit = tariff.tier.benefits.find(benefit => benefit?.benefitType === BenefitType.CASHBACK);
+            const cashBackBenefit = tariff.tier.benefits.find(
+              benefit => benefit?.benefitType === BenefitType.CASHBACK
+            );
             cashBack = cashBackBenefit ? cashBackBenefit.bonus : 0;
           }
           
+          const userData: Partial<IUser> = {
+            ...client,
+            cards: {cardId, cardNumber, cardUnqNumber, cardBalance},
+            tariff: cashBack,
+          };
+          
+          if (metaProps) {
+            userData.meta = metaProps;
+          }
+          
           set({
-            user: {
-              ...client,
-              meta,
-              cards: {cardId, cardNumber, cardUnqNumber, cardBalance},
-              tariff: cashBack,
-            },
+            user: userData as IUser,
             refreshRetryCounter: MAX_REFRESH_RETRIES,
           });
-          console.log("установили пользователя", get().user);
           
         } else if (
           formatted &&
@@ -414,8 +418,8 @@ const createUserSlice: StoreSlice<UserSlice> = (set, get) => ({
         set({loading: false});
       }
     } catch (error) {
-      console.log(error);
-      
+      console.error('Ошибка при загрузке пользователя:', error);
+      set({loading: false});
     }
   },
 

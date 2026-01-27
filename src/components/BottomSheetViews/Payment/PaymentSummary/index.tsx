@@ -3,7 +3,7 @@ import { IUser } from '../../../../types/models/User.ts';
 import { OrderDetailsType } from '../../../../state/order/OrderSlice.ts';
 import { CarWash } from '../../../../types/api/app/types.ts';
 import { StyleSheet, Text, View, ActivityIndicator } from 'react-native';
-import Skeleton from 'react-native-reanimated-skeleton'; 
+import Skeleton from 'react-native-reanimated-skeleton';
 import { Info } from 'react-native-feather';
 import { dp } from '@utils/dp.ts';
 import { useTranslation } from 'react-i18next';
@@ -20,7 +20,7 @@ interface PaymentSummaryProps {
 const PaymentSummary: React.FC<PaymentSummaryProps> = memo(
   ({ order, user, selectedPos, finalOrderCost, cashbackAmount, isCashbackLoading = false }) => {
     const { t } = useTranslation();
-    
+
     return (
       <View style={styles.container}>
         <View style={styles.row}>
@@ -29,8 +29,8 @@ const PaymentSummary: React.FC<PaymentSummaryProps> = memo(
               <Text style={styles.itemName}>
                 {t('app.payment.yourCashback')}
               </Text>
-              {!user || !user.tariff || user.tariff === 0 ? (
-                <View style={{ alignSelf: 'flex-end' }}>
+              <View style={styles.cashbackContainer}>
+                {isCashbackLoading ? (
                   <Skeleton
                     isLoading={true}
                     layout={[
@@ -48,23 +48,12 @@ const PaymentSummary: React.FC<PaymentSummaryProps> = memo(
                   >
                     <View />
                   </Skeleton>
-                </View>
-              ) : (
-                <View style={styles.cashbackContainer}>
-                  {isCashbackLoading ? (
-                    <ActivityIndicator size="small" color="#0B68E1" />
-                  ) : (
-                    <Text style={styles.itemPrice}>
-                      {cashbackAmount !== undefined 
-                        ? `${cashbackAmount} ₽`
-                        : `${(finalOrderCost * user.tariff) / 100 < 1
-                            ? 0
-                            : Math.ceil((finalOrderCost * user.tariff) / 100)} ₽`
-                      }
-                    </Text>
-                  )}
-                </View>
-              )}
+                ) : (
+                  <Text style={styles.itemPrice}>
+                    {cashbackAmount} ₽
+                  </Text>
+                )}
+              </View>
             </>
           ) : (
             <View style={styles.infoRow}>
