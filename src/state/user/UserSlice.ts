@@ -356,14 +356,21 @@ const createUserSlice: StoreSlice<UserSlice> = (set, get) => ({
     try {
       const userSession = await LocalStorage.getString('user_session');
       const existingSession = await EncryptedStorage.getItem('user_session');
-  
+
       let existingData: Record<string, any> = {};
       if (existingSession) {
-        existingData = JSON.parse(existingSession);
+          existingData = JSON.parse(existingSession);
       }
       
       if (userSession) {
-        const formatted: Record<string, any> = JSON.parse(userSession);
+        let formatted: Record<string, any> | null = null;
+        try {
+          formatted = JSON.parse(userSession);
+        } catch (parseError) {
+          set({loading: false});
+          return;
+        }
+        
         if (
           formatted &&
           isValidStorageData(formatted.accessToken, formatted.expiredDate)
@@ -374,15 +381,20 @@ const createUserSlice: StoreSlice<UserSlice> = (set, get) => ({
             isAuthenticated: true,
             loading: false,
           });
-  
+
           const clientData = await getClientMe();
+          
+          if (!clientData.client) {
+            set({loading: false});
+            return;
+          }
           
           const {cardId, cardNumber, cardUnqNumber, cardBalance, ...client} = clientData.client.props;
           
           const metaProps = clientData.meta?.props || null;
-          
+                    
           const tariff = await getTariff();
-  
+
           let cashBack = 0;
           if (tariff.tier && tariff.tier.benefits) {
             const cashBackBenefit = tariff.tier.benefits.find(
@@ -404,7 +416,7 @@ const createUserSlice: StoreSlice<UserSlice> = (set, get) => ({
           set({
             user: userData as IUser,
             refreshRetryCounter: MAX_REFRESH_RETRIES,
-          });
+          });   
           
         } else if (
           formatted &&
