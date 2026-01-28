@@ -83,6 +83,11 @@ const PromosInput = () => {
 
   const copyToClipboard = () => {
     Clipboard.setString(promoCode);
+
+    Toast.show({
+      type: 'info',
+      text1: 'Промокод скопирован',
+    });
   };
 
   useEffect(() => {
@@ -134,18 +139,10 @@ const PromosInput = () => {
                   <Text style={styles.promoCode}>{promocode.code}</Text>
                   <Pressable
                     onPress={copyToClipboard}
-                    style={{marginLeft: dp(10)}}>
-                    <Copy
-                      stroke={color}
-                      width={dp(22)}
-                      height={dp(22)}
-                      onPressIn={() => {
-                        setColor('#AAA7A7FF');
-                      }}
-                      onPressOut={() => {
-                        setColor('#000000');
-                      }}
-                    />
+                    onPressIn={() => setColor('#AAA7A7FF')}
+                    onPressOut={() => setColor('#000000')}
+                    style={{marginLeft: dp(10), padding: dp(5)}}>
+                    <Copy stroke={color} width={dp(22)} height={dp(22)} />
                   </Pressable>
                 </View>
               </View>
