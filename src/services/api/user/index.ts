@@ -193,12 +193,12 @@ export async function deleteAccount(): Promise<number> {
 
 export async function getFreeVacuum(): Promise<IGetFreeVacuum> {
   try {
-    const response = await newUserApiInstance.get<IUserApiResponse<IGetFreeVacuum>>(
+    const response = await newUserApiInstance.get<IGetFreeVacuum>(
       NEW_ACCOUNT_ENDPOINTS.GET_FREE_VACUUM,
     );
     console.log("getFreeVacuum", response);
 
-    return response.data.data;
+    return response.data;
   } catch (error) {
     console.error("getFreeVacuum failed:", {
       status: error.response?.status,
