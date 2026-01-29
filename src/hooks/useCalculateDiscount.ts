@@ -1,8 +1,9 @@
 // hooks/useCalculateDiscount.ts
 import { useState, useCallback } from 'react';
 import useSWRMutation from 'swr/mutation';
-import { ICalculateDiscountRequest, ICalculateDiscountResponse } from '../types/api/order/req/ICalculateDiscountRequest';
 import { calculateDiscount } from '@services/api/payment';
+import { ICalculateDiscountResponse } from '@app-types/api/payment/res/ICalculateDiscountResponse';
+import { ICalculateDiscountRequest } from '@app-types/api/payment/req/ICalculateDiscountRequest';
 
 /**
  * Custom hook for calculating discounts

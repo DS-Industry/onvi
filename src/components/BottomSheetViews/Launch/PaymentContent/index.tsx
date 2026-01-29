@@ -16,6 +16,7 @@ import { navigateBottomSheet } from '@navigators/BottomSheetStack';
 import { dp } from '@utils/dp';
 import { useCalculateDiscount } from '@hooks/useCalculateDiscount';
 import { BayTypeEnum } from '@app-types/BayTypeEnum';
+import { IUsedTransactionalCampaign } from '@app-types/api/payment/res/ICalculateDiscountResponse';
 
 interface PaymentContentProps {
   onClose: () => void;
@@ -34,6 +35,7 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
   const [finalOrderCost, setFinalOrderCost] = useState<number>(order?.sum || 0);
   const [cashbackAmount, setCashbackAmount] = useState<number>(0);
   const [isFirstLoad, setIsFirstLoad] = useState(true);
+  const [transactionalCampaign, setTransactionalCampaign] = useState<IUsedTransactionalCampaign | null>(null);
 
   const {
     inputCodeValue,
@@ -82,6 +84,7 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
       if (result) {
         setFinalOrderCost(prev => result.sumReal);
         setCashbackAmount(result.sumCashback);
+        setTransactionalCampaign(result.usedTransactionalCampaign);
       }
     } catch (error) {
       console.error('Failed to calculate discount:', error);
@@ -192,7 +195,47 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
             )}
 
             <View style={styles.badgesContainer}>
-              {/* Бейджики оставлены без изменений */}
+              {/* Бейдж для транзакционной кампании */}
+              {transactionalCampaign && (
+                <View style={styles.badgeWrapper}>
+                  <Button
+                    label={`${transactionalCampaign.campaignName}: ${transactionalCampaign.discountAmount}₽`}
+                    color="blue"
+                    width={184}
+                    height={31}
+                    fontSize={12}
+                    fontWeight={'600'}
+                  />
+                </View>
+              )}
+
+              {/* Бейдж для использованных баллов */}
+              {/* {usedPoints > 0 && (
+                <View style={styles.badgeWrapper}>
+                  <Button
+                    label={t('app.payment.usedPoints', {usedPoints})}
+                    color="blue"
+                    width={184}
+                    height={31}
+                    fontSize={10}
+                    fontWeight={'600'}
+                  />
+                </View>
+              )} */}
+
+              {/* Бейдж для промокода */}
+              {/* {discount && (
+                <View style={styles.badgeWrapper}>
+                  <Button
+                    label={`${t('app.payment.havePromocodeFor')} ${discount.discount}${discount.type === 'CASH' ? '₽' : '%'}`}
+                    color="blue"
+                    width={184}
+                    height={31}
+                    fontSize={10}
+                    fontWeight={'600'}
+                  />
+                </View>
+              )} */}
             </View>
           </View>
 

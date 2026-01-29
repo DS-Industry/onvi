@@ -160,7 +160,7 @@ const PromosInput = () => {
                 : promocode.campaign?.description || ''}
             </Text>
           </View>
-          {type == 'global' && (
+          {/* {type == 'global' && (
             <View style={{alignSelf: 'center'}}>
               <Button
                 label={t('common.buttons.activate')}
@@ -169,7 +169,7 @@ const PromosInput = () => {
                 onClick={() => trigger({code: promoCode})}
               />
             </View>
-          )}
+          )} */}
         </View>
       </ScrollView>
     </SafeAreaView>

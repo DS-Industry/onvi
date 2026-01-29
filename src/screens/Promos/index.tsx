@@ -53,7 +53,7 @@ const Promos = () => {
                 <Carousel
                   data={personalPromo}
                   vertical={false}
-                  width={dp(350)}
+                  width={dp(366)}
                   height={dp(200)}
                   pagingEnabled
                   renderItem={({item}) => (
@@ -99,7 +99,7 @@ const Promos = () => {
                     enabled
                     data={globalPromo}
                     pagingEnabled
-                    width={dp(350)}
+                    width={dp(366)}
                     height={dp(350)}
                     renderItem={({item}) => {
                       return (
@@ -109,14 +109,11 @@ const Promos = () => {
                               promocode: item,
                               type: 'global',
                             })
-                          }>
+                          }
+                          style={styles.promoContainer}>
                           <Image
                             source={{uri: item.mobileDisplay?.imageLink}}
-                            style={{
-                              width: '100%',
-                              height: '100%',
-                              resizeMode: 'contain',
-                            }}
+                            style={styles.promoImage}
                           />
                         </TouchableOpacity>
                       );
@@ -156,6 +153,15 @@ const styles = StyleSheet.create({
   cuponContainer: {
     flex: 2,
     marginTop: dp(25),
+  },
+  promoContainer: {
+    borderRadius: dp(12),
+    overflow: 'hidden',
+      },
+  promoImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
   },
 });
 
