@@ -53,7 +53,7 @@ const Promos = () => {
                 <Carousel
                   data={personalPromo}
                   vertical={false}
-                  width={dp(366)}
+                  width={dp(350)}
                   height={dp(200)}
                   pagingEnabled
                   renderItem={({item}) => (
@@ -111,10 +111,12 @@ const Promos = () => {
                             })
                           }
                           style={styles.promoContainer}>
-                          <Image
-                            source={{uri: item.mobileDisplay?.imageLink}}
-                            style={styles.promoImage}
-                          />
+                          <View style={styles.imageWrapper}>
+                            <Image
+                              source={{uri: item.mobileDisplay?.imageLink}}
+                              style={styles.promoImage}
+                            />
+                          </View>
                         </TouchableOpacity>
                       );
                     }}
@@ -155,13 +157,22 @@ const styles = StyleSheet.create({
     marginTop: dp(25),
   },
   promoContainer: {
+    width: '100%',
+    height: '100%',
     borderRadius: dp(12),
+    backgroundColor: '#F5F5F5',
     overflow: 'hidden',
-      },
+  },
+  imageWrapper: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#F5F5F5',
+  },
   promoImage: {
     width: '100%',
     height: '100%',
-    resizeMode: 'cover',
+    resizeMode: 'contain',
+    borderRadius: dp(8),
   },
 });
 

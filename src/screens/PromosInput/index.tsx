@@ -102,28 +102,25 @@ const PromosInput = () => {
           />
           <View style={styles.content}>
             {type === 'personal' && promocode.discountValue !== undefined ? (
-              <PersonalPromoBanner
-                title={t('app.promos.promocodeForVariables', {
-                  discount: promocode.discountValue,
-                  unit:
-                    promocode.discountType === 'percentage'
-                      ? '%'
-                      : t('common.labels.ballov'),
-                })}
-                date={promocode.validUntil ? new Date(promocode.validUntil) : new Date()}
-                disable={true}
-              />
+              <View style={styles.bannerContainer}>
+                <PersonalPromoBanner
+                  title={t('app.promos.promocodeForVariables', {
+                    discount: promocode.discountValue,
+                    unit:
+                      promocode.discountType === 'percentage'
+                        ? '%'
+                        : t('common.labels.ballov'),
+                  })}
+                  date={promocode.validUntil ? new Date(promocode.validUntil) : new Date()}
+                  disable={true}
+                />
+              </View>
             ) : (
-              <View
-                style={{width: '100%', height: '60%', borderRadius: dp(25)}}>
+              <View style={styles.imageContainer}>
                 {promocode.mobileDisplay?.imageLink && (
                   <Image
                     source={{uri: promocode.mobileDisplay.imageLink}}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      resizeMode: 'contain',
-                    }}
+                    style={styles.image}
                   />
                 )}
               </View>
@@ -131,11 +128,11 @@ const PromosInput = () => {
             {type == 'personal' ? (
               <View style={styles.promoCodeSection}>
                 <Text style={styles.title}>{t('app.promos.promocode')}</Text>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <View style={styles.promoCodeRow}>
                   <Text style={styles.promoCode}>{promocode.code}</Text>
                   <Pressable
                     onPress={copyToClipboard}
-                    style={{marginLeft: dp(10)}}>
+                    style={styles.copyButton}>
                     <Copy
                       stroke={color}
                       width={dp(22)}
@@ -150,26 +147,16 @@ const PromosInput = () => {
                   </Pressable>
                 </View>
               </View>
-            ) : (
-              <></>
-            )}
-            <Text style={styles.title}>{t('common.labels.description')}</Text>
-            <Text style={styles.text}>
-              {type === 'personal'
-                ? promocode.mobileDisplay?.description || ''
-                : promocode.campaign?.description || ''}
-            </Text>
-          </View>
-          {/* {type == 'global' && (
-            <View style={{alignSelf: 'center'}}>
-              <Button
-                label={t('common.buttons.activate')}
-                color={'blue'}
-                showLoading={isMutating}
-                onClick={() => trigger({code: promoCode})}
-              />
+            ) : null}
+            <View style={styles.descriptionSection}>
+              <Text style={styles.title}>{t('common.labels.description')}</Text>
+              <Text style={styles.text}>
+                {type === 'personal'
+                  ? promocode.mobileDisplay?.description || ''
+                  : promocode.campaign?.description || ''}
+              </Text>
             </View>
-          )} */}
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -186,26 +173,45 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     marginTop: dp(30),
-    alignItems: 'center',
   },
-  action: {
-    width: '85%',
-    display: 'flex',
-    flexDirection: 'row',
-    marginTop: dp(30),
-    justifyContent: 'space-between',
+  bannerContainer: {
+    width: '100%',
+    marginBottom: dp(20),
+  },
+  imageContainer: {
+    width: '100%',
+    height: dp(250),
+    borderRadius: dp(12),
+    marginBottom: dp(20),
+    backgroundColor: '#F5F5F5',
+    overflow: 'hidden',
+  },
+  image: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'contain',
   },
   promoCodeSection: {
     flexDirection: 'column',
     width: '100%',
-    marginTop: dp(20),
+    marginBottom: dp(20),
+  },
+  promoCodeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: dp(5),
+  },
+  copyButton: {
+    marginLeft: dp(10),
+  },
+  descriptionSection: {
+    width: '100%',
   },
   title: {
     fontSize: dp(14),
     fontWeight: '600',
-    marginTop: dp(30),
     marginBottom: dp(10),
-    alignSelf: 'flex-start',
+    color: '#000',
   },
   promoCode: {
     fontSize: dp(18),
@@ -214,8 +220,9 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: dp(14),
-    letterSpacing: 1.5,
-    alignSelf: 'flex-start',
+    letterSpacing: 0.5,
+    lineHeight: dp(20),
+    color: '#333',
   },
 });
 
