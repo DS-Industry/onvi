@@ -10,7 +10,7 @@ export interface DeviceMeta {
 }
 
 export interface Meta {
-  metaId?: number;
+  id?: number;
   clientId: number;
   deviceId: string;
   model: string;

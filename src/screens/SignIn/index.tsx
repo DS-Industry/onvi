@@ -35,7 +35,7 @@ const SignIn = () => {
   };
 
   const login = async () => {
-    if (validate(phone)) {
+    if (validate(phone)) {    
       setIsLoading(true);
       sendOtp(phone)
         .then(() => {

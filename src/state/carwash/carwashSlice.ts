@@ -35,7 +35,7 @@ const createCarwashSlice: StoreSlice<CarwashSlice> = (set, get) => ({
       set({favoritesCarwashes: newFavorites});
 
       await LocalStorage.set('favorites', JSON.stringify(newFavorites));
-      await postFavorites({carwashId: id});
+      await postFavorites({carWashId: id});
     } catch (error) {
       const currentFavorites = get().favoritesCarwashes.filter(
         favId => favId !== id,
@@ -54,7 +54,7 @@ const createCarwashSlice: StoreSlice<CarwashSlice> = (set, get) => ({
       set({favoritesCarwashes: newFavorites});
 
       await LocalStorage.set('favorites', JSON.stringify(newFavorites));
-      await removeFavorites({carwashId: id});
+      await removeFavorites({carWashId: id});
     } catch (error) {
       const currentFavorites = [...get().favoritesCarwashes, id];
       set({favoritesCarwashes: currentFavorites});
@@ -92,9 +92,11 @@ const createCarwashSlice: StoreSlice<CarwashSlice> = (set, get) => ({
   loadLatestCarwashes: async () => {
     set({latestCarwashesIsLoading: true});
     try {
-      const serverLatest = await getLatestCarwash({size: 3, page: 1});
+      const serverLatest = await getLatestCarwash({limit: 3});
+      
+      const latestCarwashesIds = serverLatest.map(item => item.carWashId);
 
-      set({latestCarwashes: serverLatest});
+      set({latestCarwashes: latestCarwashesIds});
 
       await get().loadPinnedCarwashes();
       await LocalStorage.set('latest', JSON.stringify(serverLatest));

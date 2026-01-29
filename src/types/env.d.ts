@@ -8,6 +8,7 @@ declare module '@env' {
     'live_MTY4OTA1wrqkTr02LhhiyI4db69pN15QUFq3o_4qf_g';
   export const YOKASSA_SHOP_ID: string = '168905';
   export const API_URL: string;
+  export const NEW_API_URL: string;
   export const APP_METRICA_API_KEY: string;
   export const APP_VERSION: string;
 }

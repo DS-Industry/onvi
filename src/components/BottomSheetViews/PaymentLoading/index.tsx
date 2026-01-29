@@ -47,6 +47,7 @@ type PaymentLoadingParams = {
   loadUser?: () => Promise<void>;
   freeOn: boolean;
   paymentMethod: PaymentMethodType;
+  finalOrderCost: number;
 };
 
 const PaymentLoading = () => {
@@ -62,8 +63,9 @@ const PaymentLoading = () => {
     promoCodeId,
     loadUser,
     freeOn,
+    finalOrderCost,
     paymentMethod,
-  } = route.params as PaymentLoadingParams;
+  } = route.params as PaymentLoadingParams;  
 
   const {loading, error, orderStatus, processPayment, processFreePayment} =
     usePaymentProcess(
@@ -73,6 +75,7 @@ const PaymentLoading = () => {
       usedPoints,
       promoCodeId,
       loadUser,
+      finalOrderCost,
       paymentMethod,
     );
 

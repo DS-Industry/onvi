@@ -123,8 +123,8 @@ export function setupAuthInterceptors(axiosInstance: AxiosInstance) {
     async config => {
       try {
         const state = useStore.getState();
-        const {accessToken, expiredDate} = state;
-
+        const { accessToken, expiredDate } = state;
+  
         // Mark refresh token requests to identify them in the response interceptor
         if (
           config.url?.includes('/refresh-token') ||
@@ -132,23 +132,32 @@ export function setupAuthInterceptors(axiosInstance: AxiosInstance) {
         ) {
           (config as any)._isRefreshRequest = true;
         }
-
+  
         if (
           accessToken &&
           expiredDate &&
           isValidStorageData(accessToken, expiredDate)
         ) {
           config.headers.Authorization = `Bearer ${accessToken}`;
-        } else {
         }
-      } catch (e) {}
-
+  
+        // Вывод информации о запросе
+        console.log("Request:", {
+          fullUrl: config.baseURL + config.url,
+          method: config.method?.toUpperCase(),
+          headers: config.headers,
+          body: config.data,
+        }); 
+  
+      } catch (e) {
+        console.error("Interceptor error:", e);
+      }
+  
       return config;
     },
     error => {
       return Promise.reject(error);
     },
   );
-
-  return axiosInstance;
+  
 }

@@ -91,17 +91,25 @@ const PromocodeSection: React.FC<PromocodeSectionProps> = ({
           </TouchableOpacity>
         </View>
 
-        {!isMutating && (discount || promoError) && (
+        {isMutating && (
           <View style={styles.statusContainer}>
-            {discount ? (
-              <Text style={styles.successText}>
-                {t('app.promos.promocodeApplied')}
-              </Text>
-            ) : (
-              <Text style={styles.errorText}>
-                {t('app.promos.promocodeNotFound')}
-              </Text>
-            )}
+            <ActivityIndicator size="small" color="#0B68E1" />
+          </View>
+        )}
+
+        {!isMutating && discount && (
+          <View style={styles.statusContainer}>
+            <Text style={styles.successText}>
+              {t('app.promos.promocodeApplied')}
+            </Text>
+          </View>
+        )}
+
+        {!isMutating && promoError && (
+          <View style={styles.statusContainer}>
+            <Text style={styles.errorText}>
+              {t('app.promos.promocodeNotFound')}
+            </Text>
           </View>
         )}
       </View>
@@ -149,8 +157,9 @@ const styles = StyleSheet.create({
     height: dp(24),
   },
   statusContainer: {
-    // marginTop: dp(6),
     minHeight: dp(18),
+    marginTop: dp(6),
+    justifyContent: 'center',
   },
   successText: {
     fontSize: dp(10),

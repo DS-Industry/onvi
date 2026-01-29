@@ -1,9 +1,13 @@
 export interface IRegisterOrderRequest {
+  // orderId: number;
+  // transactionId: string;
+  // paymentToken: string;
+  // amount: string;
+  // description: string;
+  // receiptReturnPhoneNumber: string;
+  // err?: number;
   orderId: number;
-  transactionId: string;
-  paymentToken: string;
-  amount: string;
-  description: string;
+  paymentToken?: string;
   receiptReturnPhoneNumber: string;
-  err?: number;
+  returnUrl?: string;
 }

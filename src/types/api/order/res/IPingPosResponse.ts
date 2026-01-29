@@ -1,5 +1,14 @@
+import { BayTypeEnum } from "@app-types/BayTypeEnum";
+
+export enum DeviceStatus {
+  BUSY = 'Busy',
+  FREE = 'Free',
+  UNAVAILABLE = 'Unavailable'
+}
+
 export interface IPingPosResponse {
-  carWashId: number;
-  bayNumber: number;
-  status: string;
+  id: number;
+  status: DeviceStatus;
+  type: BayTypeEnum;
+  errorMessage: string | null;
 }

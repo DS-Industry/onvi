@@ -17,7 +17,7 @@ export type OrderDetailsType = {
   promoCodeId?: number | null;
   rewardPointsUsed?: null | number;
   type?: null | string;
-  name?: null | string;
+  name?: null | string; 
   prices?: Price[];
   order?: number | null;
   orderDate?: string | null;
@@ -25,6 +25,7 @@ export type OrderDetailsType = {
   status?: OrderStatus; // New field for order status
   free?: boolean;
   bayType?: string | null;
+  carWashDeviceId?: string | null;
 };
 
 export interface OrderSlice {

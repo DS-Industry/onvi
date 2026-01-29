@@ -1,6 +1,13 @@
 export enum SendStatus {
-  CREATED = 'created',
-  FAIL = 'failed',
+  CREATED = 'CREATED',
+  COMPLETED = 'COMPLETED',
+  CANCELED = 'CANCELED',
+  FREE_PROCESSING = 'FREE_PROCESSING',
+  PAYED = 'PAYED',
+  FAILED = 'FAILED',
+  POS_PROCESSED = 'POS_PROCESSED',
+  PAYMENT_PROCESSING = 'PAYMENT_PROCESSING',
+  WAITING_PAYMENT = 'WAITING_PAYMENT'
 }
 
 export interface ICreateOrderResponse {
