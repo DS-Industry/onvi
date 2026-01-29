@@ -42,7 +42,7 @@ const Promos = () => {
       <ScrollView style={styles.container}>
         <ScreenHeader screenTitle={t('app.promos.title')} />
         <View style={styles.content}>
-          <View style={{flex: 1, marginBottom: dp(20), height: '30%'}}>
+          <View style={styles.personalPromosContainer}>
             <Text style={styles.sectionTitle}>
               {t('app.promos.personalPromos')}
             </Text>
@@ -53,30 +53,33 @@ const Promos = () => {
                 <Carousel
                   data={personalPromo}
                   vertical={false}
-                  width={dp(350)}
+                  width={dp(366)}
                   height={dp(200)}
                   pagingEnabled
+                  style={styles.carousel}
                   renderItem={({item}) => (
-                    <PersonalPromoBanner
-                      title={`${t('app.promos.promocodeFor')} ${
-                        item.discountValue
-                      } ${
-                        item.discountType === 'percentage' ? '%' : t('common.labels.ballov')
-                      }`}
-                      date={item.validUntil ? new Date(item.validUntil) : new Date()}
-                      onPress={() =>
-                        navigation.navigate('Ввод Промокода', {
-                          promocode: item,
-                          type: 'personal',
-                        })
-                      }
-                      disable={!item.isActive}
-                    />
+                    <View style={styles.personalBannerItem}>
+                      <PersonalPromoBanner
+                        title={`${t('app.promos.promocodeFor')} ${
+                          item.discountValue
+                        } ${
+                          item.discountType === 'percentage' ? '%' : t('common.labels.ballov')
+                        }`}
+                        date={item.validUntil ? new Date(item.validUntil) : new Date()}
+                        onPress={() =>
+                          navigation.navigate('Ввод Промокода', {
+                            promocode: item,
+                            type: 'personal',
+                          })
+                        }
+                        disable={!item.isActive}
+                      />
+                    </View>
                   )}
                 />
               </View>
             ) : (
-              <View style={{alignSelf: 'center', flex: 1, justifyContent: 'center'}}>
+              <View style={styles.emptyContainer}>
                 <EmptyPlaceholder text={t('app.promos.noPromocodes')} />
               </View>
             )}
@@ -86,7 +89,7 @@ const Promos = () => {
             <Text style={styles.sectionTitle}>
               {t('app.promos.generalPromocodes')}
             </Text>
-            <View style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+            <View style={styles.globalPromosWrapper}>
               {isGlobalPromoLoading || globalError ? (
                 <GlobalPromosPlaceholder />
               ) : globalPromo && globalPromo.length > 0 ? (
@@ -101,29 +104,32 @@ const Promos = () => {
                     pagingEnabled
                     width={dp(366)}
                     height={dp(350)}
+                    style={styles.carousel}
                     renderItem={({item}) => {
                       return (
-                        <TouchableOpacity
-                          onPress={() =>
-                            navigation.navigate('Ввод Промокода', {
-                              promocode: item,
-                              type: 'global',
-                            })
-                          }
-                          style={styles.promoContainer}>
-                          <View style={styles.imageWrapper}>
-                            <Image
-                              source={{uri: item.mobileDisplay?.imageLink}}
-                              style={styles.promoImage}
-                            />
-                          </View>
-                        </TouchableOpacity>
+                        <View style={styles.globalPromoItem}>
+                          <TouchableOpacity
+                            onPress={() =>
+                              navigation.navigate('Ввод Промокода', {
+                                promocode: item,
+                                type: 'global',
+                              })
+                            }
+                            style={styles.promoContainer}>
+                            <View style={styles.imageWrapper}>
+                              <Image
+                                source={{uri: item.mobileDisplay?.imageLink}}
+                                style={styles.promoImage}
+                              />
+                            </View>
+                          </TouchableOpacity>
+                        </View>
                       );
                     }}
                   />
                 </View>
               ) : (
-                <View style={{alignSelf: 'center', flex: 1, justifyContent: 'center'}}>
+                <View style={styles.emptyContainer}>
                   <EmptyPlaceholder text={t('app.promos.noPromocodes')} />
                 </View>
               )}
@@ -146,15 +152,38 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     marginTop: dp(30),
   },
-  sectionTitle: {
-    fontSize: dp(20),
-    color: '#000',
-    fontWeight: '600',
-    marginBottom: dp(8),
+  personalPromosContainer: {
+    flex: 1,
+    marginBottom: dp(20),
   },
   cuponContainer: {
     flex: 2,
     marginTop: dp(25),
+  },
+  sectionTitle: {
+    fontSize: dp(20),
+    color: '#000',
+    fontWeight: '600',
+    marginBottom: dp(12),
+  },
+  carousel: {
+    marginHorizontal: dp(-8),
+  },
+  personalBannerItem: {
+    paddingHorizontal: dp(8),
+  },
+  globalPromoItem: {
+    paddingHorizontal: dp(8),
+  },
+  globalPromosWrapper: {
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  emptyContainer: {
+    alignSelf: 'center',
+    flex: 1,
+    justifyContent: 'center',
+    minHeight: dp(200),
   },
   promoContainer: {
     width: '100%',
