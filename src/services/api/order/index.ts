@@ -1,11 +1,10 @@
 import { ICreateOrderRequest } from '../../../types/api/order/req/ICreateOrderRequest.ts';
 import { ICreateOrderResponse } from '../../../types/api/order/res/ICreateOrderResponse.ts';
-import { IUserApiResponse } from '../../../types/api/common/IUserApiResponse.ts';
 import { IValidatePromoCodeRequest } from '../../../types/api/order/req/IValidatePromoCodeRequest.ts';
 import { IValidatePromoCodeResponse } from '../../../types/api/order/res/IValidatePromoCodeResponse.ts';
 import { IPingPosRequestParams } from '../../../types/api/order/req/IPingPosRequestParams.ts';
 import { IPingPosResponse } from '../../../types/api/order/res/IPingPosResponse.ts';
-import { newUserApiInstance, userApiInstance } from '@services/api/axiosConfig.ts';
+import { newUserApiInstance } from '@services/api/axiosConfig.ts';
 import { IRegisterOrderRequest } from 'src/types/api/order/req/IRegisterOrderRequest.ts';
 import { IRegisterOrderResponse } from 'src/types/api/order/res/IRegisterOrderResponse.ts';
 import { IGetOrderResponse } from 'src/types/api/order/res/IGetOrderByResponse.ts';
@@ -26,119 +25,51 @@ enum NEW_ORDER {
 export async function orderCreate(
   body: ICreateOrderRequest,
 ): Promise<ICreateOrderResponse> {
-  try {
-    console.log("orderCreate request");
-
-    const response = await newUserApiInstance.post<ICreateOrderResponse>(NEW_ORDER.CREATE_ORDER, body);
-    console.log("orderCreate:", response);
-
-    return response.data;
-  } catch (error) {
-    console.error("orderCreate failed:", {
-      status: error.response?.status,
-      message: error.response?.data?.message || error.message,
-      code: error.response?.data?.code,
-    });
-    throw error;
-  }
+  const response = await newUserApiInstance.post<ICreateOrderResponse>(NEW_ORDER.CREATE_ORDER, body);
+  return response.data;
 }
 
 export async function orderRegister(
   body: IRegisterOrderRequest,
 ): Promise<IRegisterOrderResponse> {
-  try {
-    const response = await newUserApiInstance.post<IRegisterOrderResponse>(NEW_ORDER.REGISTER_ORDER, body);
-    console.log("orderRegister:", response.data);
-
-    return response.data;
-  } catch (error) {
-    console.error("orderRegister failed:", {
-      status: error.response?.status,
-      message: error.response?.data?.message || error.message,
-      code: error.response?.data?.code,
-    });
-    throw error;
-  }
+  const response = await newUserApiInstance.post<IRegisterOrderResponse>(NEW_ORDER.REGISTER_ORDER, body);
+  return response.data;
 }
 
 export async function validatePromoCode(
   body: IValidatePromoCodeRequest,
 ): Promise<IValidatePromoCodeResponse> {
-  try {
-    const response = await newUserApiInstance.post<IValidatePromoCodeResponse>(NEW_ORDER.VALIDATE_PROMOCODE_URL, body);
-    console.log("validatePromoCode:", response.data);
-
-    return response.data;
-  } catch (error) {
-    console.error("orderRegister failed:", {
-      status: error.response?.status,
-      message: error.response?.data?.message || error.message,
-      code: error.response?.data?.code,
-    });
-    throw error;
-  }
+  const response = await newUserApiInstance.post<IValidatePromoCodeResponse>(NEW_ORDER.VALIDATE_PROMOCODE_URL, body);
+  return response.data;
 }
 
 export async function pingPos(
   params: IPingPosRequestParams,
 ): Promise<IPingPosResponse> {
-  try {
-    const response = await newUserApiInstance.get<IPingPosResponse>(
-      NEW_ORDER.PING_POS_URL + `?carWashId=${params.carWashId}&carWashDeviceId=${params.carWashDeviceId}`
-    );
-    console.log("pingPos: ", response);
-
-    return response.data;
-  } catch (error) {
-    console.error("pingPos failed:", {
-      status: error.response?.status,
-      message: error.response?.data?.message || error.message,
-      code: error.response?.data?.code,
-    });
-    throw error;
-  }
+  const response = await newUserApiInstance.get<IPingPosResponse>(
+    NEW_ORDER.PING_POS_URL + `?carWashId=${params.carWashId}&carWashDeviceId=${params.carWashDeviceId}`
+  );
+  return response.data;
 }
 
 export async function getOrderByOrderId(
   id: number,
 ): Promise<IGetOrderResponse> {
-  try {
-    const response = await newUserApiInstance.get<IGetOrderResponse>(
-      NEW_ORDER.GET_ORDER_BY_ORDER_ID + `/${id}`,
-    );
-    console.log("getOrderByOrderId: ", response);
-
-    return response.data;
-  } catch (error) {
-    console.error("getOrderByOrderId failed:", {
-      status: error.response?.status,
-      message: error.response?.data?.message || error.message,
-      code: error.response?.data?.code,
-    });
-    throw error;
-  }
+  const response = await newUserApiInstance.get<IGetOrderResponse>(
+    NEW_ORDER.GET_ORDER_BY_ORDER_ID + `/${id}`,
+  );
+  return response.data;
 }
 
 export async function updateOrderStatus(
   id: number,
   status: OrderStatusCode,
 ): Promise<void> {
-  try {
-    const response = await newUserApiInstance.post<void>(
-      `${NEW_ORDER.UPDATE_ORDER_STATUS}/${id}`,
-      { status },
-    );
-    console.log("updateOrderStatus: ", response);
-
-    return response.data;
-  } catch (error) {
-    console.error("updateOrderStatus failed:", {
-      status: error.response?.status,
-      message: error.response?.data?.message || error.message,
-      code: error.response?.data?.code,
-    });
-    throw error;
-  }
+  const response = await newUserApiInstance.post<void>(
+    `${NEW_ORDER.UPDATE_ORDER_STATUS}/${id}`,
+    { status },
+  );
+  return response.data;
 }
 
 export async function getLatestCarwash(

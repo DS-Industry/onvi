@@ -27,7 +27,6 @@ const BoxesSlide = ({boxes = [], navigation, params}: BoxesSlideProps) => {
 
   const handleBoxPress = useCallback(
     (box: BoxItem) => {
-      console.log(box);
       setOrderDetails({
         ...orderDetails,
         carWashDeviceId: box.id,

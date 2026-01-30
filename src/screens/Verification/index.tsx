@@ -50,7 +50,6 @@ const Verification = ({}: VerificationProps) => {
     if (otp.length === 4) {
       const res = await login(route.params.phone, otp);
       setLoading(false);
-      console.log("login res:", res);
       
       if (!res) {
         setLoading(false);

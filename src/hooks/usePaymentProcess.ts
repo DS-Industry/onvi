@@ -161,7 +161,6 @@ export const usePaymentProcess = (
   };
 
   const processPayment = useCallback(async () => {
-    console.log(order);
     
     //Validation process
     if (!user) {
@@ -181,7 +180,6 @@ export const usePaymentProcess = (
 
     // Используем finalAmount из API, если передан, иначе order.sum (fallback)
     const paymentAmount = finalAmount !== undefined ? finalAmount : order.sum;
-    console.log('Using paymentAmount:', paymentAmount);
 
     //Order creation process
 
@@ -286,7 +284,6 @@ export const usePaymentProcess = (
       }
 
       setOrderStatus(OrderProcessingStatus.WAITING_PAYMENT);
-      console.log("confirmPayment 1");
       
       await confirmPayment({
         confirmationUrl: confirmation_url,
@@ -294,7 +291,6 @@ export const usePaymentProcess = (
         shopId: storeId,
         clientApplicationKey: apiKey,
       });
-      console.log("confirmPayment 2");
 
       AppMetrica.reportEvent('Payment Success', {
         confirmationUrl: confirmation_url,

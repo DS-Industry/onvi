@@ -85,11 +85,7 @@ const createUserSlice: StoreSlice<UserSlice> = (set, get) => ({
   setExpiredDate: expiredDate => set({expiredDate}),
   setLoading: loading => set({loading}),
   setFreeVacuum: freeVacuum => set({freeVacuum}),
-  setFcmToken: fcmToken => {
-    console.log("fcmToken", fcmToken);
-    
-    set({fcmToken})
-  },
+  setFcmToken: fcmToken => set({fcmToken}),
   mutateRefreshToken: async () => {
     try {
       const refreshRetriesLeft = get().refreshRetryCounter;
@@ -129,8 +125,6 @@ const createUserSlice: StoreSlice<UserSlice> = (set, get) => ({
       const response = await refresh({
         refreshToken: existingData.refreshToken,
       });
-
-      console.log("mutateRefreshToken:", response);
 
       if (response) {
         await LocalStorage.set(
@@ -185,7 +179,6 @@ const createUserSlice: StoreSlice<UserSlice> = (set, get) => ({
     try {
       const formattedPhone = phone.replace(/[ \(\)-]+/g, '');
       const response = await login({phone: formattedPhone, otp});
-      console.log(response.tokens);
       if (response.type === 'register-required') {
         return response;
       }
@@ -237,13 +230,6 @@ const createUserSlice: StoreSlice<UserSlice> = (set, get) => ({
         text1: i18n.t('app.authErrors.loginFailed'),
         props: {errorCode: 400},
       });
-      
-      console.error("login failed:", {
-        status: error.response?.status,
-        message: error.response?.data?.message || error.message,
-        code: error.response?.data?.code,
-        ulr: error.response
-      });
       return null;
     }
   },
@@ -257,7 +243,6 @@ const createUserSlice: StoreSlice<UserSlice> = (set, get) => ({
         isTermsAccepted,
         isPromoTermsAccepted,
       });
-      console.log("Register response:", response); 
 
       if (response.tokens) {
         DdLogs.info('Register success ', {phone});
@@ -430,7 +415,6 @@ const createUserSlice: StoreSlice<UserSlice> = (set, get) => ({
         set({loading: false});
       }
     } catch (error) {
-      console.error('Ошибка при загрузке пользователя:', error);
       set({loading: false});
     }
   },

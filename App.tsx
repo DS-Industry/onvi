@@ -174,20 +174,11 @@ function App(): React.JSX.Element {
           const localMetaDataPartial: DeviceMeta = await getLocalMetaData();
           
           if (!user?.meta) {
-            try {
-              await createUserMeta({
-                ...localMetaDataPartial,
-                appToken: fcmToken ?? '',
-                clientId: user.id,
-              });
-            } catch (error) {
-              console.error("createUserMeta failed:", {
-                status: error.response?.status,
-                message: error.response?.data?.message || error.message,
-                code: error.response?.data?.code
-              });              
-            }
-            
+            await createUserMeta({
+              ...localMetaDataPartial,
+              appToken: fcmToken ?? '',
+              clientId: user.id,
+            });
           } else if (
             hasMetaDataChanged(
               {

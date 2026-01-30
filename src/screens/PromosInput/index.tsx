@@ -38,9 +38,7 @@ const PromosInput = () => {
 
   const route = useRoute<PromoInputRouteProp>();
   const {promocode, type} = route.params;
-  const {setUserBalance} = useStore.getState();
-  console.log(type);
-  
+  const {setUserBalance} = useStore.getState();  
 
   const {trigger, isMutating} = useSWRMutation(
     'applyUserPromo',

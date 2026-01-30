@@ -32,12 +32,32 @@ export function setupAuthInterceptors(axiosInstance: AxiosInstance) {
   // Response interceptor for handling expired tokens
   axiosInstance.interceptors.response.use(
     (response: AxiosResponse) => {
+      console.log("Response Success:", {
+        fullUrl: response.config.baseURL + response.config.url,
+        method: response.config.method?.toUpperCase(),
+        status: response.status,
+        statusText: response.statusText,
+        headers: response.headers,
+        data: response.data,
+      });
+      
       return response;
     },
     async (error: AxiosError) => {
       const originalRequest = error.config;
       // Cast to any to add/check the _retry property
       const requestWithRetry = originalRequest as any;
+      console.log("Response Error:", {
+        fullUrl: error?.config?.baseURL + error?.config?.url,
+        method: error?.config?.method?.toUpperCase(),
+        status: error?.response?.status,
+        statusText: error?.response?.statusText,
+        headers: error?.response?.headers,
+        errorMessage: error?.message,
+        responseData: error?.response?.data,
+        requestData: error?.config?.data,
+        requestHeaders: error?.config?.headers,
+      });
 
       const logData = {
         message: error?.message || 'Axios error',
@@ -124,7 +144,7 @@ export function setupAuthInterceptors(axiosInstance: AxiosInstance) {
       try {
         const state = useStore.getState();
         const { accessToken, expiredDate } = state;
-  
+
         // Mark refresh token requests to identify them in the response interceptor
         if (
           config.url?.includes('/refresh-token') ||
@@ -132,7 +152,7 @@ export function setupAuthInterceptors(axiosInstance: AxiosInstance) {
         ) {
           (config as any)._isRefreshRequest = true;
         }
-  
+
         if (
           accessToken &&
           expiredDate &&
@@ -140,19 +160,19 @@ export function setupAuthInterceptors(axiosInstance: AxiosInstance) {
         ) {
           config.headers.Authorization = `Bearer ${accessToken}`;
         }
-  
+
         // Вывод информации о запросе
         console.log("Request:", {
           fullUrl: config.baseURL + config.url,
           method: config.method?.toUpperCase(),
           headers: config.headers,
           body: config.data,
-        }); 
-  
+        });
+
       } catch (e) {
         console.error("Interceptor error:", e);
       }
-  
+
       return config;
     },
     error => {

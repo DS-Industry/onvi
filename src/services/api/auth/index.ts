@@ -19,21 +19,10 @@ enum AUTH_ENDPOINTS {
 export async function sendOtp(
   body: ISendOtpRequest,
 ): Promise<ISendOtpResponse> {
-  try {    
-    const response = await newUserApiInstance.post<
-      IUserApiResponse<ISendOtpResponse>
-    >(AUTH_ENDPOINTS.SEND_OTP_URL, body);
-
-    return response.data.data;
-  } catch (error) {
-    console.error("sendOtp failed:", {
-      status: error.response?.status,
-      message: error.response?.data?.message || error.message,
-      code: error.response?.data?.code,
-      ulr: error.response
-    });
-    throw error;
-  }
+  const response = await newUserApiInstance.post<
+    IUserApiResponse<ISendOtpResponse>
+  >(AUTH_ENDPOINTS.SEND_OTP_URL, body);
+  return response.data.data;
 }
 
 export async function login(body: ILoginRequest): Promise<ILoginResponse> {
@@ -41,24 +30,16 @@ export async function login(body: ILoginRequest): Promise<ILoginResponse> {
     AUTH_ENDPOINTS.LOGIN_URL,
     body,
   );
-  console.log("login:", response);
-
   return response.data;
 }
 
 export async function register(
   body: IRegisterRequest,
 ): Promise<IRegisterResponse> {
-
-  console.log("register body:", body);
-
   const response = await newUserApiInstance.post<IRegisterResponse>(
     AUTH_ENDPOINTS.REGISTER_URL,
     body
   );
-
-  console.log("register", response);
-
   return response.data;
 }
 

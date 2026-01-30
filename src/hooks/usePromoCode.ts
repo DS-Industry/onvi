@@ -56,14 +56,11 @@ export const usePromoCode = (carWashId: number) => {
       try {
         const validPromoCode: IValidatePromoCodeResponse = await trigger(body);
 
-        // НОВАЯ ЛОГИКА: если пришел promoCodeId, значит промокод применен
+        // если пришел promoCodeId, значит промокод применен
         if (validPromoCode.isValid && validPromoCode.promoCodeId) {
-          // Здесь нужно определить тип скидки
-          // В новом API нет прямого указания типа скидки, нужно адаптировать под вашу логику
-          // Временное решение: предполагаем фиксированную скидку
           const updatedValue: DiscountValueType = {
-            type: DiscountType.CASH, // или другой тип, в зависимости от вашей логики
-            discount: 0, // нужно получить скидку из другого источника или API
+            type: DiscountType.CASH, 
+            discount: 0, 
           };
           setDiscount(updatedValue);
           setPromoCodeId(validPromoCode.promoCodeId);

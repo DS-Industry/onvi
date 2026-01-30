@@ -87,7 +87,6 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
         setTransactionalCampaign(result.usedTransactionalCampaign);
       }
     } catch (error) {
-      console.error('Failed to calculate discount:', error);
     } finally {
       if (isFirstLoad) {
         setIsFirstLoad(false);
