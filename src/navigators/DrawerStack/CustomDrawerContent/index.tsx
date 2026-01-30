@@ -236,7 +236,7 @@ const CustomDrawerContent = ({ navigation, theme, user }: CustomDrawerContentPro
           </View>
         </DrawerContentScrollView>
         <View style={styles.footer}>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={styles.transferButton}
             onPress={() => {
               navigation.reset({
@@ -255,7 +255,7 @@ const CustomDrawerContent = ({ navigation, theme, user }: CustomDrawerContentPro
                 source={require('../../../assets/icons/moyka-transfer.png')}
               />
             </View>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <View style={styles.supportContainer}>
             <Image
               style={styles.telegramIcon}
