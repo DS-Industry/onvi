@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Platform, StyleSheet, Text, View, ScrollView, ActivityIndicator } from 'react-native';
+import { Platform, StyleSheet, Text, View, ScrollView } from 'react-native';
 import { Button } from '@styled/buttons';
 import useStore from '@state/store';
 import PaymentMethods from '@components/PaymentMethods';
@@ -36,6 +36,8 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
   const [cashbackAmount, setCashbackAmount] = useState<number>(0);
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [transactionalCampaign, setTransactionalCampaign] = useState<IUsedTransactionalCampaign | null>(null);
+  const [promoCodeDiscount, setPromoCodeDiscount] = useState<number>(0);
+  const [transactionalCampaignDiscount, setTransactionalCampaignDiscount] = useState<number>(0);
 
   const {
     inputCodeValue,
@@ -47,10 +49,18 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
     applyPromoCode,
   } = usePromoCode(order?.posId || 0);
 
-  const { usedPoints, toggled, applyPoints, togglePoints } = useBonusPoints(
+  // Рассчитываем общую скидку для расчета бонусов
+  const calculateTotalDiscount = useCallback(() => {
+    if (!order?.sum) return 0;
+    
+    return promoCodeDiscount + transactionalCampaignDiscount;
+  }, [order, promoCodeDiscount, transactionalCampaignDiscount, discount]);
+
+  const { usedPoints, maxPoints, toggled, applyPoints, togglePoints } = useBonusPoints(
     user,
     order,
     discount,
+    calculateTotalDiscount(),
   );
 
   // Новый хук для расчета скидок
@@ -75,16 +85,18 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
       carWashId: Number(order.posId) || 0,
       carWashDeviceId: Number(order.carWashDeviceId) || 0,
       bayType: order.bayType as BayTypeEnum || BayTypeEnum.PORTAL,
-      rewardPointsUsed: toggled ? usedPoints : undefined,
+      rewardPointsUsed: toggled ? maxPoints : undefined,
       promoCodeId: promoCodeId || undefined,
     };
         
     try {
       const result = await calculate(requestData);
       if (result) {
-        setFinalOrderCost(prev => result.sumReal);
+        setFinalOrderCost(result.sumReal);
         setCashbackAmount(result.sumCashback);
         setTransactionalCampaign(result.usedTransactionalCampaign);
+        setPromoCodeDiscount(result.promoCodeDiscount || 0);
+        setTransactionalCampaignDiscount(result.transactionalCampaignDiscount || 0);
       }
     } catch (error) {
     } finally {
@@ -92,7 +104,7 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
         setIsFirstLoad(false);
       }
     }
-  }, [order, freeOn, toggled, usedPoints, promoCodeId, calculate, isFirstLoad]);
+  }, [order, freeOn, toggled, maxPoints, promoCodeId, calculate, isFirstLoad, transactionalCampaign]);
 
   useEffect(() => {
     AppMetrica.reportEvent('Open Payment Content Modal');
@@ -104,7 +116,7 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
     if (!isFirstLoad) {
       calculateDiscountCall();
     }
-  }, [toggled, usedPoints, promoCodeId, order?.sum]);
+  }, [toggled, promoCodeId]);
 
   const handlePromoPress = (promo: IPersonalPromotion) => {
     if (!promo) {
@@ -123,7 +135,7 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
       user,
       order,
       discount,
-      usedPoints,
+      usedPoints: toggled ? maxPoints : 0,
       promoCodeId,
       loadUser,
       freeOn,
@@ -163,7 +175,7 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
             selectedPos={selectedPos}
             finalOrderCost={freeOn ? 0 : finalOrderCost}
             cashbackAmount={cashbackAmount}
-            isCashbackLoading={isFirstLoad || isDiscountLoading} // Передаем состояние загрузки
+            isCashbackLoading={isFirstLoad || isDiscountLoading}
           />
 
           <View style={styles.choice}>
@@ -177,6 +189,7 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
                     toggled={toggled}
                     onToggle={togglePoints}
                     applyPoints={applyPoints}
+                    maxPoints={maxPoints}
                   />
                 )}
 
@@ -194,7 +207,6 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
             )}
 
             <View style={styles.badgesContainer}>
-              {/* Бейдж для транзакционной кампании */}
               {transactionalCampaign && (
                 <View style={styles.badgeWrapper}>
                   <Button
@@ -271,7 +283,7 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
             priceFontSize={18}
             priceFontWeight={'500'}
             showLoading={loading || isDiscountLoading}
-            disabled={isPaymentDisabled} // Делаем кнопку неактивной при загрузке
+            disabled={isPaymentDisabled}
           />
         )}
       </View>
