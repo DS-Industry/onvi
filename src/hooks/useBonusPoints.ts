@@ -32,7 +32,7 @@ export const useBonusPoints = (
     
     setMaxPoints(maximumApplicablePoints);
     
-ё    if (toggled) {
+    if (toggled) {
       setUsedPoints(maximumApplicablePoints);
     }
   }, [user, order?.sum, totalDiscount, toggled]);
