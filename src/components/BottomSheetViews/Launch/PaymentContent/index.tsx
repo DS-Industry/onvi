@@ -116,7 +116,7 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
     if (!isFirstLoad) {
       calculateDiscountCall();
     }
-  }, [toggled, promoCodeId]);
+  }, [toggled, promoCodeId, maxPoints]);
 
   const handlePromoPress = (promo: IPersonalPromotion) => {
     if (!promo) {
