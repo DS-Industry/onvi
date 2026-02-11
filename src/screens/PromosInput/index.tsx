@@ -15,6 +15,7 @@ import useSWRMutation from 'swr/mutation';
 import {apply} from '@services/api/promotion';
 import {IApplyPromotionRequest} from '../../types/api/promotion/req/IApplyPromotionRequest.ts';
 import Toast from 'react-native-toast-message';
+
 import {
   DrawerParamList,
   GeneralDrawerNavigationProp,
@@ -26,7 +27,6 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import ScreenHeader from '@components/ScreenHeader/index.tsx';
 import useStore from '../../state/store';
 import {useTranslation} from 'react-i18next';
-import {AvailablePromocodeResponse} from '@app-types/models/Promotion';
 
 type PromoInputRouteProp = RouteProp<DrawerParamList, 'Ввод Промокода'>;
 
@@ -38,7 +38,7 @@ const PromosInput = () => {
 
   const route = useRoute<PromoInputRouteProp>();
   const {promocode, type} = route.params;
-  const {setUserBalance} = useStore.getState();  
+  const {setUserBalance} = useStore.getState();
 
   const {trigger, isMutating} = useSWRMutation(
     'applyUserPromo',
@@ -46,7 +46,7 @@ const PromosInput = () => {
     {
       onError: err => {
         let message = t('app.errors.genericError');
-        setCode('');
+        setCode(''); // Clear the code input
 
         if (err.response && err.response.data) {
           const errorCode = parseInt(err.response.data.code);
@@ -83,12 +83,16 @@ const PromosInput = () => {
 
   const copyToClipboard = () => {
     Clipboard.setString(promoCode);
+
+    Toast.show({
+      type: 'info',
+      text1: 'Промокод скопирован',
+    });
   };
 
   useEffect(() => {
     setPromocode(promocode.code);
   }, []);
-
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: '#fff'}}>
       <ScrollView contentContainerStyle={{flexGrow: 1}}>
@@ -99,26 +103,31 @@ const PromosInput = () => {
             btnCallback={() => navigation.navigate('Промокоды')}
           />
           <View style={styles.content}>
-            {type === 'personal' && promocode.discountValue !== undefined ? (
-              <View style={styles.bannerContainer}>
-                <PersonalPromoBanner
-                  title={t('app.promos.promocodeForVariables', {
-                    discount: promocode.discountValue,
-                    unit:
-                      promocode.discountType === 'percentage'
-                        ? '%'
-                        : t('common.labels.ballov'),
-                  })}
-                  date={promocode.validUntil ? new Date(promocode.validUntil) : new Date()}
-                  disable={true}
-                />
-              </View>
+            {type == 'personal' &&
+            'discount' in promocode &&
+            'discountType' in promocode ? (
+              <PersonalPromoBanner
+                title={t('app.promos.promocodeForVariables', {
+                  discount: promocode.discount,
+                  unit:
+                    promocode.discountType == 2
+                      ? '%'
+                      : t('common.labels.ballov'),
+                })}
+                date={new Date(promocode.expiryDate)}
+                disable={true}
+              />
             ) : (
-              <View style={styles.imageContainer}>
-                {promocode.mobileDisplay?.imageLink && (
+              <View
+                style={{width: '100%', height: '60%', borderRadius: dp(25)}}>
+                {promocode.image && (
                   <Image
-                    source={{uri: promocode.mobileDisplay.imageLink}}
-                    style={styles.image}
+                    source={{uri: promocode.image}}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      resizeMode: 'contain',
+                    }}
                   />
                 )}
               </View>
@@ -126,35 +135,39 @@ const PromosInput = () => {
             {type == 'personal' ? (
               <View style={styles.promoCodeSection}>
                 <Text style={styles.title}>{t('app.promos.promocode')}</Text>
-                <View style={styles.promoCodeRow}>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
                   <Text style={styles.promoCode}>{promocode.code}</Text>
                   <Pressable
                     onPress={copyToClipboard}
-                    style={styles.copyButton}>
-                    <Copy
-                      stroke={color}
-                      width={dp(22)}
-                      height={dp(22)}
-                      onPressIn={() => {
-                        setColor('#AAA7A7FF');
-                      }}
-                      onPressOut={() => {
-                        setColor('#000000');
-                      }}
-                    />
+                    onPressIn={() => setColor('#AAA7A7FF')}
+                    onPressOut={() => setColor('#000000')}
+                    style={{marginLeft: dp(10), padding: dp(5)}}>
+                    <Copy stroke={color} width={dp(22)} height={dp(22)} />
                   </Pressable>
                 </View>
               </View>
-            ) : null}
-            <View style={styles.descriptionSection}>
-              <Text style={styles.title}>{t('common.labels.description')}</Text>
-              <Text style={styles.text}>
-                {type === 'personal'
-                  ? promocode.mobileDisplay?.description || ''
-                  : promocode.campaign?.description || ''}
-              </Text>
-            </View>
+            ) : (
+              <></>
+            )}
+            <Text style={styles.title}>{t('common.labels.description')}</Text>
+            <Text style={styles.text}>
+              {type === 'personal'
+                ? promocode.image
+                : 'description' in promocode
+                ? promocode.description
+                : ''}
+            </Text>
           </View>
+          {type == 'global' && (
+            <View style={{alignSelf: 'center'}}>
+              <Button
+                label={t('common.buttons.activate')}
+                color={'blue'}
+                showLoading={isMutating}
+                onClick={() => trigger({code: promoCode})}
+              />
+            </View>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -171,45 +184,25 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     marginTop: dp(30),
+    alignItems: 'center',
   },
-  bannerContainer: {
-    width: '100%',
-    marginBottom: dp(20),
-  },
-  imageContainer: {
-    width: '100%',
-    height: dp(250),
-    borderRadius: dp(12),
-    marginBottom: dp(20),
-    backgroundColor: '#F5F5F5',
-    overflow: 'hidden',
-  },
-  image: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'contain',
+  action: {
+    width: '85%',
+    display: 'flex',
+    flexDirection: 'row',
+    marginTop: dp(30),
+    justifyContent: 'space-between',
   },
   promoCodeSection: {
     flexDirection: 'column',
-    width: '100%',
-    marginBottom: dp(20),
-  },
-  promoCodeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: dp(5),
-  },
-  copyButton: {
-    marginLeft: dp(10),
-  },
-  descriptionSection: {
     width: '100%',
   },
   title: {
     fontSize: dp(14),
     fontWeight: '600',
+    marginTop: dp(30),
     marginBottom: dp(10),
-    color: '#000',
+    alignSelf: 'flex-start',
   },
   promoCode: {
     fontSize: dp(18),
@@ -218,9 +211,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: dp(14),
-    letterSpacing: 0.5,
-    lineHeight: dp(20),
-    color: '#333',
+    letterSpacing: 1.5,
   },
 });
 
