@@ -3,16 +3,7 @@ import {useTranslation} from 'react-i18next';
 
 import {dp} from '../../utils/dp';
 
-import {
-  View,
-  Text,
-  StyleSheet,
-  SafeAreaView,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-} from 'react-native';
-
+import {View, Text, StyleSheet, SafeAreaView, Image, TouchableOpacity, ScrollView} from 'react-native';
 import {useNavigation} from '@react-navigation/core';
 import EmptyPlaceholder from '@components/EmptyPlaceholder';
 
@@ -22,85 +13,73 @@ import {GeneralDrawerNavigationProp} from '../../types/navigation/DrawerNavigati
 import {PersonalPromoBanner} from '@styled/banners/PersonalPromoBanner';
 import Carousel from 'react-native-reanimated-carousel';
 import useSWR from 'swr';
-import {getActiveClientPromotions} from '@services/api/user';
-import {getGlobalPromotions} from '@services/api/promotion';
+import {getPromotions} from '@services/api/promotion';
 import {PersonalPromoPlaceholder} from '@screens/Promos/PersonalPromoPlaceholder.tsx';
 import ScreenHeader from '@components/ScreenHeader';
-import useStore from '../../state/store.ts';
+import { EPromorionsFilter } from '@app-types/models/Promotion.ts';
 
 const Promos = () => {
   const navigation = useNavigation<GeneralDrawerNavigationProp<'Промокоды'>>();
   const {t} = useTranslation();
 
-  const {location} = useStore.getState();
-
-  const locationParams = {
-    latitude: Number(location?.latitude),
-    longitude: Number(location?.longitude),
-  };
-
   const {
     isLoading: isGlobalPromoLoading,
-    data: globalPromo,
+    data: globalPromoData,
     error: globalError,
-  } = useSWR(['getGlobalPromos'], () => getGlobalPromotions());
+  } = useSWR(['getGlobalPromos'], () => getPromotions({filters: EPromorionsFilter.MARKETING_CAMPAIGNS}));
 
   const {
     isLoading: isPersonalPromoLoading,
-    data: personalPromo,
+    data: personalPromoData,
     error: personalError,
-  } = useSWR(['getPersonalPromos'], () =>
-    getActiveClientPromotions(locationParams),
-  );
+  } = useSWR(['getPersonalPromos'], () => getPromotions({filters: EPromorionsFilter.PERSONAL}));
+
+  const globalPromo = globalPromoData || [];  
+  const personalPromo = personalPromoData || [];
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: '#FFF'}}>
       <ScrollView style={styles.container}>
         <ScreenHeader screenTitle={t('app.promos.title')} />
         <View style={styles.content}>
-          <View style={{flex: 1, marginBottom: dp(20), height: '30%'}}>
+          <View style={styles.personalPromosContainer}>
             <Text style={styles.sectionTitle}>
               {t('app.promos.personalPromos')}
             </Text>
             {isPersonalPromoLoading || personalError ? (
-              // Show the placeholder when loading
               <PersonalPromoPlaceholder />
             ) : personalPromo && personalPromo.length > 0 ? (
-              // Show the carousel if promo data is available
               <View>
                 <Carousel
                   data={personalPromo}
                   vertical={false}
-                  width={dp(350)}
+                  width={dp(366)}
                   height={dp(200)}
                   pagingEnabled
-                  renderItem={({item}: any) => (
-                    <PersonalPromoBanner
-                      title={`${t('app.promos.promocodeFor')} ${
-                        item.discount
-                      } ${
-                        item.discountType == 2 ? '%' : t('common.labels.ballov')
-                      }`}
-                      date={new Date(item.expiryDate)}
-                      onPress={() =>
-                        navigation.navigate('Ввод Промокода', {
-                          promocode: item,
-                          type: 'personal',
-                        })
-                      }
-                      disable={false}
-                    />
+                  style={styles.carousel}
+                  renderItem={({item}) => (
+                    <View style={styles.personalBannerItem}>
+                      <PersonalPromoBanner
+                        title={`${t('app.promos.promocodeFor')} ${
+                          item.discountValue
+                        } ${
+                          item.discountType === 'percentage' ? '%' : t('common.labels.ballov')
+                        }`}
+                        date={item.validUntil ? new Date(item.validUntil) : new Date()}
+                        onPress={() =>
+                          navigation.navigate('Ввод Промокода', {
+                            promocode: item,
+                            type: 'personal',
+                          })
+                        }
+                        disable={!item.isActive}
+                      />
+                    </View>
                   )}
                 />
               </View>
             ) : (
-              // Show a fallback message if no promo codes are available
-              <View
-                style={{
-                  alignSelf: 'center',
-                  flex: 1,
-                  justifyContent: 'center',
-                }}>
+              <View style={styles.emptyContainer}>
                 <EmptyPlaceholder text={t('app.promos.noPromocodes')} />
               </View>
             )}
@@ -110,12 +89,7 @@ const Promos = () => {
             <Text style={styles.sectionTitle}>
               {t('app.promos.generalPromocodes')}
             </Text>
-            <View
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-              }}>
+            <View style={styles.globalPromosWrapper}>
               {isGlobalPromoLoading || globalError ? (
                 <GlobalPromosPlaceholder />
               ) : globalPromo && globalPromo.length > 0 ? (
@@ -128,37 +102,34 @@ const Promos = () => {
                     enabled
                     data={globalPromo}
                     pagingEnabled
-                    width={dp(350)}
+                    width={dp(366)}
                     height={dp(350)}
-                    renderItem={({item}: any) => {
+                    style={styles.carousel}
+                    renderItem={({item}) => {
                       return (
-                        <TouchableOpacity
-                          onPress={() =>
-                            navigation.navigate('Ввод Промокода', {
-                              promocode: item,
-                              type: 'global',
-                            })
-                          }>
-                          <Image
-                            source={{uri: item.image}}
-                            style={{
-                              width: '100%',
-                              height: '100%',
-                              resizeMode: 'contain',
-                            }}
-                          />
-                        </TouchableOpacity>
+                        <View style={styles.globalPromoItem}>
+                          <TouchableOpacity
+                            onPress={() =>
+                              navigation.navigate('Ввод Промокода', {
+                                promocode: item,
+                                type: 'global',
+                              })
+                            }
+                            style={styles.promoContainer}>
+                            <View style={styles.imageWrapper}>
+                              <Image
+                                source={{uri: item.mobileDisplay?.imageLink}}
+                                style={styles.promoImage}
+                              />
+                            </View>
+                          </TouchableOpacity>
+                        </View>
                       );
                     }}
                   />
                 </View>
               ) : (
-                <View
-                  style={{
-                    alignSelf: 'center',
-                    flex: 1,
-                    justifyContent: 'center',
-                  }}>
+                <View style={styles.emptyContainer}>
                   <EmptyPlaceholder text={t('app.promos.noPromocodes')} />
                 </View>
               )}
@@ -181,54 +152,56 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     marginTop: dp(30),
   },
-  sectionTitle: {
-    fontSize: dp(20),
-    color: '#000',
-    fontWeight: '600',
-    marginBottom: dp(8),
+  personalPromosContainer: {
+    flex: 1,
+    marginBottom: dp(20),
   },
   cuponContainer: {
     flex: 2,
     marginTop: dp(25),
   },
-  modalContainer: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
+  sectionTitle: {
+    fontSize: dp(20),
+    color: '#000',
+    fontWeight: '600',
+    marginBottom: dp(12),
   },
-  modalContent: {
-    backgroundColor: 'white',
-    padding: dp(20),
-    borderRadius: 38,
-    width: dp(341),
-    height: dp(309),
-    display: 'flex',
+  carousel: {
+    marginHorizontal: dp(-8),
+  },
+  personalBannerItem: {
+    paddingHorizontal: dp(8),
+  },
+  globalPromoItem: {
+    paddingHorizontal: dp(8),
+  },
+  globalPromosWrapper: {
     flexDirection: 'column',
     alignItems: 'center',
   },
-  modalTitle: {
-    fontWeight: '600',
-    fontSize: dp(24),
-    paddingBottom: dp(3),
+  emptyContainer: {
+    alignSelf: 'center',
+    flex: 1,
+    justifyContent: 'center',
+    minHeight: dp(200),
   },
-  modalText: {
-    fontWeight: '400',
-    fontSize: dp(16),
+  promoContainer: {
+    width: '100%',
+    height: '100%',
+    borderRadius: dp(12),
+    backgroundColor: '#F5F5F5',
+    overflow: 'hidden',
   },
-  actionButtons: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingTop: dp(27),
+  imageWrapper: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#F5F5F5',
   },
-  circleImage: {
-    width: dp(45),
-    height: dp(45),
-  },
-  copyImage: {
-    width: dp(24),
-    height: dp(24),
+  promoImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'contain',
+    borderRadius: dp(8),
   },
 });
 

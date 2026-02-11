@@ -168,9 +168,11 @@ function App(): React.JSX.Element {
   useEffect(() => {
     loadUser();
     const syncMetaData = async () => {
+      
       if (isConnected && user?.id) {
         try {
           const localMetaDataPartial: DeviceMeta = await getLocalMetaData();
+          
           if (!user?.meta) {
             await createUserMeta({
               ...localMetaDataPartial,
@@ -183,20 +185,19 @@ function App(): React.JSX.Element {
                 ...localMetaDataPartial,
                 appToken: fcmToken ?? '',
                 clientId: user.id,
-                metaId: user.meta.metaId,
+                id: user.meta.id,
               },
               user.meta,
             )
-          ) {
+          ) {            
             await updateUserMeta({
               ...localMetaDataPartial,
               appToken: fcmToken ?? '',
               clientId: user.id,
-              metaId: user.meta.metaId,
+              id: user.meta.id,
             });
           }
         } catch (error) {
-          console.error('Error syncing metadata:', error);
         }
       }
     };

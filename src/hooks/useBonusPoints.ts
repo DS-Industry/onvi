@@ -1,4 +1,4 @@
-import {useState, useCallback} from 'react';
+import {useState, useCallback, useEffect} from 'react';
 import {IUser} from '../types/models/User.ts';
 import {OrderDetailsType} from '../state/order/OrderSlice.ts';
 import {
@@ -11,27 +11,47 @@ export const useBonusPoints = (
   user: IUser | null,
   order: OrderDetailsType,
   discount: DiscountValueType | null,
+  totalDiscount: number = 0
 ) => {
   const [usedPoints, setUsedPoints] = useState(0);
   const [toggled, setToggled] = useState(false);
+  const [maxPoints, setMaxPoints] = useState(0);
+
+  // Рассчитываем максимальные бонусы при изменении заказа или общей скидки
+  useEffect(() => {
+    if (!user || !order?.sum) {
+      setMaxPoints(0);
+      return;
+    }
+
+    const maximumApplicablePoints = getMaximumApplicablePoints(
+      user,
+      order.sum,
+      totalDiscount,
+    );
+    
+    setMaxPoints(maximumApplicablePoints);
+    
+    if (toggled) {
+      setUsedPoints(maximumApplicablePoints);
+    }
+  }, [user, order?.sum, totalDiscount, toggled]);
 
   /**
    * Apply maximum available points to the payment
    */
   const applyPoints = useCallback(() => {
-    if (!user || !order.sum) {
+    if (!user || !order?.sum) {
       return;
     }
-
-    const actualDiscount = calculateActualDiscount(discount, order.sum);
 
     const maxPoints = getMaximumApplicablePoints(
       user,
       order.sum,
-      actualDiscount,
+      totalDiscount,
     );
     setUsedPoints(maxPoints);
-  }, [user, order.sum, discount]);
+  }, [user, order?.sum, totalDiscount]);
 
   /**
    * Toggle points usage on/off
@@ -58,16 +78,15 @@ export const useBonusPoints = (
    * Get maximum points that can be applied
    */
   const getMaxPoints = useCallback(() => {
-    if (!user || !order.sum) {
+    if (!user || !order?.sum) {
       return 0;
     }
-    const actualDiscount = calculateActualDiscount(discount, order.sum);
-
-    return getMaximumApplicablePoints(user, order.sum, actualDiscount);
-  }, [user, order.sum, discount]);
+    return getMaximumApplicablePoints(user, order.sum, totalDiscount);
+  }, [user, order?.sum, totalDiscount]);
 
   return {
     usedPoints,
+    maxPoints,
     toggled,
     applyPoints,
     togglePoints,

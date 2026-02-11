@@ -27,7 +27,7 @@ export const getMaximumApplicablePoints = (
   orderSum: number | undefined,
   discount: number,
 ): number => {
-  if (!user?.cards?.balance || !orderSum) {
+  if (!user?.cards?.cardBalance || !orderSum) {
     return 0;
   }
 
@@ -37,7 +37,7 @@ export const getMaximumApplicablePoints = (
   // Maximum points = amount after discount - minimum payment (1 ruble)
   const maxAllowedPoints = Math.max(afterDiscount - 1, 0);
 
-  return Math.min(user.cards.balance, maxAllowedPoints);
+  return Math.min(user.cards.cardBalance, maxAllowedPoints);
 };
 
 /**

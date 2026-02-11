@@ -1,26 +1,21 @@
-import {ICreatePaymentRequest} from '../../../types/api/payment/req/ICreatePaymentRequest.ts';
-import {IUserApiResponse} from '../../../types/api/common/IUserApiResponse.ts';
-import {userApiInstance} from '@services/api/axiosConfig.ts';
+import { newUserApiInstance } from '@services/api/axiosConfig.ts';
+import { ICalculateDiscountRequest } from '@app-types/api/payment/req/ICalculateDiscountRequest.ts';
+import { ICalculateDiscountResponse } from '@app-types/api/payment/res/ICalculateDiscountResponse.ts';
 
-enum PAYMENT {
-  CREATE_PAYMENT_URL = '/payment',
-  GET_CREDENTIAL = '/payment/credentials',
-}
-
-export async function createPayment(body: ICreatePaymentRequest): Promise<any> {
-  const response = await userApiInstance.post<IUserApiResponse<any>>(
-    PAYMENT.CREATE_PAYMENT_URL,
-    body,
-  );
-
-  return response.data.data;
+enum NEW_PAYMENT {
+  CREDENTIALS = '/client/order/credentials',
+  CALCULATE_DISCOUNT = '/client/order/calculate-discount',
 }
 
 export async function getCredentials(): Promise<{
-  apiKey: string;
-  storeId: string;
+  clientApplicationKey: string;
+  shopId: string;
 }> {
-  const response = await userApiInstance.get(PAYMENT.GET_CREDENTIAL);
+  const response = await newUserApiInstance.get(NEW_PAYMENT.CREDENTIALS);
+  return response.data;
+}
 
-  return response.data.data;
+export async function calculateDiscount(body: ICalculateDiscountRequest): Promise<ICalculateDiscountResponse> {
+  const response = await newUserApiInstance.post<ICalculateDiscountResponse>(NEW_PAYMENT.CALCULATE_DISCOUNT, body);
+  return response.data;
 }

@@ -20,6 +20,7 @@ export const usePromoCode = (carWashId: number) => {
   const [inputCodeValue, setInputCodeValue] = useState<string | undefined>();
   const [discount, setDiscount] = useState<DiscountValueType | null>(null);
   const [promoError, setPromoError] = useState<string | null>(null);
+  const [promoCodeId, setPromoCodeId] = useState<number | null>(null);
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
 
   // SWR mutation hook for promo code validation
@@ -42,6 +43,8 @@ export const usePromoCode = (carWashId: number) => {
 
       if (!promoToApply) {
         setDiscount(null);
+        setPromoCodeId(null);
+        setPromoError(null);
         return;
       }
 
@@ -53,18 +56,25 @@ export const usePromoCode = (carWashId: number) => {
       try {
         const validPromoCode: IValidatePromoCodeResponse = await trigger(body);
 
-        const updatedValue: DiscountValueType = {
-          type: validPromoCode.type,
-          discount: validPromoCode.discount,
-        };
-
-        if (validPromoCode.valid) {
+        // если пришел promoCodeId, значит промокод применен
+        if (validPromoCode.isValid && validPromoCode.promoCodeId) {
+          const updatedValue: DiscountValueType = {
+            type: DiscountType.CASH, 
+            discount: 0, 
+          };
           setDiscount(updatedValue);
+          setPromoCodeId(validPromoCode.promoCodeId);
+          setPromoError(null);
+        } else {
+          // Промокод не валидный
+          setDiscount(null);
+          setPromoCodeId(null);
+          setPromoError(validPromoCode.message || 'Promo code is not valid');
         }
-
-        setPromoError(null);
       } catch (error) {
         setInputCodeValue(undefined);
+        setDiscount(null);
+        setPromoCodeId(null);
         const errorMessage = handlePromoCodeError(error);
         setPromoError(errorMessage);
         Toast.show({
@@ -106,6 +116,8 @@ export const usePromoCode = (carWashId: number) => {
   const handlePromoCodeChange = useCallback((value: string | undefined) => {
     if (!value) {
       setDiscount(null);
+      setPromoCodeId(null);
+      setPromoError(null);
     }
     setInputCodeValue(value);
   }, []);
@@ -117,23 +129,16 @@ export const usePromoCode = (carWashId: number) => {
     setInputCodeValue(undefined);
     setDiscount(null);
     setPromoError(null);
+    setPromoCodeId(null);
     applyPromoCode(undefined);
   }, [applyPromoCode]);
-
-  // Update discount when data changes
-  // useCallback(() => {
-  //   if (data?.discount) {
-  //     setDiscount(data.discount);
-  //     setPromoError(null);
-  //   }
-  // }, [data]);
 
   return {
     inputCodeValue,
     discount,
     promoError,
     isMutating,
-    promoCodeId: data?.id,
+    promoCodeId,
     setPromocode: handlePromoCodeChange,
     applyPromoCode,
     debouncedApplyPromoCode,

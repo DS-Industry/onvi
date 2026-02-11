@@ -1,5 +1,5 @@
 export interface IUpdateUserMetaRequest {
-  metaId?: number;
+  id?: number;
   clientId?: number;
   deviceId?: string;
   model?: string;

@@ -30,7 +30,7 @@ const History = () => {
     getOrderHistory({size: 20, page: 1}),
   );
 
-  const orderData = Array.isArray(data) ? data : [];
+  const orderData = data?.data || [];
 
   const initialAvatar = user?.avatar || 'both.jpg';
 
@@ -71,8 +71,8 @@ const History = () => {
         <View style={styles.listContainer}>
           <BottomSheetFlatList
             data={orderData}
-            renderItem={order => <BalanceCard option={order.item} />}
-            keyExtractor={(_, index) => index.toString()}
+            renderItem={({item}) => <BalanceCard option={item} />}
+            keyExtractor={(item, index) => index.toString()}
             onRefresh={mutate}
             refreshing={isLoading}
             showsVerticalScrollIndicator={false}

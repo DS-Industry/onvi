@@ -13,9 +13,10 @@ import {
 } from '@services/validation/index.validator.ts';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import i18n from '../../locales';
-import {deleteAccount, getMe, getTariff} from '@services/api/user';
+import {deleteAccount, getClientMe, getTariff} from '@services/api/user';
 import {login, refresh, register, sendOtp} from '@services/api/auth';
 import {DdLogs} from '@datadog/mobile-react-native';
+import { BenefitType } from '@app-types/api/user/res/IGetTariffResponse.ts';
 
 const MAX_REFRESH_RETRIES = 3;
 
@@ -181,10 +182,10 @@ const createUserSlice: StoreSlice<UserSlice> = (set, get) => ({
       if (response.type === 'register-required') {
         return response;
       }
-      if (response.type === 'login-success') {
+      if (response.tokens) {
         DdLogs.info('Login success', {phone});
         const {tokens} = response;
-        if (!tokens) {
+        if (!tokens) {          
           return null;
         }
 
@@ -233,12 +234,7 @@ const createUserSlice: StoreSlice<UserSlice> = (set, get) => ({
     }
   },
 
-  register: async (
-    otp,
-    phone,
-    isTermsAccepted = true,
-    isPromoTermsAccepted = true,
-  ) => {
+  register: async (otp, phone, isTermsAccepted = true, isPromoTermsAccepted = true) => {
     try {
       const formattedPhone = phone.replace(/[ \(\)-]+/g, '');
       const response = await register({
@@ -248,7 +244,7 @@ const createUserSlice: StoreSlice<UserSlice> = (set, get) => ({
         isPromoTermsAccepted,
       });
 
-      if (response.type === 'register-success') {
+      if (response.tokens) {
         DdLogs.info('Register success ', {phone});
 
         const {tokens} = response;
@@ -288,7 +284,7 @@ const createUserSlice: StoreSlice<UserSlice> = (set, get) => ({
       });
       return response;
     } catch (error) {
-      DdLogs.error('Registration error');
+      DdLogs.error('Registration error', {error});
       Toast.show({
         type: 'customErrorToast',
         text1: i18n.t('app.authErrors.registrationFailed'),
@@ -348,11 +344,18 @@ const createUserSlice: StoreSlice<UserSlice> = (set, get) => ({
 
       let existingData: Record<string, any> = {};
       if (existingSession) {
-        existingData = JSON.parse(existingSession);
+          existingData = JSON.parse(existingSession);
       }
-
+      
       if (userSession) {
-        const formatted: Record<string, any> = JSON.parse(userSession);
+        let formatted: Record<string, any> | null = null;
+        try {
+          formatted = JSON.parse(userSession);
+        } catch (parseError) {
+          set({loading: false});
+          return;
+        }
+        
         if (
           formatted &&
           isValidStorageData(formatted.accessToken, formatted.expiredDate)
@@ -364,16 +367,42 @@ const createUserSlice: StoreSlice<UserSlice> = (set, get) => ({
             loading: false,
           });
 
-          const data = await getMe();
+          const clientData = await getClientMe();
+          
+          if (!clientData.client) {
+            set({loading: false});
+            return;
+          }
+          
+          const {cardId, cardNumber, cardUnqNumber, cardBalance, ...client} = clientData.client.props;
+          
+          const metaProps = clientData.meta?.props || null;
+                    
           const tariff = await getTariff();
 
+          let cashBack = 0;
+          if (tariff.tier && tariff.tier.benefits) {
+            const cashBackBenefit = tariff.tier.benefits.find(
+              benefit => benefit?.benefitType === BenefitType.CASHBACK
+            );
+            cashBack = cashBackBenefit ? cashBackBenefit.bonus : 0;
+          }
+          
+          const userData: Partial<IUser> = {
+            ...client,
+            cards: {cardId, cardNumber, cardUnqNumber, cardBalance},
+            tariff: cashBack,
+          };
+          
+          if (metaProps) {
+            userData.meta = metaProps;
+          }
+          
           set({
-            user: {
-              ...data,
-              tariff: tariff.cashBack,
-            },
+            user: userData as IUser,
             refreshRetryCounter: MAX_REFRESH_RETRIES,
-          });
+          });   
+          
         } else if (
           formatted &&
           hasAccessTokenCredentials(existingData.refreshToken)
@@ -385,13 +414,15 @@ const createUserSlice: StoreSlice<UserSlice> = (set, get) => ({
       } else {
         set({loading: false});
       }
-    } catch (error) {}
+    } catch (error) {
+      set({loading: false});
+    }
   },
 
   deleteUser: async () => {
     try {
       const status = await deleteAccount();
-      if (status == 200) {
+      if (status == 204) {
         await LocalStorage.delete('user_session');
 
         await EncryptedStorage.setItem(

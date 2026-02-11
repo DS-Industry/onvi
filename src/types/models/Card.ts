@@ -1,7 +1,6 @@
 export interface ICard {
-  number: string;
-  unqNumber: string;
-  balance: number;
-  isLocked: boolean | null;
-  dateBegin: string;
+  cardId: number;
+  cardNumber: string; 
+  cardUnqNumber: string; 
+  cardBalance: number;
 }

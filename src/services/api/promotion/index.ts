@@ -1,12 +1,12 @@
-import {IApplyPromotionRequest} from '../../../types/api/promotion/req/IApplyPromotionRequest.ts';
-import {IApplyPromotionResponse} from '../../../types/api/promotion/res/IApplyPromotionResponse.ts';
-import {IUserApiResponse} from '../../../types/api/common/IUserApiResponse.ts';
-import {userApiInstance} from '@services/api/axiosConfig.ts';
-import {IGlobalPromotion} from '../../../types/models/GlobalPromotion.ts';
+import { IApplyPromotionRequest } from '../../../types/api/promotion/req/IApplyPromotionRequest.ts';
+import { IApplyPromotionResponse } from '../../../types/api/promotion/res/IApplyPromotionResponse.ts';
+import { IUserApiResponse } from '../../../types/api/common/IUserApiResponse.ts';
+import { newUserApiInstance, userApiInstance } from '@services/api/axiosConfig.ts';
+import { AvailablePromocodeResponse, IGetPromotionsParams, IPromotionsResponse } from '@app-types/models/Promotion.ts';
 
 enum PROMOTION {
   APPLY_URL = '/promotion/apply',
-  GET_GLOBAL_PROMOTIONS = '/promotion',
+  GET_PROMOTIONS = '/client/order/promocodes',
 }
 export async function apply(
   body: IApplyPromotionRequest,
@@ -17,11 +17,9 @@ export async function apply(
 
   return response.data.data;
 }
-
-export async function getGlobalPromotions(): Promise<IGlobalPromotion[]> {
-  const response = await userApiInstance.get<
-    IUserApiResponse<IGlobalPromotion[]>
-  >(PROMOTION.GET_GLOBAL_PROMOTIONS);
-
-  return response.data.data;
+export async function getPromotions(params?: IGetPromotionsParams): Promise<AvailablePromocodeResponse[]> {
+  const response = await newUserApiInstance.get<IPromotionsResponse>(
+    PROMOTION.GET_PROMOTIONS + `?filter=${params?.filters}`
+  );
+  return response.data; 
 }

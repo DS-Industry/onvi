@@ -1,16 +1,12 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {IUser} from '../../../../types/models/User.ts';
 import {OrderDetailsType} from '../../../../state/order/OrderSlice.ts';
 import {Text, TouchableOpacity, View} from 'react-native';
-import Skeleton from 'react-native-reanimated-skeleton'; // Измененный импорт
+import Skeleton from 'react-native-reanimated-skeleton';
 import Switch from '@styled/buttons/CustomSwitch';
 import {dp} from '@utils/dp.ts';
-import {
-  calculateActualDiscount,
-  getMaximumApplicablePoints,
-} from '@utils/paymentHelpers.ts';
-import {DiscountValueType} from '@hooks/usePromoCode.ts';
 import {useTranslation} from 'react-i18next';
+import {DiscountValueType} from '@hooks/usePromoCode.ts';
 
 interface PointsToggleProps {
   user: IUser | null;
@@ -19,6 +15,7 @@ interface PointsToggleProps {
   toggled: boolean;
   onToggle: () => void;
   applyPoints: () => void;
+  maxPoints: number;
 }
 
 /**
@@ -31,26 +28,11 @@ const PointsToggle: React.FC<PointsToggleProps> = ({
   toggled,
   onToggle,
   applyPoints,
+  maxPoints,
 }) => {
-  // If user data is not available, show skeleton loader
-  const [maxPoints, setMaxPoints] = useState<number>(0);
   const {t} = useTranslation();
 
-  useEffect(() => {
-    if (order && order.sum) {
-      //Calculate actual discount
-      const actualDiscount = calculateActualDiscount(discount, order.sum);
-      // Calculate maximum points that can be used
-      const maximumApplicablePoints = getMaximumApplicablePoints(
-        user,
-        order.sum,
-        actualDiscount,
-      );
-      setMaxPoints(maximumApplicablePoints);
-    }
-  }, [order, discount]);
-
-  if (!user || !user.cards || user.cards.balance == null) {
+  if (!user || !user.cards || user.cards.cardBalance == null) {
     return (
       <View
         style={{
@@ -122,7 +104,7 @@ const PointsToggle: React.FC<PointsToggleProps> = ({
           flexDirection: 'row',
           alignItems: 'center',
         }}>
-        <TouchableOpacity onPress={applyPoints}>
+        <TouchableOpacity onPress={onToggle}>
           <Switch
             value={toggled}
             onValueChange={onToggle}

@@ -1,6 +1,6 @@
 export enum REGISTER_STATUS {
-  CREATED = 'waiting_payment',
-  FAIL = 'failed',
+  WAITING_PAYMENT = 'WAITING_PAYMENT',
+  FAIL = 'FAILED',
 }
 
 export interface IRegisterOrderResponse {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Platform, StyleSheet, Text, View, ScrollView } from 'react-native';
 import { Button } from '@styled/buttons';
@@ -10,15 +10,13 @@ import { useBonusPoints } from '@hooks/useBonusPoints.ts';
 import { usePaymentProcess } from '@hooks/usePaymentProcess.ts';
 import PromocodeSection from '@components/BottomSheetViews/Payment/PromocodeSection';
 import { usePromoCode } from '@hooks/usePromoCode.ts';
-import {
-  calculateActualDiscount,
-  calculateActualPointsUsed,
-  calculateFinalAmount,
-} from '@utils/paymentHelpers.ts';
 import AppMetrica from '@appmetrica/react-native-analytics';
-import { DiscountType, IPersonalPromotion } from '@app-types/models/PersonalPromotion';
+import { IPersonalPromotion } from '@app-types/models/PersonalPromotion';
 import { navigateBottomSheet } from '@navigators/BottomSheetStack';
 import { dp } from '@utils/dp';
+import { useCalculateDiscount } from '@hooks/useCalculateDiscount';
+import { BayTypeEnum } from '@app-types/BayTypeEnum';
+import { IUsedTransactionalCampaign } from '@app-types/api/payment/res/ICalculateDiscountResponse';
 
 interface PaymentContentProps {
   onClose: () => void;
@@ -35,6 +33,11 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
   const order = orderDetails;
 
   const [finalOrderCost, setFinalOrderCost] = useState<number>(order?.sum || 0);
+  const [cashbackAmount, setCashbackAmount] = useState<number>(0);
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
+  const [transactionalCampaign, setTransactionalCampaign] = useState<IUsedTransactionalCampaign | null>(null);
+  const [promoCodeDiscount, setPromoCodeDiscount] = useState<number>(0);
+  const [transactionalCampaignDiscount, setTransactionalCampaignDiscount] = useState<number>(0);
 
   const {
     inputCodeValue,
@@ -44,14 +47,24 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
     promoCodeId,
     setPromocode,
     applyPromoCode,
-    debouncedApplyPromoCode,
   } = usePromoCode(order?.posId || 0);
 
-  const { usedPoints, toggled, applyPoints, togglePoints } = useBonusPoints(
+  // Рассчитываем общую скидку для расчета бонусов
+  const calculateTotalDiscount = useCallback(() => {
+    if (!order?.sum) return 0;
+    
+    return promoCodeDiscount + transactionalCampaignDiscount;
+  }, [order, promoCodeDiscount, transactionalCampaignDiscount, discount]);
+
+  const { usedPoints, maxPoints, toggled, applyPoints, togglePoints } = useBonusPoints(
     user,
     order,
     discount,
+    calculateTotalDiscount(),
   );
+
+  // Новый хук для расчета скидок
+  const { calculate, discountData, isLoading: isDiscountLoading, error: discountError } = useCalculateDiscount();
 
   const { loading, setPaymentMethod, paymentMethod } = usePaymentProcess(
     user!,
@@ -60,11 +73,50 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
     usedPoints,
     promoCodeId,
     loadUser,
+    finalOrderCost, 
   );
+
+  // Функция для вызова calculate-discount
+  const calculateDiscountCall = useCallback(async () => {
+    if (!order || freeOn) return;
+
+    const requestData = {
+      sum: order.sum,
+      carWashId: Number(order.posId) || 0,
+      carWashDeviceId: Number(order.carWashDeviceId) || 0,
+      bayType: order.bayType as BayTypeEnum || BayTypeEnum.PORTAL,
+      rewardPointsUsed: toggled ? maxPoints : undefined,
+      promoCodeId: promoCodeId || undefined,
+    };
+        
+    try {
+      const result = await calculate(requestData);
+      if (result) {
+        setFinalOrderCost(result.sumReal);
+        setCashbackAmount(result.sumCashback);
+        setTransactionalCampaign(result.usedTransactionalCampaign);
+        setPromoCodeDiscount(result.promoCodeDiscount || 0);
+        setTransactionalCampaignDiscount(result.transactionalCampaignDiscount || 0);
+      }
+    } catch (error) {
+    } finally {
+      if (isFirstLoad) {
+        setIsFirstLoad(false);
+      }
+    }
+  }, [order, freeOn, toggled, maxPoints, promoCodeId, calculate, isFirstLoad, transactionalCampaign]);
 
   useEffect(() => {
     AppMetrica.reportEvent('Open Payment Content Modal');
+    calculateDiscountCall();
   }, []);
+
+  // Эффект для перерасчета при изменении промокода или бонусных баллов
+  useEffect(() => {
+    if (!isFirstLoad) {
+      calculateDiscountCall();
+    }
+  }, [toggled, promoCodeId, maxPoints]);
 
   const handlePromoPress = (promo: IPersonalPromotion) => {
     if (!promo) {
@@ -73,23 +125,6 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
     setPromocode(promo.code);
     applyPromoCode(promo.code);
   };
-
-  useEffect(() => {
-    if (!order?.sum) return;
-
-    const actualDiscount = calculateActualDiscount(discount, order.sum);
-    const actualPoints = calculateActualPointsUsed(
-      order.sum,
-      actualDiscount,
-      usedPoints,
-    );
-    const finalSum = calculateFinalAmount(
-      order.sum,
-      actualDiscount,
-      actualPoints,
-    );
-    setFinalOrderCost(finalSum);
-  }, [order?.sum, discount, usedPoints, toggled, user]);
 
   const handlePayment = () => {
     if (!order) return;
@@ -100,11 +135,12 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
       user,
       order,
       discount,
-      usedPoints,
+      usedPoints: toggled ? maxPoints : 0,
       promoCodeId,
       loadUser,
       freeOn,
       paymentMethod,
+      finalOrderCost,
     });
   };
 
@@ -113,6 +149,9 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
       applyPromoCode(inputCodeValue);
     }
   };
+
+  // Проверяем, можно ли нажать кнопку оплаты
+  const isPaymentDisabled = isFirstLoad || isDiscountLoading || !order || freeOn;
 
   return (
     <ScrollView
@@ -135,6 +174,8 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
             user={user}
             selectedPos={selectedPos}
             finalOrderCost={freeOn ? 0 : finalOrderCost}
+            cashbackAmount={cashbackAmount}
+            isCashbackLoading={isFirstLoad || isDiscountLoading}
           />
 
           <View style={styles.choice}>
@@ -148,6 +189,7 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
                     toggled={toggled}
                     onToggle={togglePoints}
                     applyPoints={applyPoints}
+                    maxPoints={maxPoints}
                   />
                 )}
 
@@ -164,31 +206,22 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
               </>
             )}
 
-            {/* <View style={styles.row}>
-            <Text style={styles.itemName}>Итого</Text>
-            <Text style={styles.itemPrice}>{freeOn ? '0' : finalOrderCost} ₽</Text>
-          </View> */}
-
             <View style={styles.badgesContainer}>
-              {/* {discount && !freeOn ? (
-              <View style={styles.badgeWrapper}>
-                <Button
-                  label={`${t(
-                    'app.payment.havePromocodeFor',
-                  ).toUpperCase()} ${discount.type === DiscountType.CASH
-                      ? discount.discount + '₽'
-                      : discount.discount + '%'
-                    }`}
-                  color="blue"
-                  width={184}
-                  height={31}
-                  fontSize={10}
-                  fontWeight={'600'}
-                />
-              </View>
-            ) : null} */}
+              {transactionalCampaign && (
+                <View style={styles.badgeWrapper}>
+                  <Button
+                    label={`${transactionalCampaign.campaignName}: ${transactionalCampaign.discountAmount}₽`}
+                    color="blue"
+                    width={184}
+                    height={31}
+                    fontSize={12}
+                    fontWeight={'600'}
+                  />
+                </View>
+              )}
 
-              {/* {usedPoints ? (
+              {/* Бейдж для использованных баллов */}
+              {/* {usedPoints > 0 && (
                 <View style={styles.badgeWrapper}>
                   <Button
                     label={t('app.payment.usedPoints', {usedPoints})}
@@ -199,7 +232,21 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
                     fontWeight={'600'}
                   />
                 </View>
-              ) : null} */}
+              )} */}
+
+              {/* Бейдж для промокода */}
+              {/* {discount && (
+                <View style={styles.badgeWrapper}>
+                  <Button
+                    label={`${t('app.payment.havePromocodeFor')} ${discount.discount}${discount.type === 'CASH' ? '₽' : '%'}`}
+                    color="blue"
+                    width={184}
+                    height={31}
+                    fontSize={10}
+                    fontWeight={'600'}
+                  />
+                </View>
+              )} */}
             </View>
           </View>
 
@@ -235,7 +282,8 @@ const PaymentContent: React.FC<PaymentContentProps> = ({ onClose, isFreeVacuum }
             fontWeight={'600'}
             priceFontSize={18}
             priceFontWeight={'500'}
-            showLoading={loading}
+            showLoading={loading || isDiscountLoading}
+            disabled={isPaymentDisabled}
           />
         )}
       </View>

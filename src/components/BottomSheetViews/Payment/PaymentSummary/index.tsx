@@ -2,8 +2,8 @@ import React, { memo } from 'react';
 import { IUser } from '../../../../types/models/User.ts';
 import { OrderDetailsType } from '../../../../state/order/OrderSlice.ts';
 import { CarWash } from '../../../../types/api/app/types.ts';
-import { StyleSheet, Text, View } from 'react-native';
-import Skeleton from 'react-native-reanimated-skeleton'; 
+import { StyleSheet, Text, View, ActivityIndicator } from 'react-native';
+import Skeleton from 'react-native-reanimated-skeleton';
 import { Info } from 'react-native-feather';
 import { dp } from '@utils/dp.ts';
 import { useTranslation } from 'react-i18next';
@@ -13,31 +13,24 @@ interface PaymentSummaryProps {
   user: IUser | null;
   selectedPos: CarWash | null;
   finalOrderCost: number;
+  cashbackAmount?: number;
+  isCashbackLoading?: boolean; // Новый пропс для состояния загрузки
 }
 
 const PaymentSummary: React.FC<PaymentSummaryProps> = memo(
-  ({ order, user, selectedPos, finalOrderCost }) => {
+  ({ order, user, selectedPos, finalOrderCost, cashbackAmount, isCashbackLoading = false }) => {
     const { t } = useTranslation();
 
     return (
       <View style={styles.container}>
-        {/* <View style={styles.row}>
-          {order.name ? (
-            <Text style={styles.itemName}>{order.name}</Text>
-          ) : (
-            <Text />
-          )}
-          <Text style={styles.itemPrice}>{order.sum ? order.sum : 0} ₽</Text>
-        </View> */}
-
         <View style={styles.row}>
           {selectedPos?.IsLoyaltyMember ? (
             <>
               <Text style={styles.itemName}>
                 {t('app.payment.yourCashback')}
               </Text>
-              {!user || !user.tariff || user.tariff === 0 ? (
-                <View style={{ alignSelf: 'flex-end' }}>
+              <View style={styles.cashbackContainer}>
+                {isCashbackLoading ? (
                   <Skeleton
                     isLoading={true}
                     layout={[
@@ -55,15 +48,12 @@ const PaymentSummary: React.FC<PaymentSummaryProps> = memo(
                   >
                     <View />
                   </Skeleton>
-                </View>
-              ) : (
-                <Text style={styles.itemPrice}>
-                  {(finalOrderCost * user.tariff) / 100 < 1
-                    ? 0
-                    : Math.ceil((finalOrderCost * user.tariff) / 100)}{' '}
-                  ₽
-                </Text>
-              )}
+                ) : (
+                  <Text style={styles.itemPrice}>
+                    {cashbackAmount} ₽
+                  </Text>
+                )}
+              </View>
             </>
           ) : (
             <View style={styles.infoRow}>
@@ -114,6 +104,10 @@ const styles = StyleSheet.create({
     fontSize: dp(10),
     color: 'rgba(0, 0, 0, 1)',
     marginLeft: dp(4),
+  },
+  cashbackContainer: {
+    minHeight: dp(20),
+    justifyContent: 'center',
   },
 });
 

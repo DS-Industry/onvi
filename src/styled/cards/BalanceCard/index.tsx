@@ -1,19 +1,17 @@
 import React from 'react';
-
 import {View, StyleSheet, Text} from 'react-native';
-
 import {dp} from '../../../utils/dp';
 import CustomSwitch from '@styled/buttons/CustomSwitch';
-import {IGetHistoryResponse} from '../../../types/api/user/res/IGetHistoryResponse.ts';
+import {ITransaction} from '../../../types/api/user/res/IGetHistoryResponse.ts';
 import {useTranslation} from 'react-i18next';
 
 export interface IBalanceCardProps {
-  option: IGetHistoryResponse;
+  option: ITransaction;
 }
 
-const BalanceCard = (option: IBalanceCardProps) => {
+const BalanceCard = ({option}: IBalanceCardProps) => {
   const {i18n} = useTranslation();
-  const date = new Date(option.option.operDate);
+  const date = new Date(option.orderData);
 
   return (
     <View style={styles.box}>
@@ -25,39 +23,39 @@ const BalanceCard = (option: IBalanceCardProps) => {
             day: 'numeric',
           })}
         </Text>
-        <Text style={styles.title}>{option.option.carWash}</Text>
-        <Text style={styles.text}>{option.option.address}</Text>
+        <Text style={styles.title}>{option.posName}</Text>
+        <Text style={styles.text}>{option.posAddress}</Text>
       </View>
       <View style={styles.rightSide}>
-        <Text style={styles.rubles}>{option.option.operSumReal} ₽ </Text>
+        <Text style={styles.rubles}>{option.sumReal} ₽ </Text>
 
         <View style={styles.balance}>
-          {option.option.cashBackAmount && option.option.cashBackAmount > 0 ? (
+          {option.sumCashback && option.sumCashback > 0 ? (
             <CustomSwitch
               value={false}
-              inActiveText={`+${option.option.cashBackAmount}`}
+              inActiveText={`+${option.sumCashback}`}
               disabled={false}
               backgroundInActive="#BFFA00FF"
               circleImageInactive={require('../../../assets/icons/small_icon_black.png')}
-              circleSize={dp(17)} // Adjust the circle size as needed
+              circleSize={dp(17)}
               switchBorderRadius={20}
-              width={dp(55)} // Adjust the switch width as needed
+              width={dp(55)}
               textStyle={{fontSize: dp(12), color: '#000', fontWeight: '600'}}
             />
           ) : (
             <CustomSwitch
               value={false}
               inActiveText={
-                Number(option.option.operSumPoint) === 0
-                  ? `${option.option.operSumPoint}`
-                  : `-${option.option.operSumPoint}`
+                Number(option.sumBonus) === 0
+                  ? `${option.sumBonus}`
+                  : `-${option.sumBonus}`
               }
               disabled={false}
               backgroundInActive="#000"
               circleImageInactive={require('../../../assets/icons/small-icon.png')}
-              circleSize={dp(17)} // Adjust the circle size as needed
+              circleSize={dp(17)}
               switchBorderRadius={20}
-              width={dp(55)} // Adjust the switch width as needed
+              width={dp(55)}
               textStyle={{fontSize: dp(12), color: 'white', fontWeight: '600'}}
             />
           )}
@@ -115,9 +113,6 @@ const styles = StyleSheet.create({
   },
   balance: {
     marginTop: dp(5),
-  },
-  balanceText: {
-    fontSize: dp(12),
   },
 });
 

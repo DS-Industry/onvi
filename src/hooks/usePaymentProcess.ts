@@ -4,22 +4,19 @@ import {useCallback, useRef, useState} from 'react';
 import {getCredentials} from '@services/api/payment';
 import {confirmPayment, tokenize} from '../native';
 import {
-  calculateActualPointsUsed,
-  calculateFinalAmount,
   createPaymentConfig,
-  calculateActualDiscount,
 } from '@utils/paymentHelpers.ts';
 import {
-  create,
+  orderCreate,
   pingPos,
-  register,
+  orderRegister,
   updateOrderStatus,
 } from '@services/api/order';
 import {PaymentMethodTypesEnum} from '@app-types/PaymentType.ts';
 import {ICreateOrderRequest} from '@app-types/api/order/req/ICreateOrderRequest.ts';
 import {navigateBottomSheet} from '@navigators/BottomSheetStack';
 
-import {ICreateOrderResponse} from '@app-types/api/order/res/ICreateOrderResponse.ts';
+import {ICreateOrderResponse, SendStatus} from '@app-types/api/order/res/ICreateOrderResponse.ts';
 import {DiscountValueType} from '@hooks/usePromoCode.ts';
 import {PaymentMethodType} from '@styled/buttons/PaymentMethodButton';
 import {getOrderByOrderId} from '@services/api/order';
@@ -36,6 +33,8 @@ import i18n from '../locales';
 import {OrderStatusCode} from '@app-types/api/order/status/OrderStatusCode.ts';
 import {BayTypeEnum} from '@app-types/BayTypeEnum.ts';
 import useStore from '@state/store.ts';
+import { REGISTER_STATUS } from '@app-types/api/order/res/IRegisterOrderResponse.ts';
+import { DeviceStatus } from '@app-types/api/order/res/IPingPosResponse.ts';
 
 export const usePaymentProcess = (
   user: IUser,
@@ -44,6 +43,7 @@ export const usePaymentProcess = (
   usedPoints: number,
   promoCodeId?: number,
   loadUser?: () => Promise<void>,
+  finalAmount?: number, 
   initialPaymentMethod: PaymentMethodType = 'BANK_CARD',
 ) => {
   const [loading, setLoading] = useState(false);
@@ -161,13 +161,14 @@ export const usePaymentProcess = (
   };
 
   const processPayment = useCallback(async () => {
+    
     //Validation process
     if (!user) {
       setError(i18n.t('app.paymentErrors.somethingWentWrong'));
       return;
     }
 
-    if (!order.posId || !order.bayNumber || order.sum === undefined) {
+    if (!order?.posId || !order?.carWashDeviceId || order?.sum === undefined) {
       setError(i18n.t('app.paymentErrors.somethingWentWrong'));
       return;
     }
@@ -177,6 +178,9 @@ export const usePaymentProcess = (
       return;
     }
 
+    // Используем finalAmount из API, если передан, иначе order.sum (fallback)
+    const paymentAmount = finalAmount !== undefined ? finalAmount : order.sum;
+
     //Order creation process
 
     try {
@@ -185,31 +189,16 @@ export const usePaymentProcess = (
       // Get payment credentials
       const paymentConfig = await getCredentials();
 
-      const apiKey: string = paymentConfig.apiKey.toString();
-      const storeId: string = paymentConfig.storeId.toString();
-
-      const actualDiscount = calculateActualDiscount(discount, order.sum);
-
-      const pointsSum = calculateActualPointsUsed(
-        order.sum,
-        actualDiscount,
-        usedPoints,
-      );
-
-      const realSum = calculateFinalAmount(
-        order.sum,
-        actualDiscount,
-        pointsSum,
-      );
+      const apiKey: string = paymentConfig.clientApplicationKey.toString();
+      const storeId: string = paymentConfig.shopId.toString();
 
       // Check bay status
       const bayStatus = await pingPos({
         carWashId: order.posId,
-        bayNumber: order.bayNumber,
-        bayType: order.bayType,
+        carWashDeviceId: Number(order.carWashDeviceId),
       });
-
-      if (bayStatus.status !== 'Free') {
+      
+      if (bayStatus.status !== DeviceStatus.FREE) {
         setError(i18n.t('app.paymentErrors.carwashBusyOrUnavailable'));
         setLoading(false);
         return;
@@ -232,42 +221,39 @@ export const usePaymentProcess = (
         default:
           break;
       }
-
+      
       // Create payment config
       const paymentConfigParams = createPaymentConfig(
         apiKey,
         storeId,
         order,
-        realSum,
+        paymentAmount,
         user,
         paymentMethodTypes,
       );
 
       // Create order request
       const createOrderRequest: ICreateOrderRequest = {
-        sum: realSum,
-        originalSum: order.sum,
-        rewardPointsUsed: pointsSum,
+        sumBonus: paymentAmount, // финальная сумма из API
+        sum: order.sum, // оригинальная сумма
+        rewardPointsUsed: usedPoints || 0, // использованные баллы
         carWashId: Number(order.posId),
-        bayNumber: Number(order.bayNumber),
         bayType: order.bayType,
+        carWashDeviceId: Number(order.carWashDeviceId),
       };
 
       // Add promo code if available
-      if (promoCodeId && discount && discount?.discount > 0) {
-        createOrderRequest.sum = realSum;
+      if (promoCodeId) {
         createOrderRequest.promoCodeId = promoCodeId;
       }
 
       // Create order
-      const orderResult: ICreateOrderResponse = await create(
-        createOrderRequest,
-      );
+      const orderResult = await orderCreate(createOrderRequest);
       currentOrderRef.current = orderResult.orderId;
       AppMetrica.reportEvent('Create Order Success', createOrderRequest);
 
       // обработать ошибку создания заказа
-      if (orderResult.status !== 'created') {
+      if (orderResult.status !== SendStatus.CREATED) {
         setError(i18n.t('app.paymentErrors.orderCreationUnsuccessful'));
         setLoading(false);
         // setOrderStatus(null);
@@ -284,16 +270,13 @@ export const usePaymentProcess = (
         return;
       }
 
-      const {status, confirmation_url} = await register({
+      const {status, confirmation_url} = await orderRegister({
         orderId: orderResult.orderId,
         paymentToken: token,
-        amount: realSum.toString(),
-        description: paymentConfigParams.subtitle,
         receiptReturnPhoneNumber: user.phone ?? '',
-        transactionId: '', // откуда взять?
       });
 
-      if (status !== 'waiting_payment') {
+      if (status !== REGISTER_STATUS.WAITING_PAYMENT || !confirmation_url.trim()) {
         setError(i18n.t('app.paymentErrors.paymentUnsuccessful'));
         setLoading(false);
         // setOrderStatus(null);
@@ -301,7 +284,7 @@ export const usePaymentProcess = (
       }
 
       setOrderStatus(OrderProcessingStatus.WAITING_PAYMENT);
-
+      
       await confirmPayment({
         confirmationUrl: confirmation_url,
         paymentMethodType,
@@ -315,7 +298,7 @@ export const usePaymentProcess = (
       });
 
       AppMetrica.reportAdRevenue({
-        price: realSum ?? 0,
+        price: paymentAmount ?? 0,
         currency: 'RUB',
       });
 
@@ -380,7 +363,7 @@ export const usePaymentProcess = (
     } catch (error: any) {
       errorHandler(error);
     }
-  }, [user, order, discount, usedPoints, promoCodeId, loadUser, paymentMethod]);
+  }, [user, order, discount, usedPoints, promoCodeId, loadUser, paymentMethod, finalAmount]);
 
   const handlePaymentMethodType = useCallback((value: PaymentMethodType) => {
     setPaymentMethod(value);
@@ -394,7 +377,7 @@ export const usePaymentProcess = (
   }, []);
 
   const processFreePayment = async () => {
-    if (!order.posId || !order.bayNumber || order.sum === undefined || !user) {
+    if (!order?.posId || !order?.carWashDeviceId || order?.sum === undefined || !user) {
       setError(i18n.t('app.paymentErrors.somethingWentWrong'));
       return;
     }
@@ -405,11 +388,10 @@ export const usePaymentProcess = (
 
       const bayStatus = await pingPos({
         carWashId: order.posId,
-        bayNumber: order.bayNumber,
-        bayType: order.bayType,
+        carWashDeviceId: Number(order.carWashDeviceId),
       });
-
-      if (bayStatus.status !== 'Free') {
+      
+      if (bayStatus.status !== DeviceStatus.FREE) {
         setError(i18n.t('app.paymentErrors.carwashBusyOrUnavailable'));
         setLoading(false);
         return;
@@ -417,14 +399,20 @@ export const usePaymentProcess = (
 
       const orderRequest: ICreateOrderRequest = {
         sum: order.sum,
-        originalSum: order.sum,
+        sumBonus: order.sum,
         rewardPointsUsed: 0,
         carWashId: Number(order.posId),
-        bayNumber: Number(order.bayNumber),
         bayType: order.bayType,
+        carWashDeviceId: Number(order.carWashDeviceId),
       };
 
-      const orderResult: ICreateOrderResponse = await create(orderRequest);
+      const orderResult = await orderCreate(orderRequest);
+
+      if (orderResult.status === SendStatus.POS_PROCESSED) {
+        setError(i18n.t('app.paymentErrors.carwashBusyOrUnavailable'));
+        setLoading(false);
+        return;
+      }
 
       AppMetrica.reportEvent('Create Order Success', {
         sum: order.sum,

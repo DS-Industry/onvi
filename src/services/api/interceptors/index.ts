@@ -32,12 +32,32 @@ export function setupAuthInterceptors(axiosInstance: AxiosInstance) {
   // Response interceptor for handling expired tokens
   axiosInstance.interceptors.response.use(
     (response: AxiosResponse) => {
+      console.log("Response Success:", {
+        fullUrl: response.config.baseURL + response.config.url,
+        method: response.config.method?.toUpperCase(),
+        status: response.status,
+        statusText: response.statusText,
+        headers: response.headers,
+        data: response.data,
+      });
+      
       return response;
     },
     async (error: AxiosError) => {
       const originalRequest = error.config;
       // Cast to any to add/check the _retry property
       const requestWithRetry = originalRequest as any;
+      console.log("Response Error:", {
+        fullUrl: error?.config?.baseURL + error?.config?.url,
+        method: error?.config?.method?.toUpperCase(),
+        status: error?.response?.status,
+        statusText: error?.response?.statusText,
+        headers: error?.response?.headers,
+        errorMessage: error?.message,
+        responseData: error?.response?.data,
+        requestData: error?.config?.data,
+        requestHeaders: error?.config?.headers,
+      });
 
       const logData = {
         message: error?.message || 'Axios error',
@@ -123,7 +143,7 @@ export function setupAuthInterceptors(axiosInstance: AxiosInstance) {
     async config => {
       try {
         const state = useStore.getState();
-        const {accessToken, expiredDate} = state;
+        const { accessToken, expiredDate } = state;
 
         // Mark refresh token requests to identify them in the response interceptor
         if (
@@ -139,9 +159,19 @@ export function setupAuthInterceptors(axiosInstance: AxiosInstance) {
           isValidStorageData(accessToken, expiredDate)
         ) {
           config.headers.Authorization = `Bearer ${accessToken}`;
-        } else {
         }
-      } catch (e) {}
+
+        // Вывод информации о запросе
+        console.log("Request:", {
+          fullUrl: config.baseURL + config.url,
+          method: config.method?.toUpperCase(),
+          headers: config.headers,
+          body: config.data,
+        });
+
+      } catch (e) {
+        console.error("Interceptor error:", e);
+      }
 
       return config;
     },
@@ -149,6 +179,5 @@ export function setupAuthInterceptors(axiosInstance: AxiosInstance) {
       return Promise.reject(error);
     },
   );
-
-  return axiosInstance;
+  
 }

@@ -50,7 +50,7 @@ const Balance = ({bottomSheetIndex}: BalanceProps) => {
             style={{width: dp(30), height: dp(30)}}
           />
           <Text style={{...styles.balance, color: theme.textColor}}>
-            {user.cards.balance}
+            {user.cards.cardBalance}
           </Text>
           {/*<NotificationCircle number={4} /> */}
         </TouchableOpacity>

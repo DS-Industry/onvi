@@ -56,6 +56,7 @@ export type RootStackParamList = {
     loadUser?: () => Promise<void>;
     freeOn?: boolean;
     paymentMethod: PaymentMethodType;
+    finalOrderCost: number;
   };
   PostPayment: {};
   PostPaymentVacuum: {};

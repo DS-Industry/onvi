@@ -1,10 +1,10 @@
 export interface ICreateOrderRequest {
   sum: number;
-  originalSum?: number;
   rewardPointsUsed: number;
+  sumBonus?: number;
   promoCodeId?: number;
   carWashId: number;
-  bayNumber: number;
+  carWashDeviceId: number;
   bayType?: string | null;
   err?: number;
 }
