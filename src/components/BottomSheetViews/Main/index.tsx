@@ -2,7 +2,6 @@ import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
   StyleSheet,
   Dimensions,
-  Platform,
   View,
   Text,
   Image,
@@ -26,7 +25,7 @@ import useSWR from 'swr';
 import {getCampaignList} from '@services/api/campaign';
 import CampaignPlaceholder from './CampaignPlaceholder';
 import {useNavStore} from '@state/useNavStore/index.ts';
-import {Campaign, CarWashWithLocation} from '@app-types/api/app/types.ts';
+import {NewCampaign, CarWashWithLocation} from '@app-types/api/app/types.ts';
 import {getStoryView} from '@services/api/story-view';
 import {StoryViewPlaceholder} from '@components/StoryView/StoryViewPlaceholder.tsx';
 import {transformContentDataToUserStories} from '@shared/mappers/StoryViewMapper.ts';
@@ -69,7 +68,7 @@ const Main = () => {
 
   const {isLoading: campaignLoading, data: campaignData} = useSWR(
     ['getCampaignList'],
-    () => getCampaignList('*'),
+    () => getCampaignList(),
   );
 
   const {
@@ -78,7 +77,7 @@ const Main = () => {
     error: storyError,
   } = useSWR(['getStoryViw'], () => getStoryView('*'));
 
-  const paginationData = [...new Array(campaignData?.length).keys()];
+  const paginationData = [...new Array(campaignData?.length || 0).keys()];
 
   useFocusEffect(
     useCallback(() => {
@@ -109,7 +108,7 @@ const Main = () => {
           location: pose.location,
           distance: pose.distance,
         }))
-      )
+      );
 
       carwashesList.forEach(carwash => {
         const id = Number(carwash?.id) || undefined;
@@ -137,24 +136,25 @@ const Main = () => {
     }
   }, [latestCarwashes, pinnedCarwashes, originalPosList]);
 
-  const handleCampaignItemPress = (data: Campaign) => {
+  const handleCampaignItemPress = (data: NewCampaign) => {
     navigateBottomSheet('Campaign', {
       data,
     });
   };
 
   const renderCampaignItem = useCallback(
-    ({item}: {item: Campaign}) => (
+    ({item}: {item: NewCampaign}) => (
       <PressableCard
         unstyled
         onPress={() => handleCampaignItemPress(item)}
         style={localStyles.campaigns}>
         <Image
-          source={{uri: item.attributes.image.data.attributes.url}}
+          source={{uri: item.mobileDisplay?.imageLink}}
           style={{
             width: dp(340),
             height: dp(190),
-            resizeMode: 'contain',
+            resizeMode: 'cover',
+            borderRadius: dp(12),
           }}
         />
       </PressableCard>
@@ -267,7 +267,7 @@ const Main = () => {
               <CampaignPlaceholder />
             ) : (
               <View style={{flex: 1}}>
-                {campaignData && (
+                {campaignData && campaignData.length > 0 && (
                   <>
                     <Carousel
                       ref={ref}
@@ -352,6 +352,20 @@ const localStyles = StyleSheet.create({
   campaigns: {
     width: width,
     justifyContent: 'center',
+  },
+  campaignBadge: {
+    position: 'absolute',
+    top: dp(12),
+    left: dp(12),
+    backgroundColor: 'rgba(11, 104, 225, 0.9)',
+    paddingHorizontal: dp(12),
+    paddingVertical: dp(6),
+    borderRadius: dp(16),
+  },
+  campaignBadgeText: {
+    color: 'white',
+    fontSize: dp(14),
+    fontWeight: '600',
   },
 });
 

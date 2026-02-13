@@ -1,7 +1,6 @@
 import {NavigationProp, RouteProp} from '@react-navigation/native';
 import {DrawerNavigationProp} from '@react-navigation/drawer';
-
-import {Campaign, NewsPost, Price, Tag} from '../api/app/types.ts';
+import {NewsPost, Price, Tag, StrapiCampaign, NewCampaign} from '../api/app/types.ts';
 import {IUser} from '../models/User.ts';
 import {OrderDetailsType} from 'src/state/order/OrderSlice.ts';
 import {DiscountValueType} from '@hooks/usePromoCode.ts';
@@ -43,7 +42,7 @@ export type RootStackParamList = {
     data?: NewsPost | null;
   };
   Campaign: {
-    data?: Campaign | null;
+    data?: StrapiCampaign | NewCampaign | null;
     token?: string;
   };
   About: {};

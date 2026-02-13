@@ -77,11 +77,24 @@ const Settings = () => {
     'updateUserData',
     (key, {arg}: {arg: IUpdateAccountRequest}) => accountUpdate(arg),
     {
-      onError: () => {
-        Toast.show({
-          type: 'customErrorToast',
-          text1: t('app.settings.updateDataError'),
-        });
+      onError: (error: any) => {
+        const responseData = error?.response?.data;
+        
+        if (responseData?.code === 1111) {
+          Toast.show({
+            type: 'customErrorToast',
+            text1: t('app.settings.emailExist'),
+          });
+        } else {
+          Toast.show({
+            type: 'customErrorToast',
+            text1: t('app.settings.updateDataError'),
+          });
+          setEditing(false);
+          setEmailValid(null);
+          setUserName(initialUserName);
+          setEmail(initialEmail);
+        }
       },
       onSuccess: () => {
         Toast.show({
@@ -89,6 +102,8 @@ const Settings = () => {
           text1: t('app.settings.updateDataSuccess'),
         });
         setEmailValid(null);
+        setEditing(false);
+        loadUser();
       },
     },
   );
@@ -106,6 +121,7 @@ const Settings = () => {
     setEditing(false);
     setUserName(initialUserName);
     setEmail(initialEmail);
+    setSelectedAvatar(initialAvatar);
     setEmailValid(null);
   };
 
@@ -116,11 +132,11 @@ const Settings = () => {
         [AvatarEnum.TWO]: 2,
         [AvatarEnum.THREE]: 3,
       };
-
+  
       const avatar = avatarMapping[selectedAvatar];
-
+  
       const userData: {name?: string; email?: string; avatar?: number} = {};
-
+  
       if (userName) {
         userData.name = userName;
       }
@@ -130,16 +146,8 @@ const Settings = () => {
       if (avatar !== undefined) {
         userData.avatar = avatar;
       }
-      trigger(userData).then(async () => {
-        await loadUser();
-        setEditing(false);
-      });
-    } catch (error: any) {
-      Toast.show({
-        type: 'customErrorToast',
-        text1: t('app.settings.updateDataError'),
-      });
-      setEditing(false);
+      await trigger(userData);
+    } catch (error) {
     }
   };
 
