@@ -13,12 +13,14 @@ import useStore from '../../../state/store';
 import CampaignPlaceholder from './CampaignPlaceholder';
 
 import {GeneralBottomSheetRouteProp} from '../../../types/navigation/BottomSheetNavigation.ts';
+import {WebView} from 'react-native-webview';
 
 const Campaign = () => {
   const route = useRoute<GeneralBottomSheetRouteProp<'Campaign'>>();
 
   const {isBottomSheetOpen} = useStore.getState();
   const [campaign, setCampaign] = useState<StrapiCampaign | NewCampaign | null>(null);
+  const [webViewHeight, setWebViewHeight] = useState(dp(200));
 
   useEffect(() => {
     if (route && route.params && route.params.data) {
@@ -109,6 +111,64 @@ const Campaign = () => {
     );
   }
 
+  const htmlContent = campaign.mobileDisplay?.description || campaign.description || '';
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <style>
+          body {
+            font-family: -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: ${dp(15)}px;
+            line-height: ${dp(22)}px;
+            color: #000000;
+            margin: 0;
+            padding: 0;
+          }
+          p {
+            margin: ${dp(4)}px 0;
+          }
+          strong {
+            font-weight: 700;
+          }
+          u {
+            text-decoration: underline;
+          }
+          s {
+            text-decoration: line-through;
+          }
+          ul, ol {
+            margin: ${dp(4)}px 0;
+            padding-left: ${dp(20)}px;
+          }
+          li {
+            margin: ${dp(2)}px 0;
+          }
+          ul[data-type="taskList"] {
+            list-style: none;
+            padding-left: 0;
+          }
+          ul[data-type="taskList"] li {
+            display: flex;
+            align-items: center;
+            margin: ${dp(4)}px 0;
+          }
+          ul[data-type="taskList"] input[type="checkbox"] {
+            width: ${dp(18)}px;
+            height: ${dp(18)}px;
+            margin-right: ${dp(8)}px;
+          }
+        </style>
+      </head>
+      <body>
+        ${htmlContent}
+      </body>
+    </html>
+  `;
+
   return (
     <BottomSheetScrollView
       contentContainerStyle={{...styles.container, backgroundColor: 'white'}}
@@ -142,9 +202,37 @@ const Campaign = () => {
               }}>
               {campaign.name}
             </Text>
-            <Text style={{color: '#000', fontSize: dp(15)}}>
-              {campaign.mobileDisplay?.description || campaign.description || ''}
-            </Text>
+            {htmlContent.startsWith('<') ? (
+              <WebView
+                originWhitelist={['*']}
+                source={{html}}
+                style={{
+                  height: webViewHeight,
+                  width: '100%',
+                  backgroundColor: 'transparent',
+                }}
+                scrollEnabled={false}
+                overScrollMode="never"
+                bounces={false}
+                showsVerticalScrollIndicator={false}
+                showsHorizontalScrollIndicator={false}
+                onMessage={(event) => {
+                  setWebViewHeight(Number(event.nativeEvent.data) + dp(16));
+                }}
+                injectedJavaScript={`
+                  window.onload = function() {
+                    window.ReactNativeWebView.postMessage(document.body.scrollHeight);
+                  };
+                  setTimeout(function() {
+                    window.ReactNativeWebView.postMessage(document.body.scrollHeight);
+                  }, 500);
+                `}
+              />
+            ) : (
+              <Text style={{color: '#000', fontSize: dp(15), lineHeight: dp(22)}}>
+                {htmlContent}
+              </Text>
+            )}
           </View>
         </>
       </View>
