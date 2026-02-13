@@ -94,7 +94,7 @@ export type PartnersSuccessRequestPayload = {
   meta: Meta;
 };
 
-export type Campaign = {
+export type StrapiCampaign = {
   id: number;
   attributes: {
     title: string;
@@ -112,15 +112,37 @@ export type Campaign = {
   };
 };
 
-export type CampaignSuccessRequestPayload = {
-  data: Campaign;
-  meta: Meta;
-};
+export enum EExecutionType {
+  sheduled = 'SCHEDULED',
+  transactional = 'TRANSACTIONAL',
+}
 
-export type CampaignsSuccessRequestPayload = {
-  data: Campaign[];
-  meta: Meta;
-};
+export interface NewCampaign {
+  id: number;
+  name: string;
+  description: string | null;
+  executionType: EExecutionType;
+  launchDate: string;
+  endDate: string;
+  action: {
+    id: number;
+    actionType: string;
+    payload: any;
+  };
+  conditions: Array<{
+    id: number;
+    tree: any[];
+  }>;
+  mobileDisplay: {
+    id: number;
+    marketingCampaignId: number;
+    imageLink: string;
+    description: string | null;
+    type: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+}
 
 type Meta = {
   pagination?: Pagination;

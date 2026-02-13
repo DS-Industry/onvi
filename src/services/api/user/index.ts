@@ -62,11 +62,16 @@ export async function getCampaignHistory(): Promise<IGetPromoHistoryResponse[]> 
 }
 
 export async function accountUpdate(body: IUpdateAccountRequest): Promise<number> {
-  const response = await newUserApiInstance.patch<IUserApiResponse<IUpdateAccountResponse>>(
-    NEW_ACCOUNT_ENDPOINTS.UPDATE_ACCOUNT_URL,
-    body
-  );
-  return response.status;
+  try {
+    const response = await newUserApiInstance.patch<IUserApiResponse<IUpdateAccountResponse>>(
+      NEW_ACCOUNT_ENDPOINTS.UPDATE_ACCOUNT_URL,
+      body
+    );
+    
+    return response.status;
+  } catch (error) {
+    throw error;
+  }
 }
 
 export async function getActiveClientPromotions(

@@ -1,58 +1,18 @@
 import {
-  Campaign,
-  CampaignsSuccessRequestPayload,
-  CampaignSuccessRequestPayload,
+  NewCampaign,
+  StrapiCampaign
 } from '../../../types/api/app/types.ts';
-import {contentApiInstance} from '@services/api/axiosConfig.ts';
+import { newUserApiInstance } from '@services/api/axiosConfig.ts';
 
 enum CAMPAIGN {
-  GET_CAMPAIGN_LIST = 'api/sampaigns',
-  GET_CAMPAIGN_BY_ID = 'api/sampaigns',
+  GET_NEW_CAMPAIGN_LIST = 'client/order/marketing-campaigns',
 }
 
 export async function getCampaignList(
-  populate: Record<string, any> | '*' = {},
-): Promise<Campaign[]> {
-  const params: Record<string, any> = {};
-
-  if (populate === '*') {
-    // If user wants to populate everything
-    params.populate = '*';
-  } else {
-    // Dynamically add specific populate fields
-    for (const [key, value] of Object.entries(populate)) {
-      params[`populate[${key}]`] = value;
-    }
-  }
-
-  const response = await contentApiInstance.get<CampaignsSuccessRequestPayload>(
-    CAMPAIGN.GET_CAMPAIGN_LIST,
-    {params},
+): Promise<StrapiCampaign[] | NewCampaign[]> {
+  const response = await newUserApiInstance.get<NewCampaign[]>(
+    CAMPAIGN.GET_NEW_CAMPAIGN_LIST
   );
 
-  return response.data.data;
-}
-
-export async function getCampaignById(
-  id: number,
-  populate: Record<string, any> | '*' = {},
-): Promise<Campaign> {
-  const params: Record<string, any> = {};
-
-  if (populate === '*') {
-    // If user wants to populate everything
-    params.populate = '*';
-  } else {
-    // Dynamically add specific populate fields
-    for (const [key, value] of Object.entries(populate)) {
-      params[`populate[${key}]`] = value;
-    }
-  }
-
-  const response = await contentApiInstance.get<CampaignSuccessRequestPayload>(
-    CAMPAIGN.GET_CAMPAIGN_BY_ID + `/${id}`,
-    {params},
-  );
-
-  return response.data.data;
+  return response.data;
 }
